@@ -1,0 +1,6 @@
+#!/bin/bash
+set -x -e -o pipefail
+
+time golangci-lint run
+
+time go test "$@" ./...

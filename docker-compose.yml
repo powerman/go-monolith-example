@@ -1,0 +1,47 @@
+version: "3.7"
+
+volumes:
+    mysql:
+    stan:
+
+services:
+
+    mysql:
+        image: "mysql:5.7" # We're using 5.7.
+        container_name: mono_mysql
+        restart: always
+        ports:
+            - "${MONO_MYSQL_PORT:-0}:3306"
+        volumes:
+            - "mysql:/var/lib/mysql"
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD:         "yes"
+
+    nats:
+        image: "nats:2.1.4" # This is the latest version at the moment.
+        container_name: mono_nats
+        restart: always
+        ports:
+            - "${MONO_NATS_PORT:-0}:4222"
+
+    stan:
+        image: "nats-streaming:0.17.0" # This is the latest version at the moment.
+        container_name: mono_stan
+        restart: always
+        volumes:
+            - "stan:/data"
+        command:
+            - "--cluster_id=local"
+            - "--max_channels=0"
+            - "--max_subs=0"
+            - "--max_msgs=0"
+            - "--max_bytes=0"
+            - "--max_age=0s"
+            - "--max_inactivity=0s"
+            - "--nats_server=nats://nats:4222"
+            - "--hb_interval=1s"
+            - "--hb_timeout=1s"
+            - "--hb_fail_count=3"
+            - "--store=FILE"
+            - "--dir=/data"
+            - "--file_fds_limit=4000"
