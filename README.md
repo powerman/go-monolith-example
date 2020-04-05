@@ -5,9 +5,11 @@
 1. Install Go 1.14.
 2. Install tools required to build/test project:
 
-    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.24.0
-    go get github.com/golang/mock/mockgen@v1.4.3
-
+```
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.24.0
+go get github.com/golang/mock/mockgen@v1.4.3
+go get github.com/cheekybits/genny@master
+```
 
 ## Test
 - `go test ./...` - test project, fast
