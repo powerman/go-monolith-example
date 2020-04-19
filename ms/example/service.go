@@ -3,16 +3,15 @@ package example
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/powerman/go-monolith-example/internal/apiauth"
+	"github.com/powerman/go-monolith-example/internal/cobrax"
 	"github.com/powerman/go-monolith-example/internal/concurrent"
-	"github.com/powerman/go-monolith-example/internal/config"
-	"github.com/powerman/go-monolith-example/internal/def"
 	"github.com/powerman/go-monolith-example/internal/event"
-	"github.com/powerman/go-monolith-example/internal/migrate"
 	"github.com/powerman/go-monolith-example/internal/serve"
 	"github.com/powerman/go-monolith-example/ms/example/internal/api"
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
+	"github.com/powerman/go-monolith-example/ms/example/internal/config"
 	"github.com/powerman/go-monolith-example/ms/example/internal/dal"
 	"github.com/powerman/go-monolith-example/ms/example/internal/migrations"
 	"github.com/powerman/structlog"
@@ -26,13 +25,7 @@ type Ctx = context.Context
 //nolint:gochecknoglobals // Flags and metrics are service-global anyway.
 var (
 	reg = prometheus.NewPedanticRegistry()
-	cfg struct {
-		natsUrls      config.NATSUrls      // Not used yet, just an example.
-		stanClusterID config.STANClusterID // Not used yet, just an example.
-		metrics       config.Metrics
-		mysql         config.MySQL
-		rpc           config.RPC
-	}
+	cfg *config.ServeConfig
 )
 
 // Service implements main.embeddedService interface.
@@ -42,32 +35,18 @@ type Service struct{}
 func (Service) Name() string { return app.ServiceName }
 
 // Init implements main.embeddedService interface.
-func (Service) Init(cmd, serveCmd *cobra.Command) {
+func (Service) Init(genericCfg *config.GenericCfg, cmd, serveCmd *cobra.Command) error {
 	dal.InitMetrics(reg)
 	app.InitMetrics(reg)
 	api.InitMetrics(reg)
 
-	mysqlDef := config.MySQLDef{
-		User:     def.ExampleDBUser,
-		Pass:     def.ExampleDBPass,
-		DBName:   def.ExampleDBName,
-		GooseDir: def.ExampleGooseDir,
-	}
-
-	gooseCmd := config.NewGooseCmd(runGoose)
-	cfg.mysql.AddTo(gooseCmd, app.ServiceName, mysqlDef)
+	gooseCmd := cobrax.NewGooseCmd(app.ServiceName, migrations.Goose(), config.GetGoose)
 	cmd.AddCommand(gooseCmd)
 
-	cfg.metrics.AddTo(serveCmd, app.ServiceName, def.ExampleMetricsPort)
-	cfg.mysql.AddTo(serveCmd, app.ServiceName, mysqlDef)
-	cfg.rpc.AddTo(serveCmd, app.ServiceName, def.ExampleRPCPort)
-	cfg.natsUrls.AddTo(serveCmd)
-	cfg.stanClusterID.AddTo(serveCmd)
-}
-
-func runGoose(cmd string) error {
-	ctx := def.NewContext(app.ServiceName)
-	return migrate.Run(ctx, migrations.Goose(), cfg.mysql.GooseDir(), cmd, cfg.mysql.Config())
+	return config.Init(genericCfg, config.FlagSets{
+		Serve: serveCmd.Flags(),
+		Goose: gooseCmd.Flags(),
+	})
 }
 
 //nolint:gochecknoglobals // For tests.
@@ -75,21 +54,36 @@ var (
 	natsConn *event.NATSConn
 	stanConn *event.STANConn
 	repo     *dal.Repo
+	authn    apiauth.Authenticator
 	a        app.Appl
 )
 
 // Serve implements main.embeddedService interface.
-func (Service) Serve(ctxSetup, ctxShutdown Ctx, shutdown func()) error {
-	err := concurrent.Setup(ctxSetup, map[interface{}]concurrent.SetupFunc{
-		&natsConn: connectNATS,
-		&repo:     connectRepo,
-	})
-	if err == nil && stanConn == nil {
-		stanConn, err = event.ConnectSTAN(ctxSetup, cfg.stanClusterID.String(),
-			app.ServiceName, natsConn)
+func (Service) Serve(ctxStartup, ctxShutdown Ctx, shutdown func()) (err error) {
+	log := structlog.FromContext(ctxShutdown, nil)
+	if cfg == nil {
+		cfg, err = config.GetServe()
 	}
 	if err != nil {
-		return fmt.Errorf("connect: %w", err)
+		return log.Err("failed to get config", "err", err)
+	}
+
+	err = concurrent.Setup(ctxStartup, map[interface{}]concurrent.SetupFunc{
+		&natsConn: connectNATS,
+		&repo:     connectRepo,
+		&authn:    setupAuthn,
+	})
+	if err == nil && stanConn == nil {
+		stanConn, err = event.ConnectSTAN(ctxStartup, cfg.STANClusterID, app.ServiceName, natsConn)
+	}
+	if natsConn != nil {
+		defer log.WarnIfFail(natsConn.Drain)
+	}
+	if stanConn != nil {
+		defer log.WarnIfFail(stanConn.Close)
+	}
+	if err != nil {
+		return log.Err("failed to connect", "err", err)
 	}
 
 	if a == nil {
@@ -102,25 +96,28 @@ func (Service) Serve(ctxSetup, ctxShutdown Ctx, shutdown func()) error {
 		serveMetrics,
 		serveRPC,
 	)
-
-	log := structlog.FromContext(ctxShutdown, nil)
-	log.WarnIfFail(stanConn.Close)
-	log.WarnIfFail(natsConn.Drain)
-	return err
+	if err != nil {
+		return log.Err("failed to serve", "err", err)
+	}
+	return nil
 }
 
 func connectNATS(ctx Ctx) (interface{}, error) {
-	return event.ConnectNATS(ctx, cfg.natsUrls.String(), app.ServiceName)
+	return event.ConnectNATS(ctx, cfg.NATSUrls, app.ServiceName)
 }
 
 func connectRepo(ctx Ctx) (interface{}, error) {
-	return dal.New(ctx, cfg.mysql.GooseDir(), cfg.mysql.Config())
+	return dal.New(ctx, cfg.GooseDir, cfg.MySQLConfig)
+}
+
+func setupAuthn(_ Ctx) (interface{}, error) {
+	return apiauth.NewAccessTokenParser(), nil
 }
 
 func serveMetrics(ctx Ctx) error {
-	return serve.Metrics(ctx, cfg.metrics, reg)
+	return serve.Metrics(ctx, cfg.MetricsAddr, reg)
 }
 
 func serveRPC(ctx Ctx) error {
-	return serve.RPC(ctx, cfg.rpc, api.New(a))
+	return serve.RPC(ctx, cfg.RPCAddr, api.New(a, authn))
 }

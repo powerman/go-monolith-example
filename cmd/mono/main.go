@@ -6,24 +6,19 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"path"
 	"runtime"
-	"runtime/debug"
-	"strings"
 	"syscall"
 	"time"
 
+	"github.com/powerman/appcfg"
+	"github.com/powerman/go-monolith-example/internal/cobrax"
 	"github.com/powerman/go-monolith-example/internal/concurrent"
+	"github.com/powerman/go-monolith-example/internal/config"
 	"github.com/powerman/go-monolith-example/internal/def"
-	"github.com/powerman/go-monolith-example/internal/flags"
 	"github.com/powerman/go-monolith-example/ms/example"
+	"github.com/powerman/go-monolith-example/ms/metrics"
 	"github.com/powerman/structlog"
 	"github.com/spf13/cobra"
-)
-
-const (
-	connectTimeout = 3 * time.Second // must be less than swarm's deploy.update_config.monitor
-	shutdownDelay  = 9 * time.Second // `docker stop` use 10s between SIGTERM and SIGKILL
 )
 
 // Ctx is a synonym for convenience.
@@ -31,47 +26,35 @@ type Ctx = context.Context
 
 type embeddedService interface {
 	Name() string
-	Init(cmd, serveCmd *cobra.Command)
-	Serve(ctxSetup, ctxShutdown Ctx, shutdown func()) error
+	Init(cfg *config.Cfg, cmd, serveCmd *cobra.Command) error
+	Serve(ctxStartup, ctxShutdown Ctx, shutdown func()) error
 }
 
 //nolint:gochecknoglobals // Main.
 var (
 	embeddedServices = []embeddedService{
-		Service{},
+		metrics.Service{},
 		example.Service{},
 	}
 
-	exe   = strings.TrimSuffix(path.Base(os.Args[0]), ".test")
-	bi, _ = debug.ReadBuildInfo()
-	ver   = bi.Main.Version
-	log   = structlog.New()
+	log = structlog.New()
 
-	logLevel string
+	logLevel             = appcfg.MustOneOfString("debug", []string{"debug", "info", "warn", "err"})
+	serveStartupTimeout  = appcfg.MustDuration("3s") // must be less than swarm's deploy.update_config.monitor
+	serveShutdownTimeout = appcfg.MustDuration("9s") // `docker stop` use 10s between SIGTERM and SIGKILL
 
 	rootCmd = &cobra.Command{
-		Use:     exe,
+		Use:     def.ProgName,
 		Short:   "Monolith with embedded microservices",
-		Version: ver,
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			structlog.DefaultLogger.SetLogLevel(structlog.ParseLevel(logLevel))
-		},
-	}
-	versionCmd = &cobra.Command{
-		Use:   "version",
-		Short: "Prints the monolith version",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(exe, "version", ver, runtime.Version())
-		},
+		Version: fmt.Sprintf("%s %s", def.Version(), runtime.Version()),
+		RunE:    cobrax.RequireFlagsOrCommand,
 	}
 	serveCmd = &cobra.Command{
 		Use:   "serve",
 		Short: "Starts embedded microservices",
 		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			err := runServe()
-			if err != nil {
+		Run: func(_ *cobra.Command, _ []string) {
+			if err := runServe(); err != nil {
 				log.Fatal(err)
 			}
 		},
@@ -79,7 +62,7 @@ var (
 	msCmd = &cobra.Command{
 		Use:   "ms",
 		Short: "Run given embedded microservice's command",
-		Args:  cobra.NoArgs,
+		RunE:  cobrax.RequireFlagsOrCommand,
 	}
 )
 
@@ -91,9 +74,19 @@ func main() {
 
 	log.SetDefaultKeyvals(structlog.KeyUnit, "main")
 
-	flags.OneOfStringVar(rootCmd.PersistentFlags(),
-		&logLevel, "log.level", []string{"debug", "info", "warn", "err"}, "log level")
-	rootCmd.AddCommand(versionCmd, serveCmd, msCmd)
+	cfg, err := config.Get()
+	if err != nil {
+		log.Fatalln("failed to init config:", err)
+	}
+
+	rootCmd.PersistentFlags().Var(&logLevel, "log.level", "log level [debug|info|warn|err]")
+	rootCmd.AddCommand(serveCmd, msCmd)
+	cobra.OnInitialize(func() {
+		structlog.DefaultLogger.SetLogLevel(structlog.ParseLevel(logLevel.String()))
+	})
+
+	serveCmd.Flags().Var(&serveStartupTimeout, "timeout.startup", "must be less than swarm's deploy.update_config.monitor")
+	serveCmd.Flags().Var(&serveShutdownTimeout, "timeout.shutdown", "must be less than 10s used by 'docker stop' between SIGTERM and SIGKILL")
 
 	seen := make(map[string]bool)
 	for _, service := range embeddedServices {
@@ -106,21 +99,26 @@ func main() {
 		cmd := &cobra.Command{
 			Use:   name,
 			Short: fmt.Sprintf("Run %s microservice's command", name),
-			Args:  cobra.NoArgs,
+			RunE:  cobrax.RequireFlagsOrCommand,
 		}
-		service.Init(cmd, serveCmd)
+		err := service.Init(cfg, cmd, serveCmd)
+		if err != nil {
+			log.Fatalf("failed to init service %s: %s", name, err)
+		}
 		msCmd.AddCommand(cmd)
 	}
 
-	_ = rootCmd.Execute()
+	if rootCmd.Execute() != nil {
+		os.Exit(1)
+	}
 }
 
 func runServe() error {
-	log.Info("started", "version", ver)
-	defer log.Info("finished", "version", ver)
+	log.Info("started", "version", def.Version())
+	defer log.Info("finished", "version", def.Version())
 
-	ctxSetup, cancelConnect := context.WithTimeout(context.Background(), connectTimeout)
-	defer cancelConnect()
+	ctxStartup, cancel := context.WithTimeout(context.Background(), serveStartupTimeout.Value(nil))
+	defer cancel()
 
 	ctxShutdown, shutdown := context.WithCancel(context.Background())
 	sigc := make(chan os.Signal, 1)
@@ -132,17 +130,17 @@ func runServe() error {
 	for i := range embeddedServices {
 		serve := embeddedServices[i].Serve
 		log := structlog.New(structlog.KeyApp, embeddedServices[i].Name())
-		ctxSetup := structlog.NewContext(ctxSetup, log) //nolint:govet // Shadow.
-		services[i] = func(ctx Ctx) error {
-			ctx = structlog.NewContext(ctx, log)
-			return serve(ctxSetup, ctx, shutdown)
+		ctxStartup := structlog.NewContext(ctxStartup, log) //nolint:govet // Shadow.
+		services[i] = func(ctxShutdown Ctx) error {
+			ctxShutdown = structlog.NewContext(ctxShutdown, log)
+			return serve(ctxStartup, ctxShutdown, shutdown)
 		}
 	}
 	return concurrent.Serve(ctxShutdown, shutdown, services...)
 }
 
-func forceShutdown(ctx Ctx) {
-	<-ctx.Done()
-	time.Sleep(shutdownDelay)
-	log.Fatalln("failed to graceful shutdown", "version", ver)
+func forceShutdown(ctxShutdown Ctx) {
+	<-ctxShutdown.Done()
+	time.Sleep(serveShutdownTimeout.Value(nil))
+	log.Fatalln("failed to graceful shutdown", "version", def.Version())
 }

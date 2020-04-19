@@ -1,8 +1,6 @@
 package def
 
 import (
-	"context"
-
 	"github.com/powerman/structlog"
 )
 
@@ -49,10 +47,4 @@ func setupLog() {
 			"ptr":             " %[2]p",   // for debugging references
 			"data":            " %#+[2]v", // for debugging structs
 		})
-}
-
-// NewContext returns context.Background() which contains logger
-// configured for given service.
-func NewContext(service string) context.Context {
-	return structlog.NewContext(context.Background(), structlog.New(structlog.KeyApp, service))
 }

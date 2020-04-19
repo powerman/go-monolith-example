@@ -1,13 +1,11 @@
-package rpc
+package apiauth
 
 import (
 	"context"
 
-	"github.com/powerman/go-monolith-example/internal/apiauth"
 	"github.com/powerman/go-monolith-example/internal/def"
 	"github.com/powerman/go-monolith-example/internal/dom"
 	"github.com/powerman/go-monolith-example/internal/reflectx"
-	"github.com/powerman/go-monolith-example/proto"
 	"github.com/powerman/rpc-codec/jsonrpc2"
 	"github.com/powerman/structlog"
 	"github.com/sebest/xff"
@@ -23,17 +21,23 @@ const (
 
 // Ctx describe Ctx param used by all API methods.
 type Ctx struct {
-	AccessToken proto.AccessToken
+	AccessToken AccessToken
 	jsonrpc2.Ctx
 }
 
-// NewContext returns a new Context that carries values describing this
-// RPC request without any deadline, plus some of these values.
-func (c *Ctx) NewContext(service string) (context.Context, *structlog.Logger, string, dom.Auth, error) {
-	ctx := c.Context()
-	if ctx == nil {
-		ctx = context.Background() // non-HTTP RPC call (like in tests)
-	}
+// NewContext returns a new context.Context that carries values describing
+// this request without any deadline, plus some of the values.
+func (c *Ctx) NewContext(
+	authenticator Authenticator,
+	service string,
+) (
+	ctx context.Context,
+	log *structlog.Logger,
+	methodName string,
+	auth dom.Auth,
+	err error,
+) {
+	ctx = c.Context()
 
 	remote := "unknown" // non-HTTP RPC call (like in tests)
 	if r := jsonrpc2.HTTPRequestFromContext(ctx); r != nil {
@@ -41,12 +45,12 @@ func (c *Ctx) NewContext(service string) (context.Context, *structlog.Logger, st
 	}
 	ctx = context.WithValue(ctx, contextKeyRemote, remote)
 
-	methodName := reflectx.CallerMethodName(1)
+	methodName = reflectx.CallerMethodName(1)
 	ctx = context.WithValue(ctx, contextKeyMethodName, methodName)
 
-	auth, err := apiauth.ParseAccessToken(c.AccessToken)
+	auth, err = authenticator.Authenticate(c.AccessToken)
 
-	log := structlog.New(
+	log = structlog.New(
 		structlog.KeyApp, service,
 		def.LogRemote, remote,
 		def.LogFunc, methodName,
@@ -54,10 +58,11 @@ func (c *Ctx) NewContext(service string) (context.Context, *structlog.Logger, st
 	)
 	ctx = structlog.NewContext(ctx, log)
 
+	c.SetContext(ctx)
 	return ctx, log, methodName, auth, err
 }
 
-// FromContext returns values describing RPC request stored in ctx, if any.
+// FromContext returns values describing request stored in ctx, if any.
 func FromContext(ctx context.Context) (remote, methodName string) {
 	remote, _ = ctx.Value(contextKeyRemote).(string)
 	methodName, _ = ctx.Value(contextKeyMethodName).(string)

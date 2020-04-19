@@ -13,6 +13,10 @@ export MONO_NATS_URLS="nats://localhost:$MONO_NATS_PORT"
 export MONO_STAN_CLUSTER_ID=local
 
 ###
+### External services
+###
+
+###
 ### Embedded microservices
 ###
 

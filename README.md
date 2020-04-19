@@ -1,4 +1,4 @@
-# Monolith with embedded microservices on Golang
+# Monolith with embedded microservices on Golang (example)
 
 
 ## Setup
@@ -17,43 +17,42 @@ go get github.com/cheekybits/genny@master
 
 
 ## Local Environment
-TODO В данный момент запускаются только необходимые проекту сторонние
-сервисы, сборка и запуск самого проекта будет реализована позднее.
+TODO At the moment docker-compose runs only external dependencies,
+building and running monolith itself will be implemented a bit later.
 
 ### Requirements
 - docker 19.03
 - docker-compose 1.25
 
 ### Setup
-1. После клонирования этого репо скопируйте `env.example.sh` в `env.sh`.
-2. Посмотрите `env.sh` в корне этого репо, и, если необходимо, измените
-   его для соответствия вашей системе.
+1. After cloning the repo copy `env.example.sh` to `env.sh`.
+2. Review `env.sh` and update for your system as needed.
 
 ### Run
-- Всегда загружайте `env.sh` *в каждый терминал*, в котором планируете
-  выполнять команды связанные с проектом: `source env.sh`.
-    - Если изменился `env.example.sh` то при выполнении `source env.sh` вы
-      будете об этом уведомлены, и должны будете вручную перенести
-      изменения из `env.example.sh` в `env.sh`, скорректировав их для
-      соответствия вашей системе.
-    - Рекомендуется прописать в настройках шелла
-      `alias dc="if test -f env.sh; then source env.sh; fi && docker-compose"`
-      и запускать `dc` вместо `docker-compose`, не беспокоясь больше об `env.sh`.
-- Проект запускается и управляется через `docker-compose`.
+- Always load `env.sh` *in every terminal* used to run project-related
+  commands: `source env.sh`.
+    - When `env.example.sh` change (e.g. by `git pull`) next run of
+      `source env.sh` will fail and remind you to manually update `env.sh`
+      to match current `env.example.sh`.
+    - It's recommended to add shell alias `alias dc="if test -f env.sh;
+      then source env.sh; fi && docker-compose"` and then run `dc` instead
+      of `docker-compose` - this way you won't have to bother about
+      `source env.sh` anymore.
+- Use `docker-compose` to run and control the project.
 
 ### Cheatsheet
 ```sh
-dc up -d --remove-orphans               # (пере)запустить все сервисы
-dc logs -f -t                           # логи всех сервисов
-dc logs -f -t имясервиса                # логи сервиса
-dc ps                                   # состояние сервисов
-dc restart имясервиса                   # перезапустить сервис
-dc exec mysql mysql                     # выполнить команду в контейнере сервиса
-dc stop && dc rm -f                     # останавливаем проект
-docker volume rm mono_имясервиса        # удаляем данные сервиса
+dc up -d --remove-orphans               # (re)start all project's services
+dc logs -f -t                           # view logs of all services
+dc logs -f -t SERVICENAME               # view logs of some service
+dc ps                                   # status of all services
+dc restart SERVICENAME
+dc exec mysql mysql                     # run command in given container
+dc stop && dc rm -f                     # stop the project
+docker volume rm mono_SERVICENAME       # remove some service's data
 ```
 
-Использовать `docker-compose down` не рекомендуется - при этом убивается
-сеть докера для этого проекта, и в следующий раз `dc up -d` создаст новую…
-через некоторое время доступные докеру сети могут закончиться, и нужно
-будет перезапустить сервис докера либо перегрузить комп.
+It's recommended to avoid `docker-compose down` - this command will also
+remove docker's network for the project, and next `dc up -d` will create a
+new network… repeat this many enough times and docker will exhaust
+available networks, then you'll have to restart docker service or reboot.

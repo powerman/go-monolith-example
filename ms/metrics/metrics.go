@@ -1,14 +1,16 @@
-package main
+package metrics
 
 import (
 	"runtime"
 
+	"github.com/powerman/go-monolith-example/internal/def"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// InitMetrics must be called once before using this package.
-// It registers and initializes metrics used by this package.
-func InitMetrics(namespace string) {
+func initMetrics(reg *prometheus.Registry, namespace string) {
+	reg.MustRegister(prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{}))
+	reg.MustRegister(prometheus.NewGoCollector())
+
 	version := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: namespace,
@@ -17,10 +19,10 @@ func InitMetrics(namespace string) {
 		},
 		[]string{"version", "goversion"},
 	)
-	prometheus.MustRegister(version)
+	reg.MustRegister(version)
 
 	version.With(prometheus.Labels{
-		"version":   ver,
+		"version":   def.Version(),
 		"goversion": runtime.Version(),
 	}).Set(1)
 }

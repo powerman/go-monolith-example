@@ -68,13 +68,21 @@ func (c *NATSConn) connect(urls, name string) (err error) {
 			close(c.closed)
 		}),
 		nats.DisconnectErrHandler(func(_ *nats.Conn, err error) {
-			c.log.Warn("NATS disconnected", "err", err)
+			if err == nil {
+				c.log.Info("NATS disconnected")
+			} else {
+				c.log.Warn("NATS disconnected", "err", err)
+			}
 		}),
 		nats.ReconnectHandler(func(nc *nats.Conn) {
-			c.log.Info("NATS connected", "url", nc.ConnectedUrl())
+			c.log.Info("NATS reconnected", "url", nc.ConnectedUrl())
 		}),
 		nats.ErrorHandler(func(_ *nats.Conn, sub *nats.Subscription, err error) {
-			c.log.Warn("NATS subscription error", "subject", sub.Subject, "err", err)
+			if sub == nil {
+				c.log.Warn("NATS connection failed", "err", err)
+			} else {
+				c.log.Warn("NATS connection failed", "subject", sub.Subject, "err", err)
+			}
 		}),
 	)
 	return err

@@ -34,11 +34,11 @@ func connect(ctx Ctx, goose *goosepkg.Instance, cfg *mysql.Config) (db *sql.DB, 
 	if err != nil {
 		return nil, nil, fmt.Errorf("sql.Open: %w", err)
 	}
-	defer func() {
+	defer func(dbClose func() error) {
 		if err != nil {
-			log.WarnIfFail(db.Close)
+			log.WarnIfFail(dbClose)
 		}
-	}()
+	}(db.Close)
 
 	if cfg.Timeout != 0 {
 		var cancel func()

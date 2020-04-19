@@ -1,13 +1,13 @@
+// Code in this file is copied from net/rpc with minimum changes.
+//
+// Copyright 2009 The Go Authors. All rights reserved.
+
 package reflectx
 
 import (
 	"go/token"
 	"reflect"
 )
-
-// Code in this file is copied from net/rpc with minimum changes.
-//
-// Copyright 2009 The Go Authors. All rights reserved.
 
 // suitableMethods returns suitable Rpc methods of typ.
 func suitableMethods(typ reflect.Type) (methods []string) {

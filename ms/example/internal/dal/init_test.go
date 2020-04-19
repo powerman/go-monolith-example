@@ -5,6 +5,7 @@ import (
 
 	"github.com/powerman/go-monolith-example/internal/def"
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
+	"github.com/powerman/go-monolith-example/ms/example/internal/config"
 	"github.com/powerman/gotest/testinit"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -23,6 +24,10 @@ func setupMain() {
 	def.Init()
 	app.InitMetrics(reg)
 	InitMetrics(reg)
+	cfg = config.MustGetTest()
 }
 
-var ctx = def.NewContext(app.ServiceName)
+var (
+	ctx = def.NewContext(app.ServiceName)
+	cfg *config.ServeConfig
+)

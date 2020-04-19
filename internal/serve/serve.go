@@ -7,6 +7,7 @@ import (
 	"net/rpc"
 
 	"github.com/powerman/go-monolith-example/internal/def"
+	"github.com/powerman/go-monolith-example/internal/netx"
 	"github.com/powerman/rpc-codec/jsonrpc2"
 	"github.com/powerman/structlog"
 	"github.com/prometheus/client_golang/prometheus"
@@ -16,16 +17,9 @@ import (
 // Ctx is a synonym for convenience.
 type Ctx = context.Context
 
-// Addr is a serve addr (using tcp network).
-type Addr interface {
-	Host() string
-	Port() int
-	String() string
-}
-
 // HTTP starts HTTP server on addr using handler logged as service.
 // It runs until failed or ctx.Done.
-func HTTP(ctx Ctx, addr Addr, handler http.Handler, service string) error {
+func HTTP(ctx Ctx, addr netx.Addr, handler http.Handler, service string) error {
 	log := structlog.FromContext(ctx, nil).New(def.LogService, service)
 
 	srv := &http.Server{
@@ -52,7 +46,7 @@ func HTTP(ctx Ctx, addr Addr, handler http.Handler, service string) error {
 
 // Metrics starts HTTP server on addr path /metrics using reg as
 // prometheus handler.
-func Metrics(ctx Ctx, addr Addr, reg *prometheus.Registry) error {
+func Metrics(ctx Ctx, addr netx.Addr, reg *prometheus.Registry) error {
 	handler := promhttp.InstrumentMetricHandler(reg, promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", handler)
@@ -61,7 +55,7 @@ func Metrics(ctx Ctx, addr Addr, reg *prometheus.Registry) error {
 
 // RPC starts HTTP server on addr path /rpc using rcvr as JSON-RPC 2.0
 // handler.
-func RPC(ctx Ctx, addr Addr, rcvr interface{}) error {
+func RPC(ctx Ctx, addr netx.Addr, rcvr interface{}) error {
 	srv := rpc.NewServer()
 	err := srv.Register(rcvr)
 	if err != nil {

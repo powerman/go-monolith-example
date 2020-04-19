@@ -21,7 +21,10 @@ import (
 // Ctx is a synonym for convenience.
 type Ctx = context.Context
 
-var errSchemaVer = errors.New("unsupported DB schema version")
+// Errors.
+var (
+	ErrSchemaVer = errors.New("unsupported DB schema version")
+)
 
 // Repo provides access to storage.
 type Repo struct {
@@ -98,7 +101,7 @@ func (r *Repo) strict(err error) error {
 	switch {
 	case err == nil:
 	case errors.As(err, new(*mysql.MySQLError)):
-	case errors.Is(err, errSchemaVer):
+	case errors.Is(err, ErrSchemaVer):
 	case errors.Is(err, sql.ErrNoRows):
 	case errors.Is(err, context.Canceled):
 	case errors.Is(err, context.DeadlineExceeded):
@@ -117,7 +120,7 @@ func (r *Repo) schemaLock(f func() error) error {
 	ver := r.SchemaVer.SharedLock()
 	defer r.SchemaVer.Unlock()
 	if ver != r.schemaVersion {
-		return fmt.Errorf("schema version %s, need %s: %w", ver, r.schemaVersion, errSchemaVer)
+		return fmt.Errorf("schema version %s, need %s: %w", ver, r.schemaVersion, ErrSchemaVer)
 	}
 	return f()
 }

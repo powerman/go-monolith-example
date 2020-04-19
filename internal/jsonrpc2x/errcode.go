@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strconv"
 
-	jsonrpc2pkg "github.com/powerman/rpc-codec/jsonrpc2"
+	"github.com/powerman/rpc-codec/jsonrpc2"
 )
 
 func codes(errs []error) []string {
@@ -19,11 +19,11 @@ func code(err error) string {
 	if err == nil {
 		return ""
 	}
-	return strconv.Itoa(err.(*jsonrpc2pkg.Error).Code)
+	return strconv.Itoa(err.(*jsonrpc2.Error).Code)
 }
 
 func dropcode(err error) error {
-	if err2 := new(jsonrpc2pkg.Error); errors.As(err, &err2) {
+	if err2 := new(jsonrpc2.Error); errors.As(err, &err2) {
 		return errors.New(err2.Message)
 	}
 	return err

@@ -22,7 +22,7 @@ const (
 
 // NewMetrics registers and returns common JSON-RPC 2.0 metrics used by
 // all services (namespace).
-func NewMetrics(reg *prometheus.Registry, service string, methodsFrom interface{}) (metric Metrics) {
+func NewMetrics(reg *prometheus.Registry, service string, methodsFrom interface{}, errsExtra map[string][]error) (metric Metrics) {
 	const subsystem = "api"
 
 	metric.reqInFlight = prometheus.NewGauge(
@@ -58,10 +58,10 @@ func NewMetrics(reg *prometheus.Registry, service string, methodsFrom interface{
 	commonCodes := []string{""} // Successful RPC.
 	commonCodes = append(commonCodes, codes(rpc.ErrsCommon)...)
 	for _, methodName := range reflectx.RPCMethodsOf(methodsFrom) {
-		if _, ok := rpc.ErrsExtra[methodName]; !ok {
+		if _, ok := errsExtra[methodName]; !ok {
 			panic(fmt.Sprintf("missing ErrsExtra[%s]", methodName))
 		}
-		codes := append(commonCodes, codes(rpc.ErrsExtra[methodName])...)
+		codes := append(commonCodes, codes(errsExtra[methodName])...)
 		for _, code := range codes {
 			l := prometheus.Labels{
 				methodLabel: methodName,
