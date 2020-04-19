@@ -56,3 +56,19 @@ It's recommended to avoid `docker-compose down` - this command will also
 remove docker's network for the project, and next `dc up -d` will create a
 new network… repeat this many enough times and docker will exhaust
 available networks, then you'll have to restart docker service or reboot.
+
+
+## TODO
+
+Consider extracting these packages from monolith into their own go modules
+because they're probably not project-specific (they still may be specific
+to *the way we write* any microservice/monolith, but that's okay):
+
+- `internal/cobrax`?
+- `internal/concurrent`
+- `internal/event`
+- `internal/jsonrpc2x`?
+- `internal/migrate`
+- `internal/netx`
+- `internal/reflectx`
+- `internal/serve`
