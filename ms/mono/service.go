@@ -1,8 +1,9 @@
-// Package metrics provides embedded microservice.
-package metrics
+// Package mono provides embedded microservice.
+package mono
 
 import (
 	"context"
+	"net/http"
 	"regexp"
 	"strconv"
 
@@ -27,9 +28,9 @@ var (
 	fs     *pflag.FlagSet
 	shared *config.Shared
 	own    = &struct {
-		MetricsPort appcfg.Port `env:"METRICS_ADDR_PORT"`
+		Port appcfg.Port `env:"MONO_ADDR_PORT"`
 	}{
-		MetricsPort: appcfg.MustPort(strconv.Itoa(config.MetricsPort)),
+		Port: appcfg.MustPort(strconv.Itoa(config.MonoPort)),
 	}
 
 	reg = prometheus.NewPedanticRegistry()
@@ -38,12 +39,13 @@ var (
 // Service implements main.embeddedService interface.
 type Service struct {
 	cfg struct {
-		metricsAddr netx.Addr
+		addr netx.Addr
 	}
+	mux *http.ServeMux
 }
 
 // Name implements main.embeddedService interface.
-func (s *Service) Name() string { return "metrics" }
+func (s *Service) Name() string { return "mono" }
 
 // Init implements main.embeddedService interface.
 func (s *Service) Init(sharedCfg *config.Shared, _, serveCmd *cobra.Command) error {
@@ -53,21 +55,26 @@ func (s *Service) Init(sharedCfg *config.Shared, _, serveCmd *cobra.Command) err
 	fs, shared = serveCmd.Flags(), sharedCfg
 	fromEnv := appcfg.NewFromEnv(config.EnvPrefix)
 	err := appcfg.ProvideStruct(own, fromEnv)
-	appcfg.AddPFlag(fs, &shared.MonoMetricsAddrHost, "metrics.host", "host to serve Prometheus metrics")
-	appcfg.AddPFlag(fs, &own.MetricsPort, "metrics.port", "port to serve Prometheus metrics")
+	pfx := s.Name() + "."
+	appcfg.AddPFlag(fs, &shared.AddrHostInt, "host-int", "internal host to serve")
+	appcfg.AddPFlag(fs, &own.Port, pfx+"port", "port to serve monolith introspection")
 	return err
 }
 
 // RunServe implements main.embeddedService interface.
 func (s *Service) RunServe(_, ctxShutdown Ctx, shutdown func()) (err error) {
 	log := structlog.FromContext(ctxShutdown, nil)
-	s.cfg.metricsAddr = netx.NewAddr(shared.MonoMetricsAddrHost.Value(&err), own.MetricsPort.Value(&err))
+	s.cfg.addr = netx.NewAddr(shared.AddrHostInt.Value(&err), own.Port.Value(&err))
 	if err != nil {
 		return log.Err("failed to get config", "err", appcfg.WrapPErr(err, fs, shared, own))
 	}
 
+	s.mux = http.NewServeMux()
+	serve.HandleMetrics(s.mux, reg)
+	s.mux.Handle("/health-check", http.HandlerFunc(s.serveHealthCheck))
+
 	err = concurrent.Serve(ctxShutdown, shutdown,
-		s.serveMetrics,
+		s.serveHTTP,
 	)
 	if err != nil {
 		return log.Err("failed to serve", "err", err)
@@ -75,6 +82,6 @@ func (s *Service) RunServe(_, ctxShutdown Ctx, shutdown func()) (err error) {
 	return nil
 }
 
-func (s *Service) serveMetrics(ctx Ctx) error {
-	return serve.Metrics(ctx, s.cfg.metricsAddr, reg)
+func (s *Service) serveHTTP(ctx Ctx) error {
+	return serve.HTTP(ctx, s.cfg.addr, s.mux, "monolith introspection")
 }

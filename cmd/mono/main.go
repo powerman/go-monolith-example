@@ -16,7 +16,7 @@ import (
 
 	"github.com/powerman/go-monolith-example/internal/config"
 	"github.com/powerman/go-monolith-example/ms/example"
-	"github.com/powerman/go-monolith-example/ms/metrics"
+	"github.com/powerman/go-monolith-example/ms/mono"
 	"github.com/powerman/go-monolith-example/pkg/cobrax"
 	"github.com/powerman/go-monolith-example/pkg/concurrent"
 	"github.com/powerman/go-monolith-example/pkg/def"
@@ -34,7 +34,7 @@ type embeddedService interface {
 //nolint:gochecknoglobals // Main.
 var (
 	embeddedServices = []embeddedService{
-		&metrics.Service{},
+		&mono.Service{},
 		&example.Service{},
 	}
 

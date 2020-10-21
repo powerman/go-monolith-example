@@ -68,8 +68,8 @@ func Test(t *testing.T) {
 			"--nats.urls=nats://nats4:4222",
 			"--stan.cluster_id=cluster4",
 			"--host=host4",
+			"--host-int=metrics4",
 			"--example.port=8004",
-			"--metrics.host=metrics4",
 			"--example.metrics.port=4",
 		)
 		t.Nil(err)
