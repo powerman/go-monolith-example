@@ -18,6 +18,22 @@ The embedded microservices use Uncle Bob's "Clean Architecture", check
 for more details.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Overview](#overview)
+  - [Structure of Go packages](#structure-of-go-packages)
+  - [Features](#features)
+- [Development](#development)
+  - [Requirements](#requirements)
+  - [Setup](#setup)
+  - [Usage](#usage)
+    - [Cheatsheet](#cheatsheet)
+- [Run](#run)
+  - [Docker](#docker)
+  - [Source](#source)
+- [TODO](#todo)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
