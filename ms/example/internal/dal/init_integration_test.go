@@ -1,28 +1,56 @@
 // +build integration
 
-package dal
+package dal_test
 
 import (
-	"github.com/powerman/gotest/testinit"
+	"runtime"
+	"strings"
+	"testing"
+
+	"github.com/powerman/check"
 	"github.com/powerman/mysqlx"
-	"github.com/powerman/structlog"
+	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/powerman/go-monolith-example/ms/example/internal/app"
+	"github.com/powerman/go-monolith-example/ms/example/internal/config"
+	"github.com/powerman/go-monolith-example/ms/example/internal/dal"
+	"github.com/powerman/go-monolith-example/pkg/def"
 )
 
-var r *Repo
+func TestMain(m *testing.M) {
+	def.Init()
+	reg := prometheus.NewPedanticRegistry()
+	app.InitMetrics(reg)
+	dal.InitMetrics(reg)
+	cfg = config.MustGetServeTest()
+	check.TestMain(m)
+}
 
-func init() { testinit.Setup(serialIntegration, setupIntegration) }
+type tLogger check.C
 
-func setupIntegration() {
-	const dir = "../migrations"
-	log := structlog.FromContext(ctx, nil)
+func (t tLogger) Print(args ...interface{}) { t.Log(args...) }
 
-	cfg, cleanup, err := mysqlx.EnsureTempDB(log, "", cfg.MySQLConfig)
-	if err == nil {
-		testinit.Teardown(cleanup)
-		r, err = New(ctx, dir, cfg)
+var (
+	ctx = def.NewContext(app.ServiceName)
+	cfg *config.ServeConfig
+)
+
+func newTestRepo(t *check.C) (cleanup func(), r *dal.Repo) {
+	t.Helper()
+
+	pc, _, _, _ := runtime.Caller(1)
+	suffix := runtime.FuncForPC(pc).Name()
+	suffix = suffix[:strings.LastIndex(suffix, ".")]
+	suffix += "_" + t.Name()
+
+	tempDBCfg, cleanupDB, err := mysqlx.EnsureTempDB(tLogger(*t), suffix, cfg.MySQL)
+	t.Must(t.Nil(err))
+	r, err = dal.New(ctx, cfg.MySQLGooseDir, tempDBCfg)
+	t.Must(t.Nil(err))
+
+	cleanup = func() {
+		r.Close()
+		cleanupDB()
 	}
-	if err != nil {
-		testinit.Fatal(err)
-	}
-	testinit.Teardown(r.Close)
+	return cleanup, r
 }

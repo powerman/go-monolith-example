@@ -1,0 +1,16 @@
+#!/bin/bash
+if ! type circleci &>/dev/null; then
+	echo Install circleci tool from https://circleci.com/docs/2.0/local-cli/ and re-run.
+	exit 1
+fi
+
+set -x -e -o pipefail
+
+circleci config process .circleci/config.yml >.circleci/config-local.yml
+circleci local execute -c .circleci/config-local.yml \
+	-v ~/.ssh:/run/.ssh \
+	-v ~/.cache/go-bin-ci:/home/circleci/go/bin \
+	-v ~/.cache/go-pkg-ci:/home/circleci/go/pkg \
+	-v ~/.cache/go-build-ci:/home/circleci/.cache/go-build \
+	-v ~/.cache/golangci-lint-ci:/home/circleci/.cache/golangci-lint \
+	--job test

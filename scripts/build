@@ -1,0 +1,33 @@
+#!/bin/bash
+set -x -e -o pipefail
+
+# Needed until native support will be implemented: https://github.com/golang/go/issues/37475
+### [version] [branch] revision[-dirty] build_date_time
+gitver() {
+	local ver branch rev dirty
+	ver="$(git tag -l --sort=-version:refname --merged HEAD 'v*' | head -n 1)"
+	branch="$(git rev-parse --abbrev-ref HEAD)"
+	rev="$(git log -1 --format='%h')"
+	git update-index -q --refresh --unmerged >/dev/null
+	git diff-index --quiet HEAD || dirty="-dirty"
+	test "$branch" = "HEAD" || test "$branch" = "master" && branch=
+
+	echo "${ver:+$ver }${branch:+$branch }$rev$dirty $(date -u +"%F_%T")"
+}
+
+rm -rf bin/
+mkdir bin/
+
+export CGO_ENABLED=0
+
+build() {
+	go build -ldflags "-X '$(go list -m)/pkg/def.ver=$(gitver)'" -o bin/ "$@" ./cmd/*
+}
+
+# Build binaries for linux-based Docker container.
+GOOS=linux GOARCH=amd64 build "$@"
+
+docker build -t "$(basename "$(go list -m)")" .
+
+# Build binaries for host system.
+test "$(go env GOOS)" = linux -a "$(go env GOARCH)" = amd64 || build "$@"

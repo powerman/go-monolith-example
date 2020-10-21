@@ -1,6 +1,6 @@
 //go:generate mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE Appl,Repo
 
-// Package app implements business-logic.
+// Package app provides business logic.
 package app
 
 import (
@@ -54,7 +54,7 @@ type (
 // Config contains configuration for business-logic.
 type Config struct{}
 
-// App implements business-logic.
+// App implements interface Appl.
 type App struct {
 	cfg  Config
 	repo Repo

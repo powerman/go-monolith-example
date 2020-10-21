@@ -3,37 +3,36 @@ package example
 import (
 	"testing"
 
-	"github.com/powerman/go-monolith-example/internal/apiauth"
-	"github.com/powerman/go-monolith-example/internal/def"
+	"github.com/powerman/check"
+
+	"github.com/powerman/go-monolith-example/internal/apix"
 	"github.com/powerman/go-monolith-example/internal/dom"
-	"github.com/powerman/go-monolith-example/ms/example/internal/api"
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
 	"github.com/powerman/go-monolith-example/ms/example/internal/config"
 	"github.com/powerman/go-monolith-example/ms/example/internal/dal"
-	"github.com/powerman/gotest/testinit"
+	"github.com/powerman/go-monolith-example/ms/example/internal/srv/jsonrpc2"
+	"github.com/powerman/go-monolith-example/pkg/def"
 )
 
-func TestMain(m *testing.M) { testinit.Main(m) }
-
-const (
-	serialMain = iota
-	serialIntegration
-)
-
-func init() { testinit.Setup(serialMain, setupMain) }
-
-func setupMain() {
+func TestMain(m *testing.M) {
 	def.Init()
 	dal.InitMetrics(reg)
 	app.InitMetrics(reg)
-	api.InitMetrics(reg)
-	cfg = config.MustGetTest()
+	jsonrpc2.InitMetrics(reg)
+	cfg = config.MustGetServeTest()
+	check.TestMain(m)
 }
 
+type tLogger check.C
+
+func (l tLogger) Print(v ...interface{}) { l.Log(v...) }
+
+// Const shared by tests. Recommended naming scheme: <dataType><Variant>.
 var (
+	cfg        *config.ServeConfig
 	ctx        = def.NewContext(app.ServiceName)
-	tokenAdmin = apiauth.AccessToken("admin")
-	tokenUser  = apiauth.AccessToken("user")
+	tokenAdmin = apix.AccessToken("admin")
+	tokenUser  = apix.AccessToken("user")
 	authAdmin  = dom.Auth{
 		UserID: 1,
 		Admin:  true,

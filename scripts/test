@@ -1,0 +1,24 @@
+#!/bin/bash
+set -x -e -o pipefail
+
+hadolint Dockerfile
+
+shellcheck env.sh.dist scripts/*
+
+# When https://github.com/quasilyte/go-ruleguard/issues/78 will be
+# implemented and available in golangci-lint then replace using
+# build/gorules/rules.go.
+mod="$(go list -m)"
+(! grep --color=auto -r "\"$mod/internal" pkg)
+find ms -type d -name old | while read -r old; do
+	# shellcheck disable=SC2251 # Need inverted exit status to keep -e happy.
+	! grep -P -r "\"$mod/${old%/*}/(?!old|app)" "$old"
+done
+
+golangci-lint run
+
+if which dockerize &>/dev/null; then
+	dockerize -timeout 30s -wait "tcp://${MONO_X_MYSQL_ADDR_HOST}:${MONO_X_MYSQL_ADDR_PORT:-3306}"
+fi
+
+gotestsum -- -race -tags=integration "$@" ./...

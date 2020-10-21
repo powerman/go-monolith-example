@@ -1,0 +1,7 @@
+# name      - exclude file/dir "name" in project root
+# **/name   - exclude file/dir "name" in project root or any subdir
+# !name     - include previously excluded "name"
+# a*b?c/d[0-9]e[^a-z\]]f\[g     - pattern
+*
+!bin
+!ms/example/internal/migrations/*.sql

@@ -1,0 +1,12 @@
+#!/bin/bash
+shopt -s globstar
+sloc_gen_api=$(cat ./api/**/*.go | wc -l)
+sloc_gen_mock=$(cat ./**/mock.*.go | wc -l)
+sloc_gen_other=$(($(cat ./**/*.*.go | wc -l) - sloc_gen_mock))
+sloc_gen=$((sloc_gen_api + sloc_gen_mock + sloc_gen_other))
+sloc_test=$(cat ./**/*_test.go | wc -l)
+sloc=$(cat ./**/*.go | wc -l)
+sloc_code=$((sloc - sloc_test - sloc_gen))
+printf "SLOC: all=%d (code=%d test=%d generated all=%d (api=%d mock=%d other=%d))\n" \
+	"$sloc" "$sloc_code" "$sloc_test" \
+	"$sloc_gen" "$sloc_gen_api" "$sloc_gen_mock" "$sloc_gen_other"

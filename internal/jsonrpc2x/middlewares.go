@@ -5,17 +5,21 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	rpcpkg "net/rpc"
+	"strconv"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/powerman/go-monolith-example/internal/apiauth"
-	"github.com/powerman/go-monolith-example/internal/def"
-	"github.com/powerman/go-monolith-example/internal/reflectx"
-	"github.com/powerman/go-monolith-example/internal/repo"
-	"github.com/powerman/go-monolith-example/proto/rpc"
 	"github.com/powerman/rpc-codec/jsonrpc2"
 	"github.com/powerman/structlog"
 	"github.com/prometheus/client_golang/prometheus"
+
+	api "github.com/powerman/go-monolith-example/api/jsonrpc2-example"
+	"github.com/powerman/go-monolith-example/internal/apix"
+	"github.com/powerman/go-monolith-example/pkg/def"
+	"github.com/powerman/go-monolith-example/pkg/reflectx"
+	"github.com/powerman/go-monolith-example/pkg/repo"
 )
 
 // Log is a synonym for convenience.
@@ -28,7 +32,12 @@ type Handler func() error
 type Middleware func(Handler) Handler
 
 // MakeValidateErr creates middleware which validates error against
-// documented errors (rpc.ErrsCommon + proto.ErrsExtra[method]).
+// documented errors (api.ErrsCommon + api.ErrsExtra[method]).
+//
+// Use NewError instead of jsonrpc2.NewError to create errors which must
+// match documented errors only by code.
+//
+// TODO Add new metric to report and extra (metric, methodName) args.
 func MakeValidateErr(log Log, strict bool, errsExtra []error) Middleware { //nolint:gocognit // Questionable.
 	log = log.New(structlog.KeyUnit, reflectx.CallerPkg(1))
 	report := func(err error) {
@@ -45,8 +54,8 @@ func MakeValidateErr(log Log, strict bool, errsExtra []error) Middleware { //nol
 			if err == nil {
 				return nil
 			}
-			for i := range rpc.ErrsCommon {
-				if errors.Is(err, rpc.ErrsCommon[i]) {
+			for i := range api.ErrsCommon {
+				if errors.Is(err, api.ErrsCommon[i]) {
 					return err
 				}
 			}
@@ -56,9 +65,9 @@ func MakeValidateErr(log Log, strict bool, errsExtra []error) Middleware { //nol
 				}
 			}
 			if errors.As(err, new(*jsonrpc2.Error)) {
-				report(fmt.Errorf("not documented (add to proto.ErrsExtra): %w", err))
+				report(fmt.Errorf("not documented (add to api.ErrsExtra): %w", err))
 			} else {
-				report(fmt.Errorf("not jsonrpc2.Error (add to api.protoError): %w", err))
+				report(fmt.Errorf("not jsonrpc2.Error (add to srv/jsonrpc2.apiErr): %w", err))
 			}
 			return err
 		}
@@ -70,15 +79,17 @@ func MakeRecovery(log Log, metric def.Metrics) Middleware {
 	log = log.New(structlog.KeyUnit, reflectx.CallerPkg(1))
 	return func(next Handler) Handler {
 		return func() (err error) {
+			panicked := true
 			defer func() {
-				if p := recover(); p != nil {
-					err = rpc.ErrInternal
+				if p := recover(); panicked {
+					err = api.ErrInternal
 					metric.PanicsTotal.Inc()
 					log.PrintErr("panic", "err", p, structlog.KeyStack, structlog.Auto)
 				}
 			}()
-
-			return next()
+			err = next()
+			panicked = false
+			return err
 		}
 	}
 }
@@ -98,30 +109,42 @@ func MakeMetrics(metric Metrics, methodName string) Middleware {
 				codeLabel:   code(err),
 			}
 			metric.reqTotal.With(l).Inc()
+			l = prometheus.Labels{
+				methodLabel: methodName,
+				failedLabel: strconv.FormatBool(err != nil),
+			}
 			metric.reqDuration.With(l).Observe(time.Since(start).Seconds())
 			return err
 		}
 	}
 }
 
-// ProtoErr converts common errors to JSON-RPC 2.0 errors.
-func ProtoErr(next Handler) Handler {
+// APIErr converts non-JSON-RPC 2.0 errors to JSON-RPC 2.0 errors.
+func APIErr(next Handler) Handler {
 	return func() error {
 		err := next()
 
 		switch {
-		case errors.Is(err, apiauth.ErrAccessTokenInvalid):
-			err = rpc.ErrUnauthorized
+		case errors.Is(err, apix.ErrAccessTokenInvalid):
+			err = api.ErrUnauthorized
 		case errors.Is(err, context.DeadlineExceeded):
-			err = rpc.ErrTryAgainLater
+			err = api.ErrTryAgainLater
 		case errors.Is(err, context.Canceled):
-			err = rpc.ErrTryAgainLater
+			err = api.ErrTryAgainLater
+		case errors.Is(err, io.ErrUnexpectedEOF):
+			err = api.ErrTryAgainLater
+		case errors.Is(err, rpcpkg.ErrShutdown):
+			err = api.ErrTryAgainLater
 		case errors.As(err, new(*mysql.MySQLError)):
-			err = rpc.ErrInternal
+			err = api.ErrInternal
 		case errors.Is(err, repo.ErrSchemaVer):
-			err = rpc.ErrInternal
+			err = api.ErrInternal
 		}
-		return err
+
+		if err == nil || errors.As(err, new(*jsonrpc2.Error)) {
+			return err
+		}
+		return jsonrpc2.NewError(api.ErrInternal.Code, err.Error())
 	}
 }
 

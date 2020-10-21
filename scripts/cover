@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e -o pipefail
+
+gotestsum -- \
+	-coverpkg="$(go list ./... | grep -v "^$(go list -m)/api/" | paste -s -d,)" \
+	-coverprofile cover.out \
+	-tags=integration ./...
+
+sed -i -e '/[/]mock[.]/d' cover.out
+
+go tool cover -func=cover.out | tail -n 1 | xargs echo
+
+test -n "$CI" || go tool cover -html=cover.out

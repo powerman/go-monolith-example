@@ -1,4 +1,4 @@
-// Package dal implements Data Access Layer.
+// Package dal implements Data Access Layer using MySQL DB.
 package dal
 
 import (
@@ -6,15 +6,16 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/powerman/go-monolith-example/internal/repo"
+
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
 	"github.com/powerman/go-monolith-example/ms/example/internal/migrations"
+	"github.com/powerman/go-monolith-example/pkg/repo"
 )
 
 const (
 	schemaVersion  = 3
-	dbMaxOpenConns = 0 // unlimited
-	dbMaxIdleConns = 5 // a bit more than default (2)
+	dbMaxOpenConns = 0 // Unlimited.
+	dbMaxIdleConns = 5 // A bit more than default (2).
 )
 
 // Ctx is a synonym for convenience.
@@ -28,12 +29,18 @@ type Repo struct {
 // New creates and returns new Repo.
 // It will also run required DB migrations and connects to DB.
 func New(ctx Ctx, dir string, cfg *mysql.Config) (_ *Repo, err error) {
-	var returnErrs = []error{ // List of app.Err… returned by Repo methods.
+	returnErrs := []error{ // List of app.Err… returned by Repo methods.
 		app.ErrNotFound,
 	}
 
 	r := &Repo{}
-	r.Repo, err = repo.New(ctx, migrations.Goose(), dir, schemaVersion, returnErrs, metric, cfg)
+	r.Repo, err = repo.New(ctx, migrations.Goose(), repo.Config{
+		MySQL:         cfg,
+		GooseDir:      dir,
+		SchemaVersion: schemaVersion,
+		Metric:        metric,
+		ReturnErrs:    returnErrs,
+	})
 	if err != nil {
 		return nil, err
 	}

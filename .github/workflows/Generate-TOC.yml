@@ -1,0 +1,24 @@
+name: Generate TOC
+
+on:
+  push:
+    branches: master
+  pull_request:
+    branches: master
+    types: [ opened, synchronize, reopened, closed ]
+
+jobs:
+
+  generate-TOC:
+    if: github.event.pull_request.head.user.id == github.event.pull_request.base.user.id
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Turnstyle
+        uses: softprops/turnstyle@v1
+        with:
+          poll-interval-seconds: 3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: technote-space/toc-generator@v2

@@ -3,8 +3,9 @@ package metrics
 import (
 	"runtime"
 
-	"github.com/powerman/go-monolith-example/internal/def"
 	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/powerman/go-monolith-example/pkg/def"
 )
 
 func initMetrics(reg *prometheus.Registry, namespace string) {
