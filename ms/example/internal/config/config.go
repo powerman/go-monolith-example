@@ -81,10 +81,10 @@ func Init(sharedCfg *SharedCfg, flagsets FlagSets) error {
 	appcfg.AddPFlag(fs.Serve, &own.MySQLName, pfx+"mysql.dbname", "MySQL database name")
 	appcfg.AddPFlag(fs.Serve, &shared.XNATSAddrUrls, "nats.urls", "URLs to connect to NATS (separated by comma)")
 	appcfg.AddPFlag(fs.Serve, &shared.XSTANClusterID, "stan.cluster_id", "STAN cluster ID")
-	appcfg.AddPFlag(fs.Serve, &shared.MonoMetricsAddrHost, "metrics.host", "host to serve Prometheus metrics")
-	appcfg.AddPFlag(fs.Serve, &shared.ExampleMetricsAddrPort, pfx+"metrics.port", "port to serve Prometheus metrics")
-	appcfg.AddPFlag(fs.Serve, &shared.MonoAddrHost, "host", "host to serve")
+	appcfg.AddPFlag(fs.Serve, &shared.AddrHost, "host", "host to serve")
+	appcfg.AddPFlag(fs.Serve, &shared.AddrHostInt, "host-int", "internal host to serve")
 	appcfg.AddPFlag(fs.Serve, &shared.ExampleAddrPort, pfx+"port", "port to serve")
+	appcfg.AddPFlag(fs.Serve, &shared.ExampleMetricsAddrPort, pfx+"metrics.port", "port to serve Prometheus metrics")
 
 	return nil
 }
@@ -113,8 +113,8 @@ func GetServe() (c *ServeConfig, err error) {
 		MySQLGooseDir: own.GooseDir.Value(&err),
 		NATSURLs:      shared.XNATSAddrUrls.Value(&err),
 		STANClusterID: shared.XSTANClusterID.Value(&err),
-		Addr:          netx.NewAddr(shared.MonoAddrHost.Value(&err), shared.ExampleAddrPort.Value(&err)),
-		MetricsAddr:   netx.NewAddr(shared.MonoMetricsAddrHost.Value(&err), shared.ExampleMetricsAddrPort.Value(&err)),
+		Addr:          netx.NewAddr(shared.AddrHost.Value(&err), shared.ExampleAddrPort.Value(&err)),
+		MetricsAddr:   netx.NewAddr(shared.AddrHostInt.Value(&err), shared.ExampleMetricsAddrPort.Value(&err)),
 	}
 	if err != nil {
 		return nil, appcfg.WrapPErr(err, fs.Serve, own, shared)

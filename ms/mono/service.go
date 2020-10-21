@@ -1,5 +1,5 @@
-// Package metrics provides embedded microservice.
-package metrics
+// Package mono provides embedded microservice.
+package mono
 
 import (
 	"context"
@@ -27,9 +27,9 @@ var (
 	fs     *pflag.FlagSet
 	shared *config.Shared
 	own    = &struct {
-		MetricsPort appcfg.Port `env:"METRICS_ADDR_PORT"`
+		Port appcfg.Port `env:"MONO_ADDR_PORT"`
 	}{
-		MetricsPort: appcfg.MustPort(strconv.Itoa(config.MetricsPort)),
+		Port: appcfg.MustPort(strconv.Itoa(config.MonoPort)),
 	}
 
 	reg = prometheus.NewPedanticRegistry()
@@ -43,7 +43,7 @@ type Service struct {
 }
 
 // Name implements main.embeddedService interface.
-func (s *Service) Name() string { return "metrics" }
+func (s *Service) Name() string { return "mono" }
 
 // Init implements main.embeddedService interface.
 func (s *Service) Init(sharedCfg *config.Shared, _, serveCmd *cobra.Command) error {
@@ -53,15 +53,16 @@ func (s *Service) Init(sharedCfg *config.Shared, _, serveCmd *cobra.Command) err
 	fs, shared = serveCmd.Flags(), sharedCfg
 	fromEnv := appcfg.NewFromEnv(config.EnvPrefix)
 	err := appcfg.ProvideStruct(own, fromEnv)
-	appcfg.AddPFlag(fs, &shared.MonoMetricsAddrHost, "metrics.host", "host to serve Prometheus metrics")
-	appcfg.AddPFlag(fs, &own.MetricsPort, "metrics.port", "port to serve Prometheus metrics")
+	pfx := s.Name() + "."
+	appcfg.AddPFlag(fs, &shared.AddrHostInt, "host-int", "internal host to serve")
+	appcfg.AddPFlag(fs, &own.Port, pfx+"port", "port to serve monolith introspection")
 	return err
 }
 
 // RunServe implements main.embeddedService interface.
 func (s *Service) RunServe(_, ctxShutdown Ctx, shutdown func()) (err error) {
 	log := structlog.FromContext(ctxShutdown, nil)
-	s.cfg.metricsAddr = netx.NewAddr(shared.MonoMetricsAddrHost.Value(&err), own.MetricsPort.Value(&err))
+	s.cfg.metricsAddr = netx.NewAddr(shared.AddrHostInt.Value(&err), own.Port.Value(&err))
 	if err != nil {
 		return log.Err("failed to get config", "err", appcfg.WrapPErr(err, fs, shared, own))
 	}
