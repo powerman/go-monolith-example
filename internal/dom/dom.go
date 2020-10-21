@@ -10,3 +10,8 @@ type Auth struct {
 	UserID UserID
 	Admin  bool
 }
+
+// Empty values.
+const (
+	NoUserID UserID = 0
+)

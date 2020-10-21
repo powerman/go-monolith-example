@@ -1,30 +1,42 @@
 package config
 
 import (
-	"github.com/powerman/go-monolith-example/internal/config"
-	"github.com/powerman/go-monolith-example/internal/def"
+	"os"
+	"path/filepath"
+
 	"github.com/powerman/must"
 	"github.com/spf13/pflag"
+
+	"github.com/powerman/go-monolith-example/internal/config"
+	"github.com/powerman/go-monolith-example/pkg/def"
+	"github.com/powerman/go-monolith-example/pkg/netx"
 )
 
-// MustGetTest provides a convenient way to get config for tests.
-// It'll call Init for you. You can get config just once,
-// next call to this or other method which returns config will panic.
-func MustGetTest() (cfg *ServeConfig) {
-	genericCfg, err := config.Get()
-	if err == nil {
-		err = Init(genericCfg, FlagSets{
-			Serve: pflag.NewFlagSet("", pflag.ContinueOnError),
-			Goose: pflag.NewFlagSet("", pflag.ContinueOnError),
-		})
-	}
-	if err == nil {
-		cfg, err = GetServe()
-	}
+// MustGetServeTest returns config suitable for use in tests.
+func MustGetServeTest() *ServeConfig {
+	sharedCfg, err := config.Get()
+	must.NoErr(err)
+	err = Init(sharedCfg, FlagSets{
+		Serve:      pflag.NewFlagSet("", pflag.ContinueOnError),
+		GooseMySQL: pflag.NewFlagSet("", pflag.ContinueOnError),
+	})
+	must.NoErr(err)
+	cfg, err := GetServe()
 	must.NoErr(err)
 
-	var connectTimeout = 3 * def.TestSecond
-	cfg.MySQLConfig.Timeout = connectTimeout
+	cfg.MySQL.Timeout = def.TestTimeout
+
+	const host = "localhost"
+	cfg.Addr = netx.NewAddr(host, netx.UnusedTCPPort(host))
+	cfg.MetricsAddr = netx.NewAddr(host, 0)
+
+	rootDir, err := os.Getwd()
+	must.NoErr(err)
+	for _, err := os.Stat(filepath.Join(rootDir, "go.mod")); os.IsNotExist(err) && filepath.Dir(rootDir) != rootDir; _, err = os.Stat(filepath.Join(rootDir, "go.mod")) {
+		rootDir = filepath.Dir(rootDir)
+	}
+
+	cfg.MySQLGooseDir = filepath.Join(rootDir, cfg.MySQLGooseDir)
 
 	return cfg
 }

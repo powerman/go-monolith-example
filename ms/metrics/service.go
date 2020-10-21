@@ -7,71 +7,74 @@ import (
 	"strconv"
 
 	"github.com/powerman/appcfg"
-	"github.com/powerman/go-monolith-example/internal/concurrent"
-	"github.com/powerman/go-monolith-example/internal/config"
-	"github.com/powerman/go-monolith-example/internal/def"
-	"github.com/powerman/go-monolith-example/internal/netx"
-	"github.com/powerman/go-monolith-example/internal/serve"
 	"github.com/powerman/structlog"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+
+	"github.com/powerman/go-monolith-example/internal/config"
+	"github.com/powerman/go-monolith-example/pkg/concurrent"
+	"github.com/powerman/go-monolith-example/pkg/def"
+	"github.com/powerman/go-monolith-example/pkg/netx"
+	"github.com/powerman/go-monolith-example/pkg/serve"
 )
 
 // Ctx is a synonym for convenience.
 type Ctx = context.Context
 
-//nolint:gochecknoglobals // Config and metrics are service-global anyway.
+//nolint:gochecknoglobals // Config, flags and metrics are global anyway.
 var (
-	fs         *pflag.FlagSet
-	genericCfg *config.Cfg
-	svcCfg     = &struct {
-		MetricsPort appcfg.Port `env:"METRICS_PORT"`
+	fs     *pflag.FlagSet
+	shared *config.Shared
+	own    = &struct {
+		MetricsPort appcfg.Port `env:"METRICS_ADDR_PORT"`
 	}{
-		MetricsPort: appcfg.MustPort(strconv.Itoa(def.MetricsPort)),
+		MetricsPort: appcfg.MustPort(strconv.Itoa(config.MetricsPort)),
 	}
 
 	reg = prometheus.NewPedanticRegistry()
-	cfg struct {
-		metricsAddr netx.Addr
-	}
 )
 
 // Service implements main.embeddedService interface.
-type Service struct{}
+type Service struct {
+	cfg struct {
+		metricsAddr netx.Addr
+	}
+}
 
 // Name implements main.embeddedService interface.
-func (Service) Name() string { return "metrics" }
+func (s *Service) Name() string { return "metrics" }
 
 // Init implements main.embeddedService interface.
-func (Service) Init(generic *config.Cfg, _, serveCmd *cobra.Command) error {
+func (s *Service) Init(sharedCfg *config.Shared, _, serveCmd *cobra.Command) error {
 	namespace := regexp.MustCompile(`[^a-zA-Z0-9]+`).ReplaceAllString(def.ProgName, "_")
 	initMetrics(reg, namespace)
 
-	fs, genericCfg = serveCmd.Flags(), generic
+	fs, shared = serveCmd.Flags(), sharedCfg
 	fromEnv := appcfg.NewFromEnv(config.EnvPrefix)
-	err := appcfg.ProvideStruct(svcCfg, fromEnv)
-	config.AddFlag(fs, &genericCfg.MetricsHost, "metrics.host", "host to serve Prometheus metrics")
-	config.AddFlag(fs, &svcCfg.MetricsPort, "metrics.port", "port to serve Prometheus metrics")
+	err := appcfg.ProvideStruct(own, fromEnv)
+	appcfg.AddPFlag(fs, &shared.MonoMetricsAddrHost, "metrics.host", "host to serve Prometheus metrics")
+	appcfg.AddPFlag(fs, &own.MetricsPort, "metrics.port", "port to serve Prometheus metrics")
 	return err
 }
 
-// Serve implements main.embeddedService interface.
-func (Service) Serve(_, ctxShutdown Ctx, shutdown func()) (err error) {
+// RunServe implements main.embeddedService interface.
+func (s *Service) RunServe(_, ctxShutdown Ctx, shutdown func()) (err error) {
 	log := structlog.FromContext(ctxShutdown, nil)
-	cfg.metricsAddr = netx.NewAddr(genericCfg.MetricsHost.Value(&err), svcCfg.MetricsPort.Value(&err))
+	s.cfg.metricsAddr = netx.NewAddr(shared.MonoMetricsAddrHost.Value(&err), own.MetricsPort.Value(&err))
 	if err != nil {
-		return log.Err("failed to get config", "err", appcfg.WrapPErr(err, fs, genericCfg, svcCfg))
+		return log.Err("failed to get config", "err", appcfg.WrapPErr(err, fs, shared, own))
 	}
 
 	err = concurrent.Serve(ctxShutdown, shutdown,
-		serveMetrics)
+		s.serveMetrics,
+	)
 	if err != nil {
 		return log.Err("failed to serve", "err", err)
 	}
 	return nil
 }
 
-func serveMetrics(ctx Ctx) error {
-	return serve.Metrics(ctx, cfg.metricsAddr, reg)
+func (s *Service) serveMetrics(ctx Ctx) error {
+	return serve.Metrics(ctx, s.cfg.metricsAddr, reg)
 }

@@ -1,11 +1,12 @@
 package app
 
 import (
-	"github.com/powerman/go-monolith-example/internal/def"
 	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/powerman/go-monolith-example/pkg/def"
 )
 
-//nolint:gochecknoglobals // By design.
+//nolint:gochecknoglobals // Metrics are global anyway.
 var (
 	Metric def.Metrics // Common metrics used by all packages.
 	metric struct {
@@ -18,7 +19,7 @@ var (
 func InitMetrics(reg *prometheus.Registry) {
 	const subsystem = "app"
 
-	Metric = def.NewMetrics(reg, ServiceName)
+	Metric = def.NewMetrics(reg)
 
 	metric.ErrAccessDeniedTotal = prometheus.NewCounter(
 		prometheus.CounterOpts{

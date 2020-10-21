@@ -1,47 +1,69 @@
-// Package config provides generic configuration shared by microservices.
+// Package config provides configuration shared by microservices.
 //
-// Default values can be load from different sources (constants,
-// environment variables, etc.) and then override with flags.
+// Default values can be obtained from various sources (constants,
+// environment variables, etc.) and then overridden by flags.
 //
-// As configuration is global you can get it just once for safety.
+// As configuration is global you can get it only once for safety:
+// you can call only one of Get… functions and call it just once.
 package config
 
 import (
+	"strconv"
+
 	"github.com/powerman/appcfg"
-	"github.com/powerman/go-monolith-example/internal/def"
+
+	"github.com/powerman/go-monolith-example/pkg/def"
 )
 
 // EnvPrefix defines common prefix for environment variables.
 const EnvPrefix = "MONO_"
 
-// Cfg contains config values shared by microservices.
-type Cfg struct {
-	MySQLHost     appcfg.NotEmptyString `env:"MYSQL_HOST"`
-	MySQLPort     appcfg.Port           `env:"MYSQL_PORT"`
-	NATSUrls      appcfg.NotEmptyString `env:"NATS_URLS"`
-	STANClusterID appcfg.NotEmptyString `env:"STAN_CLUSTER_ID"`
-	MetricsHost   appcfg.NotEmptyString `env:"METRICS_HOST"`
-	RPCHost       appcfg.NotEmptyString `env:"RPC_HOST"`
+// Shared contains configurable values shared by microservices.
+type Shared struct {
+	ExampleAddrPort        appcfg.Port           `env:"EXAMPLE_ADDR_PORT"`
+	ExampleMetricsAddrPort appcfg.Port           `env:"EXAMPLE_METRICS_ADDR_PORT"`
+	MonoAddrHost           appcfg.NotEmptyString `env:"MONO_ADDR_HOST"`
+	MonoMetricsAddrHost    appcfg.NotEmptyString `env:"MONO_METRICS_ADDR_HOST"`
+	XMySQLAddrHost         appcfg.NotEmptyString `env:"X_MYSQL_ADDR_HOST"`
+	XMySQLAddrPort         appcfg.Port           `env:"X_MYSQL_ADDR_PORT"`
+	XNATSAddrUrls          appcfg.NotEmptyString `env:"X_NATS_ADDR_URLS"`
+	XSTANClusterID         appcfg.NotEmptyString `env:"X_STAN_CLUSTER_ID"`
 }
 
-//nolint:gochecknoglobals // By design.
-var cfg = &Cfg{
-	MySQLHost:   appcfg.MustNotEmptyString("localhost"),
-	MySQLPort:   appcfg.MustPort("3306"),
-	MetricsHost: appcfg.MustNotEmptyString(def.Hostname),
-	RPCHost:     appcfg.MustNotEmptyString(def.Hostname),
+// Default ports for metrics.
+const (
+	MetricsPort = 16000 + iota // XXX Used in ms/metrics/service.go.
+	ExampleMetricsPort
+)
+
+// Default ports.
+const (
+	_ = 17000 + iota
+	ExamplePort
+)
+
+var shared = &Shared{ //nolint:gochecknoglobals // Config is global anyway.
+	ExampleAddrPort:        appcfg.MustPort(strconv.Itoa(ExamplePort)),
+	ExampleMetricsAddrPort: appcfg.MustPort(strconv.Itoa(ExampleMetricsPort)),
+	MonoAddrHost:           appcfg.MustNotEmptyString(def.Hostname),
+	MonoMetricsAddrHost:    appcfg.MustNotEmptyString(def.Hostname),
+	XMySQLAddrPort:         appcfg.MustPort("3306"),
 }
 
-// Get loads default configuration and returns generic config.
-// You can get config just once, next call will panic.
-func Get() (*Cfg, error) {
+// Get updates config defaults (from env) and returns shared config.
+func Get() (*Shared, error) {
 	defer cleanup()
 
 	fromEnv := appcfg.NewFromEnv(EnvPrefix)
-	err := appcfg.ProvideStruct(cfg, fromEnv)
-	return cfg, err
+	err := appcfg.ProvideStruct(shared, fromEnv)
+	if err != nil {
+		return nil, err
+	}
+	return shared, nil
 }
 
+// Cleanup must be called by all Get* functions to ensure second call to
+// any of them will panic.
 func cleanup() {
-	cfg = nil
+	shared = nil
 }

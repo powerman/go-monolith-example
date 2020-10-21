@@ -1,0 +1,14 @@
+name: Update Go module doc
+
+on:
+  push:
+    tags: v*
+
+jobs:
+
+  update-doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Pull new module version
+        uses: andrewslotin/go-proxy-pull-action@master

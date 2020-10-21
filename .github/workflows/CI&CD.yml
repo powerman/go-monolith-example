@@ -1,0 +1,161 @@
+name: CI/CD
+
+on:
+  push:
+    branches: master
+    tags: v*
+  pull_request:
+    branches: master
+
+env:
+  GO_VERSION: '^1.15.2'
+  GOFLAGS: '-mod=readonly'
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      mysql:
+        image: 'mysql:5.7'
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        ports:
+          - 3306:3306
+      nats:
+        image: 'nats:2.1.4'
+        ports:
+          - 4222:4222
+      stan:
+        image: 'nats-streaming:0.17.0'
+        command:
+          - '--cluster_id=ci'
+          - '--max_channels=0'
+          - '--max_subs=0'
+          - '--max_msgs=0'
+          - '--max_bytes=0'
+          - '--max_age=0s'
+          - '--max_inactivity=0s'
+          - '--nats_server=nats://localhost:4222'
+          - '--hb_interval=1s'
+          - '--hb_timeout=1s'
+          - '--hb_fail_count=3'
+          - '--store=FILE'
+          - '--dir=/tmp'
+          - '--file_fds_limit=4000'
+    env:
+      DOCKERIZE_VER: '0.12.0'
+      HADOLINT_VER: '1.18.0'
+      SHELLCHECK_VER: '0.7.1'
+      GOLANGCI_LINT_VER: '1.31.0'
+      GOTESTSUM_VER: '0.5.3'
+      GOSWAGGER_VER: '0.25.0'
+      GOVERALLS_VER: '0.0.7'
+      MONO_X_MYSQL_ADDR_HOST: 'localhost'
+      MONO_X_NATS_ADDR_URLS: 'nats://localhost:4222'
+      MONO_X_STAN_CLUSTER_ID: 'ci'
+      MONO__EXAMPLE_MYSQL_AUTH_LOGIN: 'root'
+      MONO__EXAMPLE_MYSQL_AUTH_PASS: ''
+      NARADA4D_TEST_MYSQL: 'goose-mysql://root@127.0.0.1'
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - uses: actions/checkout@v2
+
+      - name: Setup
+        run: |
+          env | grep _VER | sort > /tmp/tools.ver
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/bin
+            ~/go/pkg
+            ~/go/src
+            ~/.cache/go-build
+            ~/.cache/golangci-lint
+          key: v1-test-${{ runner.os }}-${{ hashFiles('/tmp/tools.ver') }}-${{ hashFiles('go.mod') }}
+          restore-keys: |
+            v1-test-${{ runner.os }}-${{ hashFiles('/tmp/tools.ver') }}-
+
+      - name: Install tools
+        env:
+          GO111MODULE: 'on'
+        run: |
+          cd /tmp # Protect go.mod for modifications by `go get`.
+          dockerize --version | tee /dev/stderr | grep -wq v$DOCKERIZE_VER ||
+            curl -sSfL https://github.com/powerman/dockerize/releases/download/v${DOCKERIZE_VER}/dockerize-$(uname)-x86_64 | install /dev/stdin $(go env GOPATH)/bin/dockerize
+          hadolint --version | tee /dev/stderr | grep -wq v$HADOLINT_VER ||
+            curl -sSfL https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VER}/hadolint-$(uname)-x86_64 | install /dev/stdin $(go env GOPATH)/bin/hadolint
+          shellcheck --version | tee /dev/stderr | grep -wq $SHELLCHECK_VER ||
+            curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VER}/shellcheck-v${SHELLCHECK_VER}.$(uname).x86_64.tar.xz | tar xJf - -C $(go env GOPATH)/bin --strip-components=1 shellcheck-v${SHELLCHECK_VER}/shellcheck
+          golangci-lint version | tee /dev/stderr | grep -wq $GOLANGCI_LINT_VER ||
+            curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v$GOLANGCI_LINT_VER
+          gotestsum --version | tee /dev/stderr | grep -wq $GOTESTSUM_VER ||
+            curl -sSfL https://github.com/gotestyourself/gotestsum/releases/download/v${GOTESTSUM_VER}/gotestsum_${GOTESTSUM_VER}_linux_amd64.tar.gz | tar xzf - -C $(go env GOPATH)/bin gotestsum
+          swagger version | tee /dev/stderr | grep -wq v$GOSWAGGER_VER ||
+            curl -sSfL https://github.com/go-swagger/go-swagger/releases/download/v${GOSWAGGER_VER}/swagger_$(uname)_amd64 | install /dev/stdin $(go env GOPATH)/bin/swagger
+          go get github.com/mattn/goveralls@v${GOVERALLS_VER}
+
+      - name: Ensure API spec match auto-generated code
+        run: |
+          go generate ./api/...
+          git add . && git status --short && git diff-index --quiet HEAD
+
+      - run: scripts/test
+
+      - name: Report code coverage
+        env:
+          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+        if: env.COVERALLS_TOKEN
+        run: |
+          scripts/cover
+          goveralls -coverprofile=cover.out -service=GitHub
+
+  build-and-release:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - uses: actions/checkout@v2
+
+      - name: Turnstyle
+        uses: softprops/turnstyle@v1
+        with:
+          poll-interval-seconds: 3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg
+            ~/.cache/go-build
+          key: v1-build-${{ runner.os }}-${{ hashFiles('go.mod') }}
+          restore-keys: |
+            v1-build-${{ runner.os }}-
+
+      - run: scripts/build
+
+      - name: Upload to GitHub Container Registry
+        run: |
+          docker login ghcr.io -u '${{ secrets.CR_USER }}' -p '${{ secrets.CR_PAT }}'
+          if echo "$GITHUB_REF" | grep -q '^refs/tags/v'; then
+            TAGS="${GITHUB_REF/refs\/tags\/v}"
+          else
+            #TAGS="$GITHUB_SHA latest"
+            TAGS="latest"
+          fi
+          for TAG in $TAGS; do
+            IMAGE_TAG="ghcr.io/${GITHUB_REPOSITORY,,*}:$TAG"
+            docker tag "$(basename $(go list -m))" "$IMAGE_TAG"
+            docker push "$IMAGE_TAG"
+          done
