@@ -3,6 +3,7 @@ package mono
 
 import (
 	"context"
+	"net/http"
 	"regexp"
 	"strconv"
 
@@ -38,8 +39,9 @@ var (
 // Service implements main.embeddedService interface.
 type Service struct {
 	cfg struct {
-		metricsAddr netx.Addr
+		addr netx.Addr
 	}
+	mux *http.ServeMux
 }
 
 // Name implements main.embeddedService interface.
@@ -62,13 +64,17 @@ func (s *Service) Init(sharedCfg *config.Shared, _, serveCmd *cobra.Command) err
 // RunServe implements main.embeddedService interface.
 func (s *Service) RunServe(_, ctxShutdown Ctx, shutdown func()) (err error) {
 	log := structlog.FromContext(ctxShutdown, nil)
-	s.cfg.metricsAddr = netx.NewAddr(shared.AddrHostInt.Value(&err), own.Port.Value(&err))
+	s.cfg.addr = netx.NewAddr(shared.AddrHostInt.Value(&err), own.Port.Value(&err))
 	if err != nil {
 		return log.Err("failed to get config", "err", appcfg.WrapPErr(err, fs, shared, own))
 	}
 
+	s.mux = http.NewServeMux()
+	serve.HandleMetrics(s.mux, reg)
+	s.mux.Handle("/health-check", http.HandlerFunc(s.serveHealthCheck))
+
 	err = concurrent.Serve(ctxShutdown, shutdown,
-		s.serveMetrics,
+		s.serveHTTP,
 	)
 	if err != nil {
 		return log.Err("failed to serve", "err", err)
@@ -76,6 +82,6 @@ func (s *Service) RunServe(_, ctxShutdown Ctx, shutdown func()) (err error) {
 	return nil
 }
 
-func (s *Service) serveMetrics(ctx Ctx) error {
-	return serve.Metrics(ctx, s.cfg.metricsAddr, reg)
+func (s *Service) serveHTTP(ctx Ctx) error {
+	return serve.HTTP(ctx, s.cfg.addr, s.mux, "monolith introspection")
 }

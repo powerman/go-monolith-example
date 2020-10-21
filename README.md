@@ -187,7 +187,6 @@ $ ./bin/mono serve
 ## TODO
 
 - [ ] Update srv/jsonrpc2 to use HTTP mux and CORS middleware.
-- [ ] Add /health-check.
 - [ ] Add gRPC service example.
 - [ ] Add OpenAPI service example.
 - [ ] Add NATS/STAN publish/subscribe example.

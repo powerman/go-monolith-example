@@ -48,10 +48,15 @@ func HTTP(ctx Ctx, addr netx.Addr, handler http.Handler, service string) error {
 // Metrics starts HTTP server on addr path /metrics using reg as
 // prometheus handler.
 func Metrics(ctx Ctx, addr netx.Addr, reg *prometheus.Registry) error {
-	handler := promhttp.InstrumentMetricHandler(reg, promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
 	mux := http.NewServeMux()
-	mux.Handle("/metrics", handler)
+	HandleMetrics(mux, reg)
 	return HTTP(ctx, addr, mux, "Prometheus metrics")
+}
+
+// HandleMetrics adds reg's prometheus handler on /metrics at mux.
+func HandleMetrics(mux *http.ServeMux, reg *prometheus.Registry) {
+	handler := promhttp.InstrumentMetricHandler(reg, promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+	mux.Handle("/metrics", handler)
 }
 
 // RPC starts HTTP server on addr path /rpc using rcvr as JSON-RPC 2.0
