@@ -82,7 +82,7 @@ for more details.
 - [X] CLI subcommands support using [cobra](https://github.com/spf13/cobra).
 - [X] Graceful shutdown support.
 - [X] Configuration defaults can be overwritten by env vars and flags.
-- [X] Example JSON-RPC 2.0 API.
+- [X] Example JSON-RPC 2.0 over HTTP API, with CORS support.
 - [X] Example tests, both unit and integration.
 - [X] Production logging using [structlog](https://github.com/powerman/structlog).
 - [X] Production metrics using Prometheus.
@@ -167,7 +167,8 @@ available networks, then you'll have to restart docker service or reboot.
 ### Docker
 
 ```
-$ docker run -i -t --rm ghcr.io/powerman/go-monolith-example -v
+$ docker run -i -t --rm ghcr.io/powerman/go-monolith-example:0.2.0 -v
+mono version v0.2.0 7562a1e 2020-10-22_03:12:04 go1.15.3
 ```
 
 ### Source
@@ -179,9 +180,73 @@ embedding git version into compiled binary), you can use usual
 ```
 $ ./scripts/build
 $ ./bin/mono -h
+Example monolith with embedded microservices
+
+Usage:
+  mono [flags]
+  mono [command]
+
+Available Commands:
+  help        Help about any command
+  ms          Run given embedded microservice's command
+  serve       Starts embedded microservices
+
+Flags:
+  -h, --help                    help for mono
+      --log.level OneOfString   log level [debug|info|warn|err] (default debug)
+  -v, --version                 version for mono
+
+Use "mono [command] --help" for more information about a command.
+
 $ ./bin/mono serve -h
+Starts embedded microservices
+
+Usage:
+  mono serve [flags]
+
+Flags:
+      --example.metrics.port Port             port to serve Prometheus metrics (default 17002)
+      --example.mysql.dbname NotEmptyString   MySQL database name (default example)
+      --example.mysql.pass String             MySQL password
+      --example.mysql.user NotEmptyString     MySQL username (default root)
+      --example.port Port                     port to serve (default 17001)
+  -h, --help                                  help for serve
+      --host NotEmptyString                   host to serve (default home)
+      --host-int NotEmptyString               internal host to serve (default home)
+      --mono.port Port                        port to serve monolith introspection (default 17000)
+      --mysql.host NotEmptyString             host to connect to MySQL (default localhost)
+      --mysql.port Port                       port to connect to MySQL (default 33306)
+      --nats.urls NotEmptyString              URLs to connect to NATS (separated by comma) (default nats://localhost:34222)
+      --stan.cluster_id NotEmptyString        STAN cluster ID (default local)
+      --timeout.shutdown Duration             must be less than 10s used by 'docker stop' between SIGTERM and SIGKILL (default 9s)
+      --timeout.startup Duration              must be less than swarm's deploy.update_config.monitor (default 3s)
+
+Global Flags:
+      --log.level OneOfString   log level [debug|info|warn|err] (default debug)
+
 $ ./bin/mono -v
+mono version v0.2.0 7562a1e 2020-10-22_03:19:37 go1.15.3
+
 $ ./bin/mono serve
+         mono: inf      main: `started` version v0.2.0 7562a1e 2020-10-22_03:19:37
+         mono: inf     serve: `serve` home:17000 [monolith introspection]
+      example: inf     natsx: `NATS connected` url=nats://localhost:34222
+      example: inf     goose: OK    00001_down_not_supported.sql
+      example: inf     goose: OK    00002_noop.go
+      example: inf     goose: OK    00003_example.sql
+      example: inf     goose: goose: no migrations to run. current version: 3
+      example: inf     natsx: `STAN connected` clusterID=local clientID=example
+      example: inf     serve: `serve` home:17001 [JSON-RPC 2.0]
+      example: inf     serve: `serve` home:17002 [Prometheus metrics]
+      example: inf  jsonrpc2: 192.168.2.1:46344     IncExample: `handled` 1
+      example: inf  jsonrpc2: 192.168.2.1:46352     Example: `handled` 1
+      example: inf  jsonrpc2: 192.168.2.1:46356     Example: `handled` 2
+      example: ERR  jsonrpc2: 192.168.2.1:46364     Example: `failed to handle` err: unauthorized 0
+^C
+      example: inf     serve: `shutdown` [JSON-RPC 2.0]
+      example: inf     serve: `shutdown` [Prometheus metrics]
+         mono: inf     serve: `shutdown` [monolith introspection]
+         mono: inf      main: `finished` version v0.2.0 7562a1e 2020-10-22_03:19:37
 ```
 
 ## TODO
