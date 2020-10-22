@@ -20,6 +20,7 @@ require (
 	github.com/powerman/sqlxx v0.2.0
 	github.com/powerman/structlog v0.7.1
 	github.com/prometheus/client_golang v1.8.0
+	github.com/rs/cors v1.7.0
 	github.com/sebest/xff v0.0.0-20160910043805-6c115e0ffa35
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.1

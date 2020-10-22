@@ -1,6 +1,7 @@
 package jsonrpc2_test
 
 import (
+	"net/http/httptest"
 	"testing"
 
 	gomock "github.com/golang/mock/gomock"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/powerman/go-monolith-example/internal/apix"
 	"github.com/powerman/go-monolith-example/internal/dom"
+	"github.com/powerman/go-monolith-example/internal/jsonrpc2x"
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
 	"github.com/powerman/go-monolith-example/ms/example/internal/srv/jsonrpc2"
 	"github.com/powerman/go-monolith-example/pkg/def"
@@ -39,13 +41,13 @@ var (
 	userIDBad = dom.UserID(0)
 )
 
-func testNew(t *check.C) (*jsonrpc2.Server, *app.MockAppl) {
+func testNew(t *check.C) (func(), *jsonrpc2x.Client, string, *app.MockAppl) {
 	ctrl := gomock.NewController(t)
-	t.Cleanup(ctrl.Finish)
 
 	mockApp := app.NewMockAppl(ctrl)
 	mockAuthn := apix.NewMockAuthn(ctrl)
-	srv := jsonrpc2.New(mockApp, mockAuthn, jsonrpc2.Config{
+	srv := jsonrpc2.NewServer(mockApp, mockAuthn, jsonrpc2.Config{
+		Pattern:   "/",
 		StrictErr: true,
 	})
 
@@ -53,5 +55,10 @@ func testNew(t *check.C) (*jsonrpc2.Server, *app.MockAppl) {
 	mockAuthn.EXPECT().Authenticate(tokenUser).Return(authUser, nil).AnyTimes()
 	mockAuthn.EXPECT().Authenticate(gomock.Any()).Return(dom.Auth{}, apix.ErrAccessTokenInvalid).AnyTimes()
 
-	return srv, mockApp
+	ts := httptest.NewServer(srv)
+	cleanup := func() {
+		ts.Close()
+		ctrl.Finish()
+	}
+	return cleanup, jsonrpc2x.NewHTTPClient(ts.URL), ts.URL, mockApp
 }

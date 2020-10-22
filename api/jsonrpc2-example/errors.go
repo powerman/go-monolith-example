@@ -34,6 +34,6 @@ var (
 
 // ErrsExtra list non-common errors which may be returned by concrete RPC method.
 var ErrsExtra = map[string][]error{
-	"RPC.Example":    {ErrNotFound},
-	"RPC.IncExample": nil,
+	Name + ".Example":    {ErrNotFound},
+	Name + ".IncExample": nil,
 }

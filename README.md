@@ -40,16 +40,16 @@ for more details.
 
 ### Structure of Go packages
 
-- `api/*` - definitions of own and 3rd-party APIs/protocols and related
-  auto-generated code
+- `api/*` - definitions of own and 3rd-party (in `api/ext-*`)
+  APIs/protocols and related auto-generated code
 - `cmd/*` - main application(s)
 - `internal/*` - packages shared by embedded microservices, e.g.:
   - `internal/config` - configuration (default values, env) shared by
     embedded microservices' subcommands and tests
   - `internal/dom` - domain types shared by microservices (Entities)
 - `ms/*` - embedded microservices, with structure:
-  - `internal/config` - configuration(s) (default values, env, flags)
-    for microservice's subcommands and tests
+  - `internal/config` - configuration(s) (default values, env, flags) for
+    microservice's subcommands and tests
   - `internal/app` - define interfaces ("ports") for The Clean
     Architecture (or "Ports and Adapters" architecture) and implements
     business-logic
@@ -186,7 +186,6 @@ $ ./bin/mono serve
 
 ## TODO
 
-- [ ] Update srv/jsonrpc2 to use HTTP mux and CORS middleware.
 - [ ] Add gRPC service example.
 - [ ] Add OpenAPI service example.
 - [ ] Add NATS/STAN publish/subscribe example.

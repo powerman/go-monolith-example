@@ -24,6 +24,7 @@ func Test(t *testing.T) {
 		STANClusterID: "cluster",
 		Addr:          netx.NewAddr(def.Hostname, config.ExamplePort),
 		MetricsAddr:   netx.NewAddr(def.Hostname, config.ExampleMetricsPort),
+		Path:          "/rpc",
 	}
 
 	t.Run("required", func(tt *testing.T) {
