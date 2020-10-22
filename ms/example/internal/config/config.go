@@ -41,10 +41,12 @@ var own = &struct { //nolint:gochecknoglobals // Config is global anyway.
 	MySQLPass appcfg.String         `env:"MYSQL_AUTH_PASS"`
 	MySQLName appcfg.NotEmptyString `env:"MYSQL_DB"`
 	GooseDir  appcfg.NotEmptyString
+	Path      appcfg.NotEmptyString
 }{ // Defaults, if any:
 	MySQLUser: appcfg.MustNotEmptyString(app.ServiceName),
 	MySQLName: appcfg.MustNotEmptyString(app.ServiceName),
 	GooseDir:  appcfg.MustNotEmptyString(fmt.Sprintf("ms/%s/internal/migrations", app.ServiceName)),
+	Path:      appcfg.MustNotEmptyString("/rpc"),
 }
 
 // FlagSets for all CLI subcommands which use flags to set config values.
@@ -97,6 +99,7 @@ type ServeConfig struct {
 	STANClusterID string
 	Addr          netx.Addr
 	MetricsAddr   netx.Addr
+	Path          string
 }
 
 // GetServe validates and returns configuration for subcommand.
@@ -115,6 +118,7 @@ func GetServe() (c *ServeConfig, err error) {
 		STANClusterID: shared.XSTANClusterID.Value(&err),
 		Addr:          netx.NewAddr(shared.AddrHost.Value(&err), shared.ExampleAddrPort.Value(&err)),
 		MetricsAddr:   netx.NewAddr(shared.AddrHostInt.Value(&err), shared.ExampleMetricsAddrPort.Value(&err)),
+		Path:          own.Path.Value(&err),
 	}
 	if err != nil {
 		return nil, appcfg.WrapPErr(err, fs.Serve, own, shared)

@@ -15,7 +15,8 @@ import (
 func TestExample(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	srv, mockAppl := testNew(t)
+	cleanup, c, _, mockAppl := testNew(t)
+	defer cleanup()
 
 	exampleUser := &app.Example{Counter: 3}
 
@@ -44,7 +45,7 @@ func TestExample(tt *testing.T) {
 				UserID: tc.userID,
 			}
 			var res api.RPCExampleResp
-			err := srv.Example(req, &res)
+			err := c.Call("RPC.Example", req, &res)
 			t.Err(err, tc.wantErr)
 			if tc.wantErr == nil {
 				t.DeepEqual(res, *tc.want)
@@ -56,7 +57,8 @@ func TestExample(tt *testing.T) {
 func TestIncExample(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	srv, mockAppl := testNew(t)
+	cleanup, c, _, mockAppl := testNew(t)
+	defer cleanup()
 
 	mockAppl.EXPECT().IncExample(gomock.Any(), authAdmin).Return(nil)
 
@@ -65,5 +67,5 @@ func TestIncExample(tt *testing.T) {
 			AccessToken: tokenAdmin,
 		},
 	}
-	t.Nil(srv.IncExample(req, new(api.RPCIncExampleResp)))
+	t.Nil(c.Call("RPC.IncExample", req, new(api.RPCIncExampleResp)))
 }

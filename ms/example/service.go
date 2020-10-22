@@ -3,6 +3,7 @@ package example
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/powerman/structlog"
 	"github.com/prometheus/client_golang/prometheus"
@@ -34,6 +35,7 @@ type Service struct {
 	repo     *dal.Repo
 	authn    apix.Authn
 	appl     *app.App
+	mux      *http.ServeMux
 }
 
 // Name implements main.embeddedService interface.
@@ -86,11 +88,15 @@ func (s *Service) RunServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 		s.appl = app.New(s.repo, app.Config{})
 	}
 
+	s.mux = jsonrpc2.NewServer(s.appl, s.authn, jsonrpc2.Config{
+		Pattern: s.cfg.Path,
+	})
+
 	err = concurrent.Serve(ctxShutdown, shutdown,
 		s.natsConn.Monitor,
 		s.stanConn.Monitor,
 		s.serveMetrics,
-		s.serveRPC,
+		s.serveHTTP,
 	)
 	if err != nil {
 		return log.Err("failed to serve", "err", err)
@@ -114,6 +120,6 @@ func (s *Service) serveMetrics(ctx Ctx) error {
 	return serve.Metrics(ctx, s.cfg.MetricsAddr, reg)
 }
 
-func (s *Service) serveRPC(ctx Ctx) error {
-	return serve.RPCName(ctx, s.cfg.Addr, jsonrpc2.New(s.appl, s.authn, jsonrpc2.Config{}), "RPC")
+func (s *Service) serveHTTP(ctx Ctx) error {
+	return serve.HTTP(ctx, s.cfg.Addr, s.mux, "JSON-RPC 2.0")
 }
