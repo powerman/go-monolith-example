@@ -15,7 +15,7 @@ require (
 	github.com/powerman/goose/v2 v2.7.0
 	github.com/powerman/must v0.1.0
 	github.com/powerman/mysqlx v0.3.3
-	github.com/powerman/narada4d v1.7.0
+	github.com/powerman/narada4d v1.7.1
 	github.com/powerman/rpc-codec v1.2.2
 	github.com/powerman/sqlxx v0.2.0
 	github.com/powerman/structlog v0.7.1
