@@ -60,7 +60,7 @@ for more details.
   - `internal/svc/*` - adapters for accessing external services
 - `pkg/*` - helper packages, not related to architecture and
   business-logic (may be later moved to own modules and/or replaced by
-  external dependencies), e.g:
+  external dependencies), e.g.:
   - `pkg/def/` - project-wide defaults
 - `*/old/*` - contains legacy code which shouldn't be modified - this code
   is supposed to be extracted from `old/` directories (and refactored to

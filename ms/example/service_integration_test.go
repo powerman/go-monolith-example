@@ -10,11 +10,11 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/powerman/check"
 	"github.com/powerman/mysqlx"
-	"github.com/powerman/rpc-codec/jsonrpc2"
 
 	api "github.com/powerman/go-monolith-example/api/jsonrpc2-example"
 	"github.com/powerman/go-monolith-example/internal/apix"
 	"github.com/powerman/go-monolith-example/internal/dom"
+	"github.com/powerman/go-monolith-example/internal/jsonrpc2x"
 	"github.com/powerman/go-monolith-example/pkg/def"
 	"github.com/powerman/go-monolith-example/pkg/netx"
 )
@@ -52,7 +52,7 @@ func TestSmoke(tt *testing.T) {
 	mockAuthn.EXPECT().Authenticate(tokenUser).Return(authUser, nil).AnyTimes()
 	mockAuthn.EXPECT().Authenticate(gomock.Any()).Return(dom.Auth{}, apix.ErrAccessTokenInvalid).AnyTimes()
 
-	rpcClient := jsonrpc2.NewHTTPClient(fmt.Sprintf("http://%s/rpc", cfg.Addr))
+	rpcClient := jsonrpc2x.NewHTTPClient(fmt.Sprintf("http://%s/rpc", cfg.Addr))
 
 	var (
 		argIncExample api.RPCIncExampleReq
@@ -72,7 +72,7 @@ func TestSmoke(tt *testing.T) {
 		argExample.Ctx.AccessToken = tokenAdmin
 		argExample.UserID = authAdmin.UserID
 		err := rpcClient.Call("RPC.Example", argExample, &resExample)
-		t.Err(jsonrpc2.ServerError(err), api.ErrNotFound)
+		t.Err(err, api.ErrNotFound)
 	}
 	{
 		argExample.Ctx.AccessToken = tokenUser
