@@ -28,13 +28,8 @@ jobs:
         ports:
           - 4222:4222
     env:
-      DOCKERIZE_VER: '0.12.0'
       HADOLINT_VER: '1.18.0'
       SHELLCHECK_VER: '0.7.1'
-      GOLANGCI_LINT_VER: '1.31.0'
-      GOTESTSUM_VER: '0.5.3'
-      GOSWAGGER_VER: '0.25.0'
-      GOVERALLS_VER: '0.0.7'
       MONO_X_MYSQL_ADDR_HOST: 'localhost'
       MONO_X_NATS_ADDR_URLS: 'nats://localhost:4222'
       MONO_X_STAN_CLUSTER_ID: 'ci'
@@ -78,28 +73,21 @@ jobs:
             ~/go/src
             ~/.cache/go-build
             ~/.cache/golangci-lint
-          key: v1-test-${{ runner.os }}-${{ hashFiles('/tmp/tools.ver') }}-${{ hashFiles('go.mod') }}
+            ~/.cache/gobin
+            .gobincache
+          key: v2-test-${{ runner.os }}-${{ hashFiles('/tmp/tools.ver') }}-${{ hashFiles('go.mod') }}
           restore-keys: |
-            v1-test-${{ runner.os }}-${{ hashFiles('/tmp/tools.ver') }}-
+            v2-test-${{ runner.os }}-${{ hashFiles('/tmp/tools.ver') }}-
 
       - name: Install tools
         env:
           GO111MODULE: 'on'
         run: |
-          cd /tmp # Protect go.mod for modifications by `go get`.
-          dockerize --version | tee /dev/stderr | grep -wq v$DOCKERIZE_VER ||
-            curl -sSfL https://github.com/powerman/dockerize/releases/download/v${DOCKERIZE_VER}/dockerize-$(uname)-x86_64 | install /dev/stdin $(go env GOPATH)/bin/dockerize
+          GO111MODULE=off go get -u github.com/myitcv/gobin
           hadolint --version | tee /dev/stderr | grep -wq v$HADOLINT_VER ||
             curl -sSfL https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VER}/hadolint-$(uname)-x86_64 | install /dev/stdin $(go env GOPATH)/bin/hadolint
           shellcheck --version | tee /dev/stderr | grep -wq $SHELLCHECK_VER ||
             curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VER}/shellcheck-v${SHELLCHECK_VER}.$(uname).x86_64.tar.xz | tar xJf - -C $(go env GOPATH)/bin --strip-components=1 shellcheck-v${SHELLCHECK_VER}/shellcheck
-          golangci-lint version | tee /dev/stderr | grep -wq $GOLANGCI_LINT_VER ||
-            curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v$GOLANGCI_LINT_VER
-          gotestsum --version | tee /dev/stderr | grep -wq $GOTESTSUM_VER ||
-            curl -sSfL https://github.com/gotestyourself/gotestsum/releases/download/v${GOTESTSUM_VER}/gotestsum_${GOTESTSUM_VER}_linux_amd64.tar.gz | tar xzf - -C $(go env GOPATH)/bin gotestsum
-          swagger version | tee /dev/stderr | grep -wq v$GOSWAGGER_VER ||
-            curl -sSfL https://github.com/go-swagger/go-swagger/releases/download/v${GOSWAGGER_VER}/swagger_$(uname)_amd64 | install /dev/stdin $(go env GOPATH)/bin/swagger
-          go get github.com/mattn/goveralls@v${GOVERALLS_VER}
 
       - name: Ensure API spec match auto-generated code
         run: |
@@ -114,7 +102,7 @@ jobs:
         if: env.COVERALLS_TOKEN
         run: |
           scripts/cover
-          goveralls -coverprofile=cover.out -service=GitHub
+          gobin -m -run github.com/mattn/goveralls -coverprofile=cover.out -service=GitHub
 
   build-and-release:
     needs: test

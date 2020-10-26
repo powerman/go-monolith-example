@@ -1,4 +1,12 @@
 #!/bin/bash
+PATH=$(gobin -m -p \
+	github.com/golangci/golangci-lint/cmd/golangci-lint \
+	github.com/googleapis/api-linter/cmd/api-linter \
+	github.com/nilslice/protolock/cmd/protolock \
+	github.com/powerman/dockerize \
+	github.com/yoheimuta/protolint/cmd/protolint \
+	gotest.tools/gotestsum |
+	xargs dirname | sed -z 's/\n/:/g')$PATH
 set -x -e -o pipefail
 
 hadolint Dockerfile
