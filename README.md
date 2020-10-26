@@ -100,17 +100,14 @@ for more details.
 - [Docker Compose](https://docs.docker.com/compose/install/) 1.25+
 - Tools used to build/test project (feel free to install these tools using
   your OS package manager or any other way, but please ensure they've
-  required versions; also note these commands will install some non-Go
-  tools into `$GOPATH/bin` for the sake of simplicity):
+  required versions):
 
 ```sh
-curl -sSfL https://github.com/hadolint/hadolint/releases/download/v1.18.0/hadolint-$(uname)-x86_64 | install /dev/stdin $(go env GOPATH)/bin/hadolint
-curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v0.7.1/shellcheck-v0.7.1.$(uname).x86_64.tar.xz | tar xJf - -C $(go env GOPATH)/bin --strip-components=1 shellcheck-v0.7.1/shellcheck
-curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.31.0
-go get gotest.tools/gotestsum@v0.5.3
-go get github.com/golang/mock/mockgen@v1.4.4
-go get github.com/cheekybits/genny@master
-curl -sSfL https://github.com/go-swagger/go-swagger/releases/download/v0.25.0/swagger_$(uname)_amd64 | install /dev/stdin $(go env GOPATH)/bin/swagger
+GO111MODULE=off go get -u github.com/myitcv/gobin
+curl -sSfL https://github.com/hadolint/hadolint/releases/download/v1.18.0/hadolint-$(uname)-x86_64 | sudo install /dev/stdin /usr/local/bin/hadolint
+curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v0.7.1/shellcheck-v0.7.1.$(uname).x86_64.tar.xz | sudo tar xJf - -C /usr/local/bin --strip-components=1 shellcheck-v0.7.1/shellcheck
+curl -sSfL https://github.com/protocolbuffers/protobuf/releases/download/v3.12.4/protoc-3.12.4-$(uname -s)-$(uname -m).zip >/tmp/protoc.zip &&
+    sudo unzip -q -o /tmp/protoc.zip -d /usr/local/ -x readme.txt && rm /tmp/protoc.zip
 ```
 
 ### Setup

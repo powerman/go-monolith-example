@@ -1,4 +1,4 @@
-//go:generate mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE Authn
+//go:generate gobin -m -run github.com/golang/mock/mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE Authn
 
 package apix
 

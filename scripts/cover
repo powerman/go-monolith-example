@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e -o pipefail
 
-gotestsum -- \
+gobin -m -run gotest.tools/gotestsum -- \
 	-coverpkg="$(go list ./... | grep -v "^$(go list -m)/api/" | paste -s -d,)" \
 	-coverprofile cover.out \
 	-tags=integration ./...
