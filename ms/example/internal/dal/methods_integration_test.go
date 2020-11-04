@@ -19,25 +19,25 @@ func TestExampleSmoke(tt *testing.T) {
 	defer cleanup()
 
 	var (
-		now  = time.Now().Truncate(time.Second)
-		idU1 = dom.UserID(1)
-		idU2 = dom.UserID(2)
+		now    = time.Now().Truncate(time.Second)
+		nameU1 = dom.NewUserName("1")
+		nameU2 = dom.NewUserName("2")
 	)
 
-	res, err := r.Example(ctx, idU1)
+	res, err := r.Example(ctx, nameU1)
 	t.Err(err, app.ErrNotFound)
 	t.Nil(res)
 
-	err = r.IncExample(ctx, idU1)
+	err = r.IncExample(ctx, nameU1)
 	t.Nil(err)
-	err = r.IncExample(ctx, idU1)
+	err = r.IncExample(ctx, nameU1)
 	t.Nil(err)
 
-	res, err = r.Example(ctx, idU1)
+	res, err = r.Example(ctx, nameU1)
 	t.Nil(err)
 	t.Equal(res.Counter, 2)
 	t.GE(res.Mtime, now)
-	res, err = r.Example(ctx, idU2)
+	res, err = r.Example(ctx, nameU2)
 	t.Err(err, app.ErrNotFound)
 	t.Nil(res)
 }

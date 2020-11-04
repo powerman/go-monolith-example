@@ -3,8 +3,8 @@ package app
 import "github.com/powerman/go-monolith-example/internal/dom"
 
 // Example implements Appl interface.
-func (a *App) Example(ctx Ctx, auth dom.Auth, userID dom.UserID) (*Example, error) {
-	if !(auth.UserID == userID || auth.Admin) {
+func (a *App) Example(ctx Ctx, auth dom.Auth, userID dom.UserName) (*Example, error) {
+	if !(auth.UserName == userID || auth.Admin) {
 		metric.ErrAccessDeniedTotal.Inc()
 		return nil, ErrAccessDenied
 	}
@@ -13,5 +13,5 @@ func (a *App) Example(ctx Ctx, auth dom.Auth, userID dom.UserID) (*Example, erro
 
 // IncExample implements Appl interface.
 func (a *App) IncExample(ctx Ctx, auth dom.Auth) error {
-	return a.repo.IncExample(ctx, auth.UserID)
+	return a.repo.IncExample(ctx, auth.UserName)
 }

@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	schemaVersion  = 3
+	schemaVersion  = 4
 	dbMaxOpenConns = 0 // Unlimited.
 	dbMaxIdleConns = 5 // A bit more than default (2).
 )

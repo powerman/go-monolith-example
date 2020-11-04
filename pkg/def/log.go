@@ -6,13 +6,13 @@ import (
 
 // Log field names.
 const (
-	LogServer = "server" // "OpenAPI", "gRPC", "Prometheus metrics", etc.
-	LogRemote = "remote" // Aligned IPv4:Port "   192.168.0.42:1234 ".
-	LogAddr   = "addr"   // host:port.
-	LogHost   = "host"   // DNS hostname or IPv4/IPv6 address.
-	LogPort   = "port"   // TCP/UDP port number.
-	LogFunc   = "func"   // RPC/event handler method name, REST resource path.
-	LogUserID = "userID"
+	LogServer   = "server" // "OpenAPI", "gRPC", "Prometheus metrics", etc.
+	LogRemote   = "remote" // Aligned IPv4:Port "   192.168.0.42:1234 ".
+	LogAddr     = "addr"   // host:port.
+	LogHost     = "host"   // DNS hostname or IPv4/IPv6 address.
+	LogPort     = "port"   // TCP/UDP port number.
+	LogFunc     = "func"   // RPC/event handler method name, REST resource path.
+	LogUserName = "userName"
 )
 
 func setupLog() {
@@ -23,7 +23,7 @@ func setupLog() {
 		).
 		SetSuffixKeys(
 			LogServer,
-			LogUserID,
+			LogUserName,
 			structlog.KeyStack,
 		).
 		SetDefaultKeyvals(
@@ -45,6 +45,6 @@ func setupLog() {
 			"limit":           "+%[2]d ",
 			"err":             " %s: %v",
 			LogServer:         " [%[2]s]",
-			LogUserID:         " %[2]v",
+			LogUserName:       " %[2]v",
 		})
 }

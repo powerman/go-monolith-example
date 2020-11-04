@@ -2,8 +2,6 @@ package dal
 
 import (
 	"time"
-
-	"github.com/powerman/go-monolith-example/internal/dom"
 )
 
 const (
@@ -19,11 +17,11 @@ SELECT counter, mtime FROM example WHERE user_id = :user_id
 
 type (
 	argExampleInc struct {
-		UserID dom.UserID
+		UserID string
 	}
 
 	argExampleGet struct {
-		UserID dom.UserID
+		UserID string
 	}
 	rowExampleGet struct {
 		Counter int
