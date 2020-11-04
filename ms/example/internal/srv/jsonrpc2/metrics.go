@@ -4,8 +4,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 
 	api "github.com/powerman/go-monolith-example/api/jsonrpc2-example"
-	"github.com/powerman/go-monolith-example/internal/jsonrpc2x"
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
+	"github.com/powerman/go-monolith-example/pkg/jsonrpc2x"
 )
 
 //nolint:gochecknoglobals // By design.
@@ -20,6 +20,7 @@ func InitMetrics(reg *prometheus.Registry) {
 		map[string]interface{}{
 			"RPC": new(Server),
 		},
+		api.ErrsCommon,
 		api.ErrsExtra,
 	)
 }

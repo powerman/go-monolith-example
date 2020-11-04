@@ -10,6 +10,7 @@ import (
 	"github.com/powerman/go-monolith-example/internal/apix"
 	"github.com/powerman/go-monolith-example/internal/dom"
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
+	"github.com/powerman/go-monolith-example/pkg/jsonrpc2x"
 )
 
 func TestExample(tt *testing.T) {
@@ -30,7 +31,7 @@ func TestExample(tt *testing.T) {
 		wantErr error
 	}{
 		{tokenEmpty, authUser.UserID, nil, api.ErrUnauthorized},
-		{tokenAdmin, userIDBad, nil, api.ErrInvalidParams},
+		{tokenAdmin, userIDBad, nil, jsonrpc2x.ErrInvalidParams},
 		{tokenUser, authAdmin.UserID, nil, api.ErrForbidden},
 		{tokenAdmin, authUser.UserID, &api.Example{Counter: 3}, nil},
 	}
@@ -39,7 +40,7 @@ func TestExample(tt *testing.T) {
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
 			req := api.RPCExampleReq{
-				Ctx: apix.Ctx{
+				Ctx: apix.JSONRPC2Ctx{
 					AccessToken: tc.token,
 				},
 				UserID: tc.userID,
@@ -63,7 +64,7 @@ func TestIncExample(tt *testing.T) {
 	mockAppl.EXPECT().IncExample(gomock.Any(), authAdmin).Return(nil)
 
 	req := api.RPCIncExampleReq{
-		Ctx: apix.Ctx{
+		Ctx: apix.JSONRPC2Ctx{
 			AccessToken: tokenAdmin,
 		},
 	}

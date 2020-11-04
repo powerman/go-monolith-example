@@ -3,11 +3,12 @@ package jsonrpc2
 import (
 	api "github.com/powerman/go-monolith-example/api/jsonrpc2-example"
 	"github.com/powerman/go-monolith-example/internal/dom"
+	"github.com/powerman/go-monolith-example/pkg/jsonrpc2x"
 )
 
 func (srv *Server) doExample(ctx Ctx, auth dom.Auth, arg api.RPCExampleReq, res *api.RPCExampleResp) error {
 	if arg.UserID <= 0 {
-		return api.ErrInvalidParams
+		return jsonrpc2x.ErrInvalidParams
 	}
 
 	example, err := srv.appl.Example(ctx, auth, arg.UserID)
