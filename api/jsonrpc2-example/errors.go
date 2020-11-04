@@ -1,13 +1,15 @@
 package api
 
-import "github.com/powerman/rpc-codec/jsonrpc2"
+import (
+	"github.com/powerman/rpc-codec/jsonrpc2"
+
+	"github.com/powerman/go-monolith-example/pkg/jsonrpc2x"
+)
 
 // All generic errors which may be returned by RPC methods.
 //
 //nolint:gomnd // By design.
 var (
-	ErrInvalidParams   = jsonrpc2.NewError(-32602, "invalid params")  // Client bug.
-	ErrInternal        = jsonrpc2.NewError(-32000, "server error")    // Server bug or I/O issue.
 	ErrTryAgainLater   = jsonrpc2.NewError(-503, "temporary error")   // Safe to resend.
 	ErrTooManyRequests = jsonrpc2.NewError(-429, "too many requests") // Safe to resend (after delay).
 	ErrNotFound        = jsonrpc2.NewError(-404, "not found")         // Given ID does not exists.
@@ -17,8 +19,8 @@ var (
 
 // ErrsCommon may be returned by any RPC method.
 var ErrsCommon = []error{
-	ErrInvalidParams,
-	ErrInternal,
+	jsonrpc2x.ErrInvalidParams,
+	jsonrpc2x.ErrInternal,
 	ErrTryAgainLater,
 	ErrTooManyRequests,
 	ErrForbidden,

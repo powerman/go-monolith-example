@@ -5,7 +5,6 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	api "github.com/powerman/go-monolith-example/api/jsonrpc2-example"
 	"github.com/powerman/go-monolith-example/pkg/reflectx"
 )
 
@@ -29,6 +28,7 @@ func NewMetrics( //nolint:funlen // By design.
 	service string,
 	subsystem string,
 	methodsFrom map[string]interface{},
+	errsCommon []error,
 	errsExtra map[string][]error,
 ) (
 	metric Metrics,
@@ -64,7 +64,7 @@ func NewMetrics( //nolint:funlen // By design.
 	reg.MustRegister(metric.reqDuration)
 
 	commonCodes := []string{""} // Successful RPC.
-	commonCodes = append(commonCodes, codes(api.ErrsCommon)...)
+	commonCodes = append(commonCodes, codes(errsCommon)...)
 	for name, rcvr := range methodsFrom {
 		for _, methodName := range reflectx.RPCMethodsOf(rcvr) {
 			methodName = name + "." + methodName

@@ -8,7 +8,7 @@ import (
 	"github.com/powerman/check"
 	"github.com/powerman/rpc-codec/jsonrpc2"
 
-	"github.com/powerman/go-monolith-example/internal/jsonrpc2x"
+	"github.com/powerman/go-monolith-example/pkg/jsonrpc2x"
 )
 
 func TestError(tt *testing.T) {

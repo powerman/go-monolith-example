@@ -11,10 +11,10 @@ import (
 
 	"github.com/powerman/go-monolith-example/internal/apix"
 	"github.com/powerman/go-monolith-example/internal/dom"
-	"github.com/powerman/go-monolith-example/internal/jsonrpc2x"
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
 	"github.com/powerman/go-monolith-example/ms/example/internal/srv/jsonrpc2"
 	"github.com/powerman/go-monolith-example/pkg/def"
+	"github.com/powerman/go-monolith-example/pkg/jsonrpc2x"
 )
 
 func TestMain(m *testing.M) {
