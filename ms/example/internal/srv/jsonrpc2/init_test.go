@@ -31,14 +31,14 @@ var (
 	tokenAdmin = apix.AccessToken("admin")
 	tokenUser  = apix.AccessToken("user")
 	authAdmin  = dom.Auth{
-		UserID: 1,
-		Admin:  true,
+		UserName: dom.NewUserName("1"),
+		Admin:    true,
 	}
 	authUser = dom.Auth{
-		UserID: 2,
-		Admin:  false,
+		UserName: dom.NewUserName("2"),
+		Admin:    false,
 	}
-	userIDBad = dom.UserID(0)
+	userIDBad = dom.UserName("0")
 )
 
 func testNew(t *check.C) (func(), *jsonrpc2x.Client, string, *app.MockAppl) {

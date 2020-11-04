@@ -70,13 +70,13 @@ func TestSmoke(tt *testing.T) {
 	}
 	{
 		argExample.Ctx.AccessToken = tokenAdmin
-		argExample.UserID = authAdmin.UserID
+		argExample.UserName = authAdmin.UserName
 		err := rpcClient.Call("RPC.Example", argExample, &resExample)
 		t.Err(err, api.ErrNotFound)
 	}
 	{
 		argExample.Ctx.AccessToken = tokenUser
-		argExample.UserID = authUser.UserID
+		argExample.UserName = authUser.UserName
 		t.Nil(rpcClient.Call("RPC.Example", argExample, &resExample))
 		t.NotZero(resExample.UpdatedAt)
 		t.DeepEqual(resExample, api.RPCExampleResp{

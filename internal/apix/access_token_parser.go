@@ -9,15 +9,15 @@ type AccessTokenParser map[AccessToken]dom.Auth
 // signature using rsaPublicKey in PEM format.
 func NewAccessTokenParser() AccessTokenParser {
 	return AccessTokenParser{
-		"admin": dom.Auth{UserID: 1, Admin: true},
-		"user":  dom.Auth{UserID: 2}, //nolint:gomnd // Example.
+		"admin": dom.Auth{UserName: dom.NewUserName("1"), Admin: true},
+		"user":  dom.Auth{UserName: dom.NewUserName("2")}, //nolint:gomnd // Example.
 	}
 }
 
 // Authenticate implements Authenticator interface.
 func (p AccessTokenParser) Authenticate(token AccessToken) (auth dom.Auth, err error) {
 	auth = p[token]
-	if auth.UserID == 0 {
+	if auth.UserName == dom.NoUser {
 		err = ErrAccessTokenInvalid
 	}
 	return auth, err

@@ -18,18 +18,18 @@ func TestExample(tt *testing.T) {
 
 	exampleUser := &app.Example{Counter: 3}
 
-	mockRepo.EXPECT().Example(gomock.Any(), authUser.UserID).Return(exampleUser, nil).Times(2)
+	mockRepo.EXPECT().Example(gomock.Any(), authUser.UserName).Return(exampleUser, nil).Times(2)
 	mockRepo.EXPECT().Example(gomock.Any(), gomock.Any()).Return(nil, app.ErrNotFound)
 
 	tests := []struct {
 		auth    dom.Auth
-		userID  dom.UserID
+		userID  dom.UserName
 		want    *app.Example
 		wantErr error
 	}{
-		{authUser, authUser.UserID, exampleUser, nil},
-		{authUser, authAdmin.UserID, nil, app.ErrAccessDenied},
-		{authAdmin, authUser.UserID, exampleUser, nil},
+		{authUser, authUser.UserName, exampleUser, nil},
+		{authUser, authAdmin.UserName, nil, app.ErrAccessDenied},
+		{authAdmin, authUser.UserName, exampleUser, nil},
 		{authAdmin, userIDBad, nil, app.ErrNotFound},
 	}
 	for _, tc := range tests {
@@ -49,6 +49,6 @@ func TestIncExample(tt *testing.T) {
 	cleanup, a, mockRepo := testNew(t)
 	defer cleanup()
 
-	mockRepo.EXPECT().IncExample(gomock.Any(), authAdmin.UserID).Return(nil)
+	mockRepo.EXPECT().IncExample(gomock.Any(), authAdmin.UserName).Return(nil)
 	t.Nil(a.IncExample(ctx, authAdmin))
 }

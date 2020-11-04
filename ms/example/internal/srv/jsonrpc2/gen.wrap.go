@@ -23,7 +23,7 @@ func (srv *Server) IncExample(arg api.RPCIncExampleReq, res *api.RPCIncExampleRe
 		if err != nil {
 			return err
 		}
-		if auth.UserID == dom.NoUserID {
+		if auth.UserName == dom.NoUser {
 			return api.ErrUnauthorized
 		}
 		return srv.doIncExample(ctx, auth, arg, res)

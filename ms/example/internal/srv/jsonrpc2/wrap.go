@@ -21,7 +21,7 @@ func (srv *Server) Example(arg api.RPCExampleReq, res *api.RPCExampleResp) error
 		if err != nil {
 			return err
 		}
-		if auth.UserID == dom.NoUserID {
+		if auth.UserName == dom.NoUser {
 			return api.ErrUnauthorized
 		}
 		return srv.doExample(ctx, auth, arg, res)

@@ -10,11 +10,11 @@ import (
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
 )
 
-func (r *Repo) Example(ctx app.Ctx, userID dom.UserID) (res *app.Example, err error) {
+func (r *Repo) Example(ctx app.Ctx, userName dom.UserName) (res *app.Example, err error) {
 	err = r.Tx(ctx, &sql.TxOptions{ReadOnly: true}, func(tx *sqlxx.Tx) error {
 		var resExampleGet rowExampleGet
 		err := tx.NamedGetContext(ctx, &resExampleGet, sqlExampleGet, argExampleGet{
-			UserID: userID,
+			UserID: userName.ID(),
 		})
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -31,10 +31,10 @@ func (r *Repo) Example(ctx app.Ctx, userID dom.UserID) (res *app.Example, err er
 	return
 }
 
-func (r *Repo) IncExample(ctx app.Ctx, userID dom.UserID) error {
+func (r *Repo) IncExample(ctx app.Ctx, userName dom.UserName) error {
 	return r.Tx(ctx, nil, func(tx *sqlxx.Tx) error {
 		_, err := tx.NamedExecContext(ctx, sqlExampleInc, argExampleInc{
-			UserID: userID,
+			UserID: userName.ID(),
 		})
 		return err
 	})

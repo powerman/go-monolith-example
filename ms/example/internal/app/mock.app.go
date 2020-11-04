@@ -34,7 +34,7 @@ func (m *MockAppl) EXPECT() *MockApplMockRecorder {
 }
 
 // Example mocks base method
-func (m *MockAppl) Example(arg0 Ctx, arg1 dom.Auth, arg2 dom.UserID) (*Example, error) {
+func (m *MockAppl) Example(arg0 Ctx, arg1 dom.Auth, arg2 dom.UserName) (*Example, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Example", arg0, arg1, arg2)
 	ret0, _ := ret[0].(*Example)
@@ -86,7 +86,7 @@ func (m *MockRepo) EXPECT() *MockRepoMockRecorder {
 }
 
 // Example mocks base method
-func (m *MockRepo) Example(arg0 Ctx, arg1 dom.UserID) (*Example, error) {
+func (m *MockRepo) Example(arg0 Ctx, arg1 dom.UserName) (*Example, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Example", arg0, arg1)
 	ret0, _ := ret[0].(*Example)
@@ -101,7 +101,7 @@ func (mr *MockRepoMockRecorder) Example(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // IncExample mocks base method
-func (m *MockRepo) IncExample(arg0 Ctx, arg1 dom.UserID) error {
+func (m *MockRepo) IncExample(arg0 Ctx, arg1 dom.UserName) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IncExample", arg0, arg1)
 	ret0, _ := ret[0].(error)

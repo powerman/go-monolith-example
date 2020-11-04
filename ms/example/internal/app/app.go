@@ -27,7 +27,7 @@ var (
 type Appl interface {
 	// Example returns ...
 	// Errors: ErrAccessDenied, ErrNotFound.
-	Example(Ctx, dom.Auth, dom.UserID) (*Example, error)
+	Example(Ctx, dom.Auth, dom.UserName) (*Example, error)
 	// IncExample creates or increments ...
 	// Errors: none.
 	IncExample(Ctx, dom.Auth) error
@@ -37,10 +37,10 @@ type Appl interface {
 type Repo interface {
 	// Example returns ...
 	// Errors: ErrNotFound.
-	Example(Ctx, dom.UserID) (*Example, error)
+	Example(Ctx, dom.UserName) (*Example, error)
 	// IncExample creates or increments ...
 	// Errors: none.
-	IncExample(Ctx, dom.UserID) error
+	IncExample(Ctx, dom.UserName) error
 }
 
 type (

@@ -26,14 +26,14 @@ type Ctx = context.Context
 // Const shared by tests. Recommended naming scheme: <dataType><Variant>.
 var (
 	ctx       = def.NewContext(app.ServiceName)
-	userIDBad = dom.UserID(666)
+	userIDBad = dom.NewUserName("666")
 	authAdmin = dom.Auth{
-		UserID: 1,
-		Admin:  true,
+		UserName: dom.NewUserName("1"),
+		Admin:    true,
 	}
 	authUser = dom.Auth{
-		UserID: 2,
-		Admin:  false,
+		UserName: dom.NewUserName("2"),
+		Admin:    false,
 	}
 )
 

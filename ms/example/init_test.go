@@ -34,11 +34,11 @@ var (
 	tokenAdmin = apix.AccessToken("admin")
 	tokenUser  = apix.AccessToken("user")
 	authAdmin  = dom.Auth{
-		UserID: 1,
-		Admin:  true,
+		UserName: dom.NewUserName("1"),
+		Admin:    true,
 	}
 	authUser = dom.Auth{
-		UserID: 2,
-		Admin:  false,
+		UserName: dom.NewUserName("2"),
+		Admin:    false,
 	}
 )

@@ -21,19 +21,19 @@ func TestExample(tt *testing.T) {
 
 	exampleUser := &app.Example{Counter: 3}
 
-	mockAppl.EXPECT().Example(gomock.Any(), authUser, authAdmin.UserID).Return(nil, app.ErrAccessDenied)
-	mockAppl.EXPECT().Example(gomock.Any(), authAdmin, authUser.UserID).Return(exampleUser, nil)
+	mockAppl.EXPECT().Example(gomock.Any(), authUser, authAdmin.UserName).Return(nil, app.ErrAccessDenied)
+	mockAppl.EXPECT().Example(gomock.Any(), authAdmin, authUser.UserName).Return(exampleUser, nil)
 
 	tests := []struct {
 		token   apix.AccessToken
-		userID  dom.UserID
+		userID  dom.UserName
 		want    *api.Example
 		wantErr error
 	}{
-		{tokenEmpty, authUser.UserID, nil, api.ErrUnauthorized},
+		{tokenEmpty, authUser.UserName, nil, api.ErrUnauthorized},
 		{tokenAdmin, userIDBad, nil, jsonrpc2x.ErrInvalidParams},
-		{tokenUser, authAdmin.UserID, nil, api.ErrForbidden},
-		{tokenAdmin, authUser.UserID, &api.Example{Counter: 3}, nil},
+		{tokenUser, authAdmin.UserName, nil, api.ErrForbidden},
+		{tokenAdmin, authUser.UserName, &api.Example{Counter: 3}, nil},
 	}
 	for _, tc := range tests {
 		tc := tc
@@ -43,7 +43,7 @@ func TestExample(tt *testing.T) {
 				Ctx: apix.JSONRPC2Ctx{
 					AccessToken: tc.token,
 				},
-				UserID: tc.userID,
+				UserName: tc.userID,
 			}
 			var res api.RPCExampleResp
 			err := c.Call("RPC.Example", req, &res)

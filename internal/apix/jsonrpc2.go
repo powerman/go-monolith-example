@@ -49,7 +49,7 @@ func (c *JSONRPC2Ctx) NewContext(
 		structlog.KeyApp, service,
 		def.LogRemote, remote,
 		def.LogFunc, methodName,
-		def.LogUserID, auth.UserID,
+		def.LogUserName, auth.UserName,
 	)
 	ctx = structlog.NewContext(ctx, log)
 

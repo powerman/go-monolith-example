@@ -7,11 +7,11 @@ import (
 )
 
 func (srv *Server) doExample(ctx Ctx, auth dom.Auth, arg api.RPCExampleReq, res *api.RPCExampleResp) error {
-	if arg.UserID <= 0 {
+	if !arg.UserName.Valid() {
 		return jsonrpc2x.ErrInvalidParams
 	}
 
-	example, err := srv.appl.Example(ctx, auth, arg.UserID)
+	example, err := srv.appl.Example(ctx, auth, arg.UserName)
 	if err == nil {
 		*res = protoExample(*example)
 	}

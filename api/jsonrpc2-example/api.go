@@ -11,8 +11,8 @@ const Name = "RPC"
 type (
 	// RPC.Example returns given user's Example.
 	RPCExampleReq struct {
-		Ctx    `json:"Ctx"`
-		UserID dom.UserID
+		Ctx      `json:"Ctx"`
+		UserName dom.UserName
 	}
 	RPCExampleResp = Example
 
