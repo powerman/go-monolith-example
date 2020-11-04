@@ -1,7 +1,6 @@
 #!/bin/bash
 PATH=$(gobin -m -p \
 	github.com/golangci/golangci-lint/cmd/golangci-lint \
-	github.com/googleapis/api-linter/cmd/api-linter \
 	github.com/powerman/dockerize \
 	gotest.tools/gotestsum |
 	xargs dirname | sed -z -e 's/\n/:/g')$PATH
