@@ -2,11 +2,9 @@
 PATH=$(gobin -m -p \
 	github.com/golangci/golangci-lint/cmd/golangci-lint \
 	github.com/googleapis/api-linter/cmd/api-linter \
-	github.com/nilslice/protolock/cmd/protolock \
 	github.com/powerman/dockerize \
-	github.com/yoheimuta/protolint/cmd/protolint \
 	gotest.tools/gotestsum |
-	xargs dirname | sed -z 's/\n/:/g')$PATH
+	xargs dirname | sed -z -e 's/\n/:/g')$PATH
 set -x -e -o pipefail
 
 hadolint Dockerfile
@@ -25,8 +23,5 @@ done
 
 golangci-lint run
 
-if which dockerize &>/dev/null; then
-	dockerize -timeout 30s -wait "tcp://${MONO_X_MYSQL_ADDR_HOST}:${MONO_X_MYSQL_ADDR_PORT:-3306}"
-fi
-
+dockerize -timeout 30s -wait "tcp://${MONO_X_MYSQL_ADDR_HOST}:${MONO_X_MYSQL_ADDR_PORT:-3306}"
 gotestsum -- -race -tags=integration "$@" ./...
