@@ -6,6 +6,7 @@
 # na/**/me  - apply (* doesn't match /) to file "na/me", "na/*/me", "na/*/*/me", …
 go.sum binary
 *.*.go binary
+/third_party/*/** binary
 /api/**/model/** binary
 /api/**/restapi/** binary
 /api/**/restapi/configure_*.go -binary
