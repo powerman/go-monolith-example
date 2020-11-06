@@ -48,9 +48,9 @@ func TestSmoke(tt *testing.T) {
 	}()
 	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.Addr), "connect to service"))
 
-	mockAuthn.EXPECT().Authenticate(tokenAdmin).Return(authAdmin, nil).AnyTimes()
-	mockAuthn.EXPECT().Authenticate(tokenUser).Return(authUser, nil).AnyTimes()
-	mockAuthn.EXPECT().Authenticate(gomock.Any()).Return(dom.Auth{}, apix.ErrAccessTokenInvalid).AnyTimes()
+	mockAuthn.EXPECT().Authenticate(gomock.Any(), tokenAdmin).Return(authAdmin, nil).AnyTimes()
+	mockAuthn.EXPECT().Authenticate(gomock.Any(), tokenUser).Return(authUser, nil).AnyTimes()
+	mockAuthn.EXPECT().Authenticate(gomock.Any(), gomock.Any()).Return(dom.Auth{}, apix.ErrAccessTokenInvalid).AnyTimes()
 
 	rpcClient := jsonrpc2x.NewHTTPClient(fmt.Sprintf("http://%s/rpc", cfg.Addr))
 
@@ -70,13 +70,13 @@ func TestSmoke(tt *testing.T) {
 	}
 	{
 		argExample.Ctx.AccessToken = tokenAdmin
-		argExample.UserName = authAdmin.UserName
+		argExample.UserName = authAdmin.UserName.String()
 		err := rpcClient.Call("RPC.Example", argExample, &resExample)
 		t.Err(err, api.ErrNotFound)
 	}
 	{
 		argExample.Ctx.AccessToken = tokenUser
-		argExample.UserName = authUser.UserName
+		argExample.UserName = authUser.UserName.String()
 		t.Nil(rpcClient.Call("RPC.Example", argExample, &resExample))
 		t.NotZero(resExample.UpdatedAt)
 		t.DeepEqual(resExample, api.RPCExampleResp{

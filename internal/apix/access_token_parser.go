@@ -15,7 +15,7 @@ func NewAccessTokenParser() AccessTokenParser {
 }
 
 // Authenticate implements Authenticator interface.
-func (p AccessTokenParser) Authenticate(token AccessToken) (auth dom.Auth, err error) {
+func (p AccessTokenParser) Authenticate(_ Ctx, token AccessToken) (auth dom.Auth, err error) {
 	auth = p[token]
 	if auth.UserName == dom.NoUser {
 		err = ErrAccessTokenInvalid

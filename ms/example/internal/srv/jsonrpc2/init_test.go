@@ -38,27 +38,27 @@ var (
 		UserName: dom.NewUserName("2"),
 		Admin:    false,
 	}
-	userIDBad = dom.UserName("0")
+	userIDBad = dom.UserName{Name: dom.NewName("guests", "0")}
 )
 
 func testNew(t *check.C) (func(), *jsonrpc2x.Client, string, *app.MockAppl) {
 	ctrl := gomock.NewController(t)
 
-	mockApp := app.NewMockAppl(ctrl)
+	mockAppl := app.NewMockAppl(ctrl)
 	mockAuthn := apix.NewMockAuthn(ctrl)
-	srv := jsonrpc2.NewServer(mockApp, mockAuthn, jsonrpc2.Config{
+	srv := jsonrpc2.NewServer(mockAppl, mockAuthn, jsonrpc2.Config{
 		Pattern:   "/",
 		StrictErr: true,
 	})
 
-	mockAuthn.EXPECT().Authenticate(tokenAdmin).Return(authAdmin, nil).AnyTimes()
-	mockAuthn.EXPECT().Authenticate(tokenUser).Return(authUser, nil).AnyTimes()
-	mockAuthn.EXPECT().Authenticate(gomock.Any()).Return(dom.Auth{}, apix.ErrAccessTokenInvalid).AnyTimes()
+	mockAuthn.EXPECT().Authenticate(gomock.Any(), tokenAdmin).Return(authAdmin, nil).AnyTimes()
+	mockAuthn.EXPECT().Authenticate(gomock.Any(), tokenUser).Return(authUser, nil).AnyTimes()
+	mockAuthn.EXPECT().Authenticate(gomock.Any(), gomock.Any()).Return(dom.Auth{}, apix.ErrAccessTokenInvalid).AnyTimes()
 
 	ts := httptest.NewServer(srv)
 	cleanup := func() {
 		ts.Close()
 		ctrl.Finish()
 	}
-	return cleanup, jsonrpc2x.NewHTTPClient(ts.URL), ts.URL, mockApp
+	return cleanup, jsonrpc2x.NewHTTPClient(ts.URL), ts.URL, mockAppl
 }

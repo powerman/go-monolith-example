@@ -80,8 +80,6 @@ jobs:
             v2-test-${{ runner.os }}-${{ hashFiles('/tmp/tools.ver') }}-
 
       - name: Install tools
-        env:
-          GO111MODULE: 'on'
         run: |
           GO111MODULE=off go get -u github.com/myitcv/gobin
           hadolint --version | tee /dev/stderr | grep -wq v$HADOLINT_VER ||

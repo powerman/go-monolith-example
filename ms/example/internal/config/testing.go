@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/powerman/must"
 	"github.com/spf13/pflag"
@@ -26,7 +27,7 @@ func MustGetServeTest() *ServeConfig {
 
 	cfg.MySQL.Timeout = def.TestTimeout
 
-	const host = "localhost"
+	const host = "127.0.0.1"
 	cfg.Addr = netx.NewAddr(host, netx.UnusedTCPPort(host))
 	cfg.MetricsAddr = netx.NewAddr(host, 0)
 
@@ -36,7 +37,13 @@ func MustGetServeTest() *ServeConfig {
 		rootDir = filepath.Dir(rootDir)
 	}
 
-	cfg.MySQLGooseDir = filepath.Join(rootDir, cfg.MySQLGooseDir)
+	for _, path := range []*string{
+		&cfg.MySQLGooseDir,
+	} {
+		if !strings.HasPrefix(*path, "/") {
+			*path = filepath.Join(rootDir, *path)
+		}
+	}
 
 	return cfg
 }
