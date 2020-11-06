@@ -66,12 +66,8 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
 
       - uses: actions/checkout@v2
-        with:
-          ref: master
       
-      - uses: actions/checkout@v2
-        with:
-          clean: 'false'
+      - run: git fetch origin/master && git branch master origin/master
 
       - name: Setup
         run: |
