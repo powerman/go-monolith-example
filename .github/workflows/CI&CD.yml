@@ -68,6 +68,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: master
+          
+      - run: git checkout master
       
       - uses: actions/checkout@v2
 
