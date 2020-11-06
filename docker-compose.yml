@@ -54,9 +54,9 @@ services:
     container_name: mono_mono
     restart: always
     ports:
+      - "${MONO_ADDR_PORT:-0}:17000"
       - "${MONO_EXAMPLE_ADDR_PORT:-0}:17001"
-      - "${MONO_EXAMPLE_METRICS_ADDR_PORT:-0}:16001"
-      - "${MONO_METRICS_ADDR_PORT:-0}:16000"
+      - "${MONO_EXAMPLE_METRICS_ADDR_PORT:-0}:17002"
     environment:
       MONO_X_MYSQL_ADDR_HOST: "mysql"
       MONO_X_NATS_ADDR_URLS: "nats://nats:4222"

@@ -222,6 +222,9 @@ linters-settings:
         # - golang.org
     blocked:
       modules:                                                        # List of blocked modules
+        - github.com/cenkalti/backoff:
+            recommendations:
+              - github.com/cenkalti/backoff/v4
         # - github.com/uudashr/go-module:                             # Blocked module
         #     recommendations:                                        # Recommended modules that should be used instead (Optional)
         #       - golang.org/x/mod

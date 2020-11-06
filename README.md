@@ -106,8 +106,6 @@ for more details.
 GO111MODULE=off go get -u github.com/myitcv/gobin
 curl -sSfL https://github.com/hadolint/hadolint/releases/download/v1.18.0/hadolint-$(uname)-x86_64 | sudo install /dev/stdin /usr/local/bin/hadolint
 curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v0.7.1/shellcheck-v0.7.1.$(uname).x86_64.tar.xz | sudo tar xJf - -C /usr/local/bin --strip-components=1 shellcheck-v0.7.1/shellcheck
-curl -sSfL https://github.com/protocolbuffers/protobuf/releases/download/v3.12.4/protoc-3.12.4-$(uname -s)-$(uname -m).zip >/tmp/protoc.zip &&
-    sudo unzip -q -o /tmp/protoc.zip -d /usr/local/ -x readme.txt && rm /tmp/protoc.zip
 ```
 
 ### Setup

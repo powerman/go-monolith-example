@@ -63,8 +63,6 @@ jobs:
             - v2-{{ checksum "/tmp/tools.ver" }}-
       - run:
           name: Install tools
-          environment:
-            GO111MODULE: "on"
           command: |
             GO111MODULE=off go get -u github.com/myitcv/gobin
             hadolint --version | tee /dev/stderr | grep -wq v$HADOLINT_VER ||

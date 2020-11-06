@@ -24,7 +24,7 @@ func (c *JSONRPC2Ctx) NewContext(
 	authn Authn,
 	service string,
 ) (
-	ctx context.Context,
+	ctx Ctx,
 	log *structlog.Logger,
 	methodName string,
 	auth dom.Auth,
@@ -42,7 +42,9 @@ func (c *JSONRPC2Ctx) NewContext(
 	ctx = context.WithValue(ctx, contextKeyMethodName, methodName)
 
 	if c.AccessToken != "" {
-		auth, err = authn.Authenticate(c.AccessToken)
+		ctx = context.WithValue(ctx, contextKeyAccessToken, c.AccessToken)
+		auth, err = authn.Authenticate(ctx, c.AccessToken)
+		ctx = context.WithValue(ctx, contextKeyAuth, auth)
 	}
 
 	log = structlog.New(

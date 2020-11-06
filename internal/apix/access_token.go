@@ -19,7 +19,7 @@ type Authn interface {
 	// Auth. If validation fails returns zero Auth with error.
 	//
 	// Errors: ErrAccessTokenInvalid.
-	Authenticate(AccessToken) (dom.Auth, error)
+	Authenticate(Ctx, AccessToken) (dom.Auth, error)
 }
 
 // AccessToken is an access token.

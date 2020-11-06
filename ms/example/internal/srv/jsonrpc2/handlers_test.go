@@ -43,7 +43,7 @@ func TestExample(tt *testing.T) {
 				Ctx: apix.JSONRPC2Ctx{
 					AccessToken: tc.token,
 				},
-				UserName: tc.userID,
+				UserName: tc.userID.String(),
 			}
 			var res api.RPCExampleResp
 			err := c.Call("RPC.Example", req, &res)
