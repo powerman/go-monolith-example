@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/powerman/go-monolith-example/internal/config"
+	"github.com/powerman/go-monolith-example/ms/auth"
 	"github.com/powerman/go-monolith-example/ms/example"
 	"github.com/powerman/go-monolith-example/ms/mono"
 	"github.com/powerman/go-monolith-example/pkg/cobrax"
@@ -35,6 +36,7 @@ type embeddedService interface {
 var (
 	embeddedServices = []embeddedService{
 		&mono.Service{},
+		&auth.Service{},
 		&example.Service{},
 	}
 

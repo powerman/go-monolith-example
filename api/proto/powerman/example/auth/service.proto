@@ -1,0 +1,134 @@
+syntax = "proto3";
+
+package powerman.example.auth;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/powerman/go-monolith-example/api/proto/powerman/example/auth;api";
+
+// Public API, do not require authentication.
+service NoAuthSvc {
+    // Registers new user account.
+    //
+    // User can provide optional account_id (username).
+    //
+    // These fields will be ignored in input and set automatically:
+    // account.name, account.user.name, account.user.access.
+    //
+    // If account_id=="admin" then user's role will be set to ROLE_ADMIN.
+    //
+    // XXX No email validation.
+    rpc CreateAccount(CreateAccountRequest) returns (Account) {}
+
+    // Authenticates user by different credentials.
+    //
+    // Creates and returns access_token.
+    // Also returns user's account details for convenience.
+    rpc SigninIdentity(SigninIdentityRequest) returns (SigninIdentityResponse) {}
+}
+
+// Public API, require authentication.
+service AuthSvc {
+    // Logout.
+    //
+    // Invalidates either current or all user's access_token.
+    //
+    // (-- api-linter: core::0136::verb-noun=disabled --)
+    rpc SignoutIdentity(SignoutIdentityRequest) returns (SignoutIdentityResponse) {}
+}
+
+// Request.
+message CreateAccountRequest {
+    // The account to create.
+    Account account = 1 [(google.api.field_behavior) = REQUIRED];
+    // The ID to use for the account.
+    // This value should be 4-63 characters [a-z0-9-].
+    string account_id = 2;
+}
+
+// Request.
+message SigninIdentityRequest {
+    // Authentication using username and password.
+    message AccountAuth {
+        // This value should be 4-63 characters [a-z0-9-].
+        string account_id = 1;
+        // Any value.
+        string password = 2;
+    }
+    // Authentication user email and password.
+    message EmailAuth {
+        // This value should contain [@].
+        string email = 1;
+        // Any value.
+        string password = 2;
+    }
+    // Different ways to authenticate.
+    oneof auth {
+        // By username.
+        AccountAuth account = 1;
+        // By email.
+        EmailAuth email = 2;
+    }
+}
+
+// Response.
+message SigninIdentityResponse {
+    // Opaque.
+    string access_token = 1;
+    // User/Access details.
+    User user = 2;
+}
+
+// Request.
+message SignoutIdentityRequest {
+    // Set to true to invalidate all user's access_token.
+    bool everywhere = 1;
+}
+
+// Response.
+message SignoutIdentityResponse {}
+
+// Account contains data needed for authentication.
+message Account {
+    // Format: "accounts/{account_id}".
+    string name = 1;
+    // Default identity connected to the account.
+    User user = 2;
+    // Must be strong enough.
+    string password = 16 [(google.api.field_behavior) = INPUT_ONLY];
+    // Primary email, needed to reset password.
+    string email = 3;
+    // Account create time.
+    // Output only.
+    google.protobuf.Timestamp create_time = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// User is an identity tied to Account.
+message User {
+    // Format: "users/{user_uid}".
+    string name = 1;
+    // By default set to {account_id}.
+    string display_name = 2;
+    // Permissions.
+    Access access = 3;
+}
+
+// Access describes identity's permissions.
+message Access {
+    // Possible roles for a user.
+    // New values may be added in the future.
+    enum Role {
+        // Default value. This value is unused.
+        ROLE_UNSPECIFIED = 0;
+        // Full access to everything.
+        ROLE_ADMIN = 1;
+        // Full access only to user's own data.
+        // Read-only access to user's Access.
+        ROLE_USER = 2;
+    }
+    // User's role.
+    Role role = 1;
+}

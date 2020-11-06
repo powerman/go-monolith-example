@@ -22,9 +22,11 @@ func Test(t *testing.T) {
 		MySQLGooseDir: "ms/example/internal/migrations",
 		NATSURLs:      "nats://localhost:4222",
 		STANClusterID: "cluster",
+		AuthAddrInt:   netx.NewAddr(def.Hostname, config.AuthPortInt),
 		Addr:          netx.NewAddr(def.Hostname, config.ExamplePort),
 		MetricsAddr:   netx.NewAddr(def.Hostname, config.ExampleMetricsPort),
 		Path:          "/rpc",
+		TLSCACert:     "ca.crt",
 	}
 
 	t.Run("required", func(tt *testing.T) {
@@ -68,6 +70,8 @@ func Test(t *testing.T) {
 			"--example.mysql.dbname=db4",
 			"--nats.urls=nats://nats4:4222",
 			"--stan.cluster_id=cluster4",
+			"--auth.host.int=authhost4",
+			"--auth.port.int=44",
 			"--host=host4",
 			"--host-int=metrics4",
 			"--example.port=8004",
@@ -82,6 +86,7 @@ func Test(t *testing.T) {
 		})
 		want.NATSURLs = "nats://nats4:4222"
 		want.STANClusterID = "cluster4"
+		want.AuthAddrInt = netx.NewAddr("authhost4", 44)
 		want.Addr = netx.NewAddr("host4", 8004)
 		want.MetricsAddr = netx.NewAddr("metrics4", 4)
 		t.DeepEqual(c, want)

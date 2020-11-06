@@ -3,6 +3,10 @@ package example
 
 import (
 	"context"
+	"crypto/x509"
+	"errors"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/powerman/structlog"
@@ -27,9 +31,12 @@ type Ctx = context.Context
 
 var reg = prometheus.NewPedanticRegistry() //nolint:gochecknoglobals // Metrics are global anyway.
 
+var errPEM = errors.New("unable to load PEM certs")
+
 // Service implements main.embeddedService interface.
 type Service struct {
 	cfg      *config.ServeConfig
+	ca       *x509.CertPool
 	natsConn *natsx.NATSConn
 	stanConn *natsx.STANConn
 	repo     *dal.Repo
@@ -61,6 +68,14 @@ func (s *Service) RunServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	log := structlog.FromContext(ctxShutdown, nil)
 	if s.cfg == nil {
 		s.cfg, err = config.GetServe()
+	}
+	if err == nil {
+		s.ca = x509.NewCertPool()
+		var caCert []byte
+		caCert, err = ioutil.ReadFile(s.cfg.TLSCACert)
+		if err == nil && !s.ca.AppendCertsFromPEM(caCert) {
+			err = fmt.Errorf("%w: %q", errPEM, s.cfg.TLSCACert)
+		}
 	}
 	if err != nil {
 		return log.Err("failed to get config", "err", err)
@@ -112,8 +127,8 @@ func (s *Service) connectRepo(ctx Ctx) (interface{}, error) {
 	return dal.New(ctx, s.cfg.MySQLGooseDir, s.cfg.MySQL)
 }
 
-func (s *Service) setupAuthn(_ Ctx) (interface{}, error) {
-	return apix.NewAccessTokenParser(), nil
+func (s *Service) setupAuthn(ctx Ctx) (interface{}, error) {
+	return apix.NewAuthnClient(ctx, reg, app.ServiceName, s.ca, s.cfg.AuthAddrInt.String())
 }
 
 func (s *Service) serveMetrics(ctx Ctx) error {

@@ -83,6 +83,9 @@ for more details.
 - [X] Graceful shutdown support.
 - [X] Configuration defaults can be overwritten by env vars and flags.
 - [X] Example JSON-RPC 2.0 over HTTP API, with CORS support.
+- [X] Example gRPC:
+  - [X] External and internal APIs on different host/port.
+  - [X] gRPC services with and without token-based authentication.
 - [X] Example tests, both unit and integration.
 - [X] Production logging using [structlog](https://github.com/powerman/structlog).
 - [X] Production metrics using Prometheus.
@@ -116,6 +119,22 @@ curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v0.7.1/shell
    source env.sh; fi && docker-compose"` and then run `dc` instead of
    `docker-compose` - this way you won't have to run `source env.sh` after
    changing it.
+
+#### HTTPS
+
+1. This project requires https:// and will send HTST and CSP HTTP headers,
+   and also it uses gRPC with authentication which also require TLS certs,
+   so you'll need to create certificate to run it on localhost - follow
+   instructions in [Create local CA to issue localhost HTTPS
+   certificates](https://gist.github.com/powerman/2fc4b1a5aee62dd9491cee7f75ead0b4).
+2. Or you can just use certificates in `configs/pki`, which was created this way:
+
+```
+$ /path/to/easyrsa init-pki
+$ echo Dev CA $(go list -m) | /path/to/easyrsa build-ca nopass
+$ /path/to/easyrsa --days=3650 "--subject-alt-name=DNS:localhost" build-server-full ms-auth nopass
+$ /path/to/easyrsa --days=3650 "--subject-alt-name=IP:127.0.0.1" build-server-full ms-auth-int nopass
+```
 
 ### Usage
 
@@ -246,7 +265,6 @@ $ ./bin/mono serve
 
 ## TODO
 
-- [ ] Add gRPC service example.
 - [ ] Add OpenAPI service example.
 - [ ] Add NATS/STAN publish/subscribe example.
 - [ ] Add DAL implementation for Postgresql.

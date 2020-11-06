@@ -55,6 +55,9 @@ services:
     restart: always
     ports:
       - "${MONO_ADDR_PORT:-0}:17000"
+      - "${MONO_AUTH_ADDR_PORT:-0}:17003"
+      - "${MONO_AUTH_ADDR_PORT_INT:-0}:17004"
+      - "${MONO_AUTH_METRICS_ADDR_PORT:-0}:17005"
       - "${MONO_EXAMPLE_ADDR_PORT:-0}:17001"
       - "${MONO_EXAMPLE_METRICS_ADDR_PORT:-0}:17002"
     environment:
@@ -63,3 +66,4 @@ services:
       MONO_X_STAN_CLUSTER_ID: "local"
       MONO__EXAMPLE_MYSQL_AUTH_LOGIN: "root"
       MONO__EXAMPLE_MYSQL_AUTH_PASS: ""
+      MONO__AUTH_SECRET: "s3cr3t"

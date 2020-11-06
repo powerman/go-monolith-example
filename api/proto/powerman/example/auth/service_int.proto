@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+// (-- api-linter: core::0127::http-annotation=disabled
+//     aip.dev/not-precedent: No HTTP support for private API. --)
+
+package powerman.example.auth;
+
+import "powerman/example/auth/service.proto";
+
+option go_package = "github.com/powerman/go-monolith-example/api/proto/powerman/example/auth;api";
+
+// Private API, require authentication.
+service AuthIntSvc {
+    // Returns identity tied to access_token.
+    rpc CheckAccessToken(CheckAccessTokenRequest) returns (CheckAccessTokenResponse) {}
+}
+
+// Request.
+message CheckAccessTokenRequest {}
+
+// Response.
+message CheckAccessTokenResponse {
+    // Identity tied to access_token.
+    User user = 1;
+}
