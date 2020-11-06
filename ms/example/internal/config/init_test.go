@@ -24,6 +24,7 @@ var (
 func TestMain(m *testing.M) {
 	def.Init()
 	os.Clearenv()
+	os.Setenv("MONO_TLS_CA_CERT", "ca.crt")
 	os.Setenv("MONO_X_MYSQL_ADDR_HOST", "localhost")
 	os.Setenv("MONO_X_NATS_ADDR_URLS", "nats://localhost:4222")
 	os.Setenv("MONO_X_STAN_CLUSTER_ID", "cluster")

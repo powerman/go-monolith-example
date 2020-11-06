@@ -1,0 +1,88 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            f4:e1:6e:d0:52:d9:e1:65:91:20:65:59:6b:3e:9f:89
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN=Dev CA github.com/powerman/go-monolith-example
+        Validity
+            Not Before: Nov  6 10:14:00 2020 GMT
+            Not After : Nov  4 10:14:00 2030 GMT
+        Subject: CN=ms-auth
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (2048 bit)
+                Modulus:
+                    00:b9:40:aa:c3:5f:a2:53:42:ec:e8:fa:5d:ff:a2:
+                    9a:d2:2a:29:fc:ec:5a:65:ad:a5:7a:fb:d5:10:cb:
+                    b1:03:97:a7:b1:f4:78:18:fc:1b:05:a9:eb:62:93:
+                    2e:cf:4f:18:4b:61:fa:cb:91:f3:17:e9:76:d5:04:
+                    9a:38:3b:f2:12:76:3c:a5:11:58:cf:21:9a:b3:5f:
+                    20:e9:6f:7d:97:83:df:ab:5e:7f:e0:41:6a:8b:c5:
+                    88:aa:fe:ff:18:74:c9:e3:00:6d:e7:f1:68:9a:34:
+                    35:85:1d:c0:d7:84:12:47:fe:0d:f3:c7:05:38:66:
+                    73:92:25:5f:2d:ac:3a:3e:15:80:d8:88:cf:cc:b8:
+                    fe:f9:7f:5e:bd:e9:2a:b9:0f:97:d2:f0:0c:37:29:
+                    34:c1:d9:63:5a:bd:28:d1:70:20:75:25:0b:53:e4:
+                    0d:19:3e:56:ef:58:aa:54:cf:0a:8c:87:31:80:e8:
+                    c2:eb:41:f6:f7:12:eb:70:54:e4:aa:20:4b:30:ca:
+                    ac:4b:b4:26:c7:fa:d2:5e:28:6e:87:09:08:ed:6f:
+                    d2:62:76:60:4f:67:97:3d:e0:7f:de:39:78:f3:c4:
+                    cb:af:46:e3:c7:89:dd:ac:f8:4f:e7:75:77:49:14:
+                    c1:72:26:07:6c:ce:f9:7e:a2:e0:46:7b:49:65:ff:
+                    07:a1
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 Subject Key Identifier: 
+                BF:4F:FD:34:CD:B5:9B:B4:21:5F:22:07:BE:ED:50:52:20:08:6D:D3
+            X509v3 Authority Key Identifier: 
+                keyid:EC:FB:82:1D:DC:CB:A3:F9:FA:02:98:10:D7:B6:B3:9A:EF:67:4C:EF
+                DirName:/CN=Dev CA github.com/powerman/go-monolith-example
+                serial:22:C1:C6:47:29:F7:26:71:92:BA:1E:29:A2:29:90:F4:D4:81:AE:D3
+
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+            X509v3 Subject Alternative Name: 
+                DNS:localhost
+    Signature Algorithm: sha256WithRSAEncryption
+         13:0e:ce:76:e4:70:ea:3d:ed:0f:95:22:3d:22:4d:17:46:79:
+         0a:df:da:ad:70:eb:d2:de:23:1a:7e:1c:08:48:63:92:36:b7:
+         99:88:37:01:14:9f:a3:18:6c:4b:b6:74:a4:b3:07:1c:f8:db:
+         8d:d4:fe:05:6e:4d:db:d3:9a:2f:94:3d:b2:d1:4f:14:74:13:
+         31:98:ed:f1:5d:aa:54:51:9a:00:7c:f5:eb:ed:30:d3:33:01:
+         7c:64:34:ac:f3:f0:6f:99:9d:aa:3f:f3:e3:2c:78:6e:5a:8d:
+         49:62:a6:56:90:8e:52:6b:c7:71:23:bb:95:1f:01:7f:fd:d1:
+         a3:ac:05:c3:5e:c5:28:80:65:90:d7:69:23:ef:26:80:33:09:
+         c2:39:ff:0a:b0:20:a5:c4:92:e0:90:10:a0:58:48:33:2c:9d:
+         2a:c8:ca:a5:31:79:2c:ec:8b:62:f6:25:98:27:45:53:0e:00:
+         8e:ae:98:94:a9:40:ad:cb:5f:40:33:2d:4f:7b:47:5a:eb:22:
+         95:04:3a:17:ac:f3:01:6d:5c:00:d5:b7:9d:f2:c5:fe:bf:de:
+         9c:4d:85:b8:ed:ee:a6:21:1a:ad:3d:3c:78:79:df:1a:45:46:
+         2b:56:bc:e8:7d:0d:4a:76:b2:9e:e4:7b:54:db:5e:13:33:03:
+         3d:b0:95:e7
+-----BEGIN CERTIFICATE-----
+MIIDsjCCApqgAwIBAgIRAPThbtBS2eFlkSBlWWs+n4kwDQYJKoZIhvcNAQELBQAw
+OTE3MDUGA1UEAwwuRGV2IENBIGdpdGh1Yi5jb20vcG93ZXJtYW4vZ28tbW9ub2xp
+dGgtZXhhbXBsZTAeFw0yMDExMDYxMDE0MDBaFw0zMDExMDQxMDE0MDBaMBIxEDAO
+BgNVBAMMB21zLWF1dGgwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC5
+QKrDX6JTQuzo+l3/oprSKin87FplraV6+9UQy7EDl6ex9HgY/BsFqetiky7PTxhL
+YfrLkfMX6XbVBJo4O/ISdjylEVjPIZqzXyDpb32Xg9+rXn/gQWqLxYiq/v8YdMnj
+AG3n8WiaNDWFHcDXhBJH/g3zxwU4ZnOSJV8trDo+FYDYiM/MuP75f1696Sq5D5fS
+8Aw3KTTB2WNavSjRcCB1JQtT5A0ZPlbvWKpUzwqMhzGA6MLrQfb3EutwVOSqIEsw
+yqxLtCbH+tJeKG6HCQjtb9JidmBPZ5c94H/eOXjzxMuvRuPHid2s+E/ndXdJFMFy
+Jgdszvl+ouBGe0ll/wehAgMBAAGjgdswgdgwCQYDVR0TBAIwADAdBgNVHQ4EFgQU
+v0/9NM21m7QhXyIHvu1QUiAIbdMwdAYDVR0jBG0wa4AU7PuCHdzLo/n6ApgQ17az
+mu9nTO+hPaQ7MDkxNzA1BgNVBAMMLkRldiBDQSBnaXRodWIuY29tL3Bvd2VybWFu
+L2dvLW1vbm9saXRoLWV4YW1wbGWCFCLBxkcp9yZxkroeKaIpkPTUga7TMBMGA1Ud
+JQQMMAoGCCsGAQUFBwMBMAsGA1UdDwQEAwIFoDAUBgNVHREEDTALgglsb2NhbGhv
+c3QwDQYJKoZIhvcNAQELBQADggEBABMOznbkcOo97Q+VIj0iTRdGeQrf2q1w69Le
+Ixp+HAhIY5I2t5mINwEUn6MYbEu2dKSzBxz4243U/gVuTdvTmi+UPbLRTxR0EzGY
+7fFdqlRRmgB89evtMNMzAXxkNKzz8G+Znao/8+MseG5ajUliplaQjlJrx3Eju5Uf
+AX/90aOsBcNexSiAZZDXaSPvJoAzCcI5/wqwIKXEkuCQEKBYSDMsnSrIyqUxeSzs
+i2L2JZgnRVMOAI6umJSpQK3LX0AzLU97R1rrIpUEOhes8wFtXADVt53yxf6/3pxN
+hbjt7qYhGq09PHh53xpFRitWvOh9DUp2sp7ke1TbXhMzAz2wlec=
+-----END CERTIFICATE-----

@@ -1,0 +1,12 @@
+- included_paths:
+    - 'api/proto/**/*.proto'
+  disabled_rules:
+    - 'core::0191::java-outer-classname'    # We don't use Java.
+    - 'core::0191::java-multiple-files'     # We don't use Java.
+    - 'core::0191::java-package'            # We don't use Java.
+    - 'core::0215::versioned-packages'      # Allow omitted version for v1.
+    - 'core::0123::resource-annotation'     # We are not Google, so we don't use it.
+    - 'core::0133::method-signature'        # Not useful in Go code.
+    - 'core::0133::http-uri-parent'         # We mostly use top-level resources.
+    - 'core::0133::request-parent-required' # We mostly use top-level resources.
+    - 'core::0127::http-annotation'         # We don't proxy gRPC to HTTP REST.

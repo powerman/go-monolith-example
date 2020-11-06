@@ -1,0 +1,22 @@
+version: v1beta1
+build:
+  roots:
+    - api/proto
+    - third_party/googleapis/api-common-protos
+breaking:
+  use:
+    - WIRE_JSON
+lint:
+  ignore:
+    - google
+  use:
+    - DEFAULT
+    - COMMENTS
+    - OTHER
+  except:
+    - PACKAGE_VERSION_SUFFIX        # Allow omitted version for v1.
+    - RPC_REQUEST_RESPONSE_UNIQUE   # Allow CRUD to return entity type.
+    - RPC_RESPONSE_STANDARD_NAME    # Allow CRUD to return entity type.
+  service_suffix: Svc
+  rpc_allow_google_protobuf_empty_responses: true
+  allow_comment_ignores: true

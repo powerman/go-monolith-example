@@ -83,6 +83,8 @@ func Init(sharedCfg *SharedCfg, flagsets FlagSets) error {
 	appcfg.AddPFlag(fs.Serve, &own.MySQLName, pfx+"mysql.dbname", "MySQL database name")
 	appcfg.AddPFlag(fs.Serve, &shared.XNATSAddrUrls, "nats.urls", "URLs to connect to NATS (separated by comma)")
 	appcfg.AddPFlag(fs.Serve, &shared.XSTANClusterID, "stan.cluster_id", "STAN cluster ID")
+	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrHostInt, "auth.host.int", "host to connect to ms/auth internal API")
+	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrPortInt, "auth.port.int", "port to connect to ms/auth internal API")
 	appcfg.AddPFlag(fs.Serve, &shared.AddrHost, "host", "host to serve")
 	appcfg.AddPFlag(fs.Serve, &shared.AddrHostInt, "host-int", "internal host to serve")
 	appcfg.AddPFlag(fs.Serve, &shared.ExampleAddrPort, pfx+"port", "port to serve")
@@ -97,9 +99,11 @@ type ServeConfig struct {
 	MySQLGooseDir string
 	NATSURLs      string
 	STANClusterID string
+	AuthAddrInt   netx.Addr
 	Addr          netx.Addr
 	MetricsAddr   netx.Addr
 	Path          string
+	TLSCACert     string
 }
 
 // GetServe validates and returns configuration for subcommand.
@@ -116,9 +120,11 @@ func GetServe() (c *ServeConfig, err error) {
 		MySQLGooseDir: own.GooseDir.Value(&err),
 		NATSURLs:      shared.XNATSAddrUrls.Value(&err),
 		STANClusterID: shared.XSTANClusterID.Value(&err),
+		AuthAddrInt:   netx.NewAddr(shared.AuthAddrHostInt.Value(&err), shared.AuthAddrPortInt.Value(&err)),
 		Addr:          netx.NewAddr(shared.AddrHost.Value(&err), shared.ExampleAddrPort.Value(&err)),
 		MetricsAddr:   netx.NewAddr(shared.AddrHostInt.Value(&err), shared.ExampleMetricsAddrPort.Value(&err)),
 		Path:          own.Path.Value(&err),
+		TLSCACert:     shared.TLSCACert.Value(&err),
 	}
 	if err != nil {
 		return nil, appcfg.WrapPErr(err, fs.Serve, own, shared)

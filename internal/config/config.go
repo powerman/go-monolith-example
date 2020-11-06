@@ -22,8 +22,13 @@ const EnvPrefix = "MONO_"
 type Shared struct {
 	AddrHost               appcfg.NotEmptyString `env:"ADDR_HOST"`
 	AddrHostInt            appcfg.NotEmptyString `env:"ADDR_HOST_INT"`
+	AuthAddrHostInt        appcfg.NotEmptyString `env:"AUTH_ADDR_HOST_INT"`
+	AuthAddrPort           appcfg.Port           `env:"AUTH_ADDR_PORT"`
+	AuthAddrPortInt        appcfg.Port           `env:"AUTH_ADDR_PORT_INT"`
+	AuthMetricsAddrPort    appcfg.Port           `env:"AUTH_METRICS_ADDR_PORT"`
 	ExampleAddrPort        appcfg.Port           `env:"EXAMPLE_ADDR_PORT"`
 	ExampleMetricsAddrPort appcfg.Port           `env:"EXAMPLE_METRICS_ADDR_PORT"`
+	TLSCACert              appcfg.NotEmptyString `env:"TLS_CA_CERT"`
 	XMySQLAddrHost         appcfg.NotEmptyString `env:"X_MYSQL_ADDR_HOST"`
 	XMySQLAddrPort         appcfg.Port           `env:"X_MYSQL_ADDR_PORT"`
 	XNATSAddrUrls          appcfg.NotEmptyString `env:"X_NATS_ADDR_URLS"`
@@ -35,11 +40,18 @@ const (
 	MonoPort = 17000 + iota
 	ExamplePort
 	ExampleMetricsPort
+	AuthPort
+	AuthPortInt
+	AuthMetricsPort
 )
 
 var shared = &Shared{ //nolint:gochecknoglobals // Config is global anyway.
 	AddrHost:               appcfg.MustNotEmptyString(def.Hostname),
 	AddrHostInt:            appcfg.MustNotEmptyString(def.Hostname),
+	AuthAddrHostInt:        appcfg.MustNotEmptyString(def.Hostname),
+	AuthAddrPort:           appcfg.MustPort(strconv.Itoa(AuthPort)),
+	AuthAddrPortInt:        appcfg.MustPort(strconv.Itoa(AuthPortInt)),
+	AuthMetricsAddrPort:    appcfg.MustPort(strconv.Itoa(AuthMetricsPort)),
 	ExampleAddrPort:        appcfg.MustPort(strconv.Itoa(ExamplePort)),
 	ExampleMetricsAddrPort: appcfg.MustPort(strconv.Itoa(ExampleMetricsPort)),
 	XMySQLAddrPort:         appcfg.MustPort("3306"),

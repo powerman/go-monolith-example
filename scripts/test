@@ -1,6 +1,8 @@
 #!/bin/bash
 PATH=$(gobin -m -p \
+	github.com/bufbuild/buf/cmd/buf \
 	github.com/golangci/golangci-lint/cmd/golangci-lint \
+	github.com/googleapis/api-linter/cmd/api-linter \
 	github.com/powerman/dockerize \
 	gotest.tools/gotestsum |
 	xargs dirname | sed -z -e 's/\n/:/g')$PATH
@@ -9,6 +11,20 @@ set -x -e -o pipefail
 hadolint Dockerfile
 
 shellcheck env.sh.dist scripts/*
+
+if test -d api/proto; then
+	git show-branch master >/dev/null
+	! git ls-tree -r master api/proto | grep -q '[.]proto$' ||
+		! find api/proto -name '*.proto' -print -quit 2>/dev/null | grep -q . ||
+		buf check breaking --against '.git#branch=master'
+
+	buf check lint
+
+	# shellcheck disable=SC2046 # $(sed) needs to output multiple words.
+	find api/proto -name '*.proto' -print0 2>/dev/null | xargs -0 --no-run-if-empty -n 1 \
+		api-linter --set-exit-status --config .api-linter.yml \
+		$(sed -n -e '/roots:/,/:$/{s/^\s*- /-I /p}' buf.yaml)
+fi
 
 # When https://github.com/quasilyte/go-ruleguard/issues/78 will be
 # implemented and available in golangci-lint then replace using

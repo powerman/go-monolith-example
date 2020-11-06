@@ -3,10 +3,15 @@ module github.com/powerman/go-monolith-example
 go 1.15
 
 require (
+	github.com/bufbuild/buf v0.29.0
 	github.com/cheekybits/genny v1.0.1-0.20200709201058-3e22f1a88ff2
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/mock v1.4.4
+	github.com/golang/protobuf v1.4.3
 	github.com/golangci/golangci-lint v1.32.2
+	github.com/googleapis/api-linter v1.7.1
+	github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4
+	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
 	github.com/mattn/goveralls v0.0.7
 	github.com/nats-io/nats-streaming-server v0.18.0 // indirect
@@ -30,5 +35,12 @@ require (
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
+	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
+	golang.org/x/oauth2 v0.0.0-20200902213428-5d25da1a8d43
+	golang.org/x/text v0.3.3
+	google.golang.org/genproto v0.0.0-20201030142918-24207fddd1c3
+	google.golang.org/grpc v1.33.1
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.0.1
+	google.golang.org/protobuf v1.25.0
 	gotest.tools/gotestsum v0.6.0
 )

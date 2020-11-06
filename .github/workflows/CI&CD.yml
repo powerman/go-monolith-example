@@ -30,9 +30,15 @@ jobs:
     env:
       HADOLINT_VER: '1.18.0'
       SHELLCHECK_VER: '0.7.1'
+      MONO_TLS_CA_CERT: 'configs/pki/ca.crt'
       MONO_X_MYSQL_ADDR_HOST: 'localhost'
       MONO_X_NATS_ADDR_URLS: 'nats://localhost:4222'
       MONO_X_STAN_CLUSTER_ID: 'ci'
+      MONO__AUTH_SECRET: 's3cr3t'
+      MONO__AUTH_TLS_CERT: 'configs/pki/issued/ms-auth.crt'
+      MONO__AUTH_TLS_CERT_INT: 'configs/pki/issued/ms-auth-int.crt'
+      MONO__AUTH_TLS_KEY: 'configs/pki/private/ms-auth.key'
+      MONO__AUTH_TLS_KEY_INT: 'configs/pki/private/ms-auth-int.key'
       MONO__EXAMPLE_MYSQL_AUTH_LOGIN: 'root'
       MONO__EXAMPLE_MYSQL_AUTH_PASS: ''
       NARADA4D_TEST_MYSQL: 'goose-mysql://root@127.0.0.1'
@@ -60,6 +66,8 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
 
       - uses: actions/checkout@v2
+      
+      - run: git fetch --depth=1 origin master && git branch master origin/master
 
       - name: Setup
         run: |
