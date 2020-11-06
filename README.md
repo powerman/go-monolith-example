@@ -27,6 +27,7 @@ for more details.
 - [Development](#development)
   - [Requirements](#requirements)
   - [Setup](#setup)
+    - [HTTPS](#https)
   - [Usage](#usage)
     - [Cheatsheet](#cheatsheet)
 - [Run](#run)
