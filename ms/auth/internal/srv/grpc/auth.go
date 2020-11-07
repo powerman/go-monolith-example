@@ -21,6 +21,8 @@ func (srv *server) authn(ctx Ctx, fullMethod string) (Ctx, error) {
 	ctx, auth, err := apix.GRPCNewContext(ctx, fullMethod, srv)
 
 	switch {
+	case strings.Contains(fullMethod, "/grpc.reflection."):
+		return ctx, nil
 	case strings.Contains(fullMethod, ".NoAuthSvc/"):
 		return ctx, nil
 	case errors.Is(err, apix.ErrAccessTokenInvalid):
