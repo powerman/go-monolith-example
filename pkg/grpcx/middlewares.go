@@ -158,9 +158,12 @@ func UnaryClientAccessLog(ctx Ctx, method string, req, reply interface{}, cc *gr
 // StreamClientAccessLog returns a new stream client interceptor that logs request status.
 func StreamClientAccessLog(ctx Ctx, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 	log := structlog.FromContext(ctx, nil)
-	log.Info("started")
 	clientStream, err := streamer(ctx, desc, cc, method, opts...)
-	err = logHandler(log, err)
+	if status.Convert(err).Code() == codes.OK {
+		log.Info("started")
+	} else {
+		err = logHandler(log, err)
+	}
 	return clientStream, err
 }
 
