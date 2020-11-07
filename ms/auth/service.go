@@ -76,10 +76,12 @@ func (s *Service) RunServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	}
 
 	s.srv = grpc.NewServer(s.appl, grpc.Config{
-		Cert: &s.cert,
+		CtxShutdown: ctxShutdown,
+		Cert:        &s.cert,
 	})
 	s.srvInt = grpc.NewServerInt(s.appl, grpc.Config{
-		Cert: &s.certInt,
+		CtxShutdown: ctxShutdown,
+		Cert:        &s.certInt,
 	})
 
 	err = concurrent.Serve(ctxShutdown, shutdown,

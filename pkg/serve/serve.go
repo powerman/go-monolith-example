@@ -102,7 +102,7 @@ func GRPC(ctx Ctx, addr netx.Addr, srv *grpc.Server, service string) (err error)
 	select {
 	case err = <-errc:
 	case <-ctx.Done():
-		srv.GracefulStop() // TODO Use Stop() if it will not interrupt streaming.
+		srv.GracefulStop() // It will not interrupt streaming.
 	}
 	if err != nil {
 		return log.Err("failed to serve", "err", err)

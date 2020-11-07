@@ -16,20 +16,23 @@ import (
 type Ctx = context.Context
 
 type Config struct {
-	Cert *tls.Certificate
+	CtxShutdown Ctx // Let streaming methods use def.MergeCancel(stream.Context(), CtxShutdown).
+	Cert        *tls.Certificate
 }
 
 type server struct {
 	api.UnimplementedNoAuthSvcServer
 	api.UnimplementedAuthSvcServer
 	api.UnimplementedAuthIntSvcServer
-	appl app.Appl
+	appl        app.Appl
+	ctxShutdown Ctx
 }
 
 // NewServer creates and returns gRPC server.
 func NewServer(appl app.Appl, cfg Config) *grpc.Server {
 	srv := &server{
-		appl: appl,
+		appl:        appl,
+		ctxShutdown: cfg.CtxShutdown,
 	}
 	server := grpcx.NewServer(app.ServiceName, app.Metric, metric.server, cfg.Cert, srv.authn)
 	api.RegisterNoAuthSvcServer(server, srv)
@@ -41,7 +44,8 @@ func NewServer(appl app.Appl, cfg Config) *grpc.Server {
 // NewServerInt creates and returns gRPC server.
 func NewServerInt(appl app.Appl, cfg Config) *grpc.Server {
 	srv := &server{
-		appl: appl,
+		appl:        appl,
+		ctxShutdown: cfg.CtxShutdown,
 	}
 	server := grpcx.NewServer(app.ServiceName, app.Metric, metric.server, cfg.Cert, srv.authn)
 	api.RegisterAuthIntSvcServer(server, srv)
