@@ -159,7 +159,7 @@ func UnaryClientAccessLog(ctx Ctx, method string, req, reply interface{}, cc *gr
 func StreamClientAccessLog(ctx Ctx, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 	log := structlog.FromContext(ctx, nil)
 	clientStream, err := streamer(ctx, desc, cc, method, opts...)
-	if status.Convert(err).Code() == codes.OK {
+	if status.Code(err) == codes.OK {
 		log.Info("started")
 	} else {
 		err = logHandler(log, err)

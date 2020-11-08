@@ -6,7 +6,6 @@ import (
 	"crypto/tls"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 
 	api "github.com/powerman/go-monolith-example/api/proto/powerman/example/auth"
 	"github.com/powerman/go-monolith-example/ms/auth/internal/app"
@@ -35,8 +34,7 @@ func NewServer(appl app.Appl, cfg Config) *grpc.Server {
 		appl:        appl,
 		ctxShutdown: cfg.CtxShutdown,
 	}
-	server := grpcx.NewServer(app.ServiceName, app.Metric, metric.server, cfg.Cert, srv.authn)
-	reflection.Register(server)
+	server, _ := grpcx.NewServer(app.ServiceName, app.Metric, metric.server, cfg.Cert, srv.authn)
 	api.RegisterNoAuthSvcServer(server, srv)
 	api.RegisterAuthSvcServer(server, srv)
 	metric.server.InitializeMetrics(server)
@@ -49,8 +47,7 @@ func NewServerInt(appl app.Appl, cfg Config) *grpc.Server {
 		appl:        appl,
 		ctxShutdown: cfg.CtxShutdown,
 	}
-	server := grpcx.NewServer(app.ServiceName, app.Metric, metric.server, cfg.Cert, srv.authn)
-	reflection.Register(server)
+	server, _ := grpcx.NewServer(app.ServiceName, app.Metric, metric.server, cfg.Cert, srv.authn)
 	api.RegisterAuthIntSvcServer(server, srv)
 	metric.server.InitializeMetrics(server)
 	return server
