@@ -69,7 +69,9 @@ jobs:
 
       - name: Fetch master branch (to compare .proto files)
         run: |
-          git fetch --depth=1 origin master && git branch master origin/master
+          if ! git show-branch master >/dev/null 2>&1; then
+            git fetch --depth=1 origin master && git branch master origin/master
+          fi
 
       - name: Setup
         run: |
