@@ -56,8 +56,13 @@ func ParseName(collection, name string) (*Name, error) {
 	return &n, nil
 }
 
-// String returns "{collection}/{id}".
-func (name Name) String() string { return name.collection + "/" + name.id }
+// String returns "{collection}/{id}" or empty string for NoName.
+func (name Name) String() string {
+	if name == NoName {
+		return ""
+	}
+	return name.collection + "/" + name.id
+}
 
 // ID returns "{id}" part of the name.
 func (name Name) ID() string { return name.id }

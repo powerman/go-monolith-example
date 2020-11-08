@@ -4,6 +4,8 @@ import (
 	"crypto/x509"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	api "github.com/powerman/go-monolith-example/api/proto/powerman/example/auth"
 	"github.com/powerman/go-monolith-example/internal/dom"
@@ -33,7 +35,7 @@ func NewAuthnClient(
 }
 
 func (c *authnClient) Authenticate(ctx Ctx, accessToken AccessToken) (auth dom.Auth, err error) {
-	resp, err := c.client.CheckAccessToken(ctx, nil, grpcx.Token(string(accessToken)))
+	resp, err := c.client.CheckAccessToken(ctx, &api.CheckAccessTokenRequest{}, grpcx.Token(string(accessToken)))
 	var userName *dom.UserName
 	if err == nil {
 		userName, err = dom.ParseUserName(resp.GetUser().GetName())
@@ -41,6 +43,9 @@ func (c *authnClient) Authenticate(ctx Ctx, accessToken AccessToken) (auth dom.A
 	if err == nil {
 		auth.UserName = *userName
 		auth.Admin = resp.GetUser().GetAccess().GetRole() == api.Access_ROLE_ADMIN
+	}
+	if status.Code(err) == codes.Unauthenticated {
+		err = ErrAccessTokenInvalid
 	}
 	return auth, err
 }
