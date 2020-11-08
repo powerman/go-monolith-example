@@ -14,8 +14,15 @@ import (
 
 // Dial creates a gRPC client connection to the given target.
 func Dial(ctx Ctx, addr, service string, metrics *grpc_prometheus.ClientMetrics, ca *x509.CertPool) (*grpc.ClientConn, error) {
+	const serviceConfigHealthCheck = `{
+		"loadBalancingPolicy": "round_robin",
+		"healthCheckConfig": {
+			"serviceName": ""
+		}
+	}`
 	return grpc.DialContext(ctx, addr,
 		grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(ca, "")),
+		grpc.WithDefaultServiceConfig(serviceConfigHealthCheck),
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
 			Time:                keepaliveTime,
 			Timeout:             keepaliveTimeout,

@@ -6,7 +6,10 @@
 package jsonrpc2
 
 import (
+	"errors"
+
 	api "github.com/powerman/go-monolith-example/api/jsonrpc2-example"
+	"github.com/powerman/go-monolith-example/internal/apix"
 	"github.com/powerman/go-monolith-example/internal/dom"
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
 	"github.com/powerman/go-monolith-example/pkg/jsonrpc2x"
@@ -20,10 +23,12 @@ func (srv *Server) IncExample(arg api.RPCIncExampleReq, res *api.RPCIncExampleRe
 	metrics := jsonrpc2x.MakeMetrics(metric, "RPC."+methodName)
 	accessLog := jsonrpc2x.MakeAccessLog(log)
 	handler := validateErr(recovery(metrics(apiErr(accessLog(func() error {
-		if err != nil {
-			return err
-		}
-		if auth.UserName == dom.NoUser {
+		switch {
+		case errors.Is(err, apix.ErrAccessTokenInvalid):
+			return api.ErrUnauthorized
+		case err != nil: // Any other error from authn is considered temporary.
+			return api.ErrTryAgainLater
+		case auth.UserName == dom.NoUser: // Authenticated but anon user (visitor).
 			return api.ErrUnauthorized
 		}
 		return srv.doIncExample(ctx, auth, arg, res)
