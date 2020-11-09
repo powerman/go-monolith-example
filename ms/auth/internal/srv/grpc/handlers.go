@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/powerman/sensitive"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -14,7 +15,7 @@ import (
 
 func (srv *server) CreateAccount(ctx Ctx, req *api.CreateAccountRequest) (*api.Account, error) {
 	userID := req.GetAccountId()
-	password := req.GetAccount().GetPassword()
+	password := sensitive.String(req.GetAccount().GetPassword())
 	user := app.User{
 		Email:       req.GetAccount().GetEmail(),
 		DisplayName: req.GetAccount().GetUser().GetDisplayName(),
@@ -36,10 +37,10 @@ func (srv *server) SigninIdentity(ctx Ctx, req *api.SigninIdentityRequest) (_ *a
 		return nil, status.Error(codes.InvalidArgument, "auth required")
 	case *api.SigninIdentityRequest_Account:
 		auth := req.GetAccount()
-		accessToken, err = srv.appl.LoginByUserID(ctx, auth.GetAccountId(), auth.GetPassword())
+		accessToken, err = srv.appl.LoginByUserID(ctx, auth.GetAccountId(), sensitive.String(auth.GetPassword()))
 	case *api.SigninIdentityRequest_Email:
 		auth := req.GetEmail()
-		accessToken, err = srv.appl.LoginByEmail(ctx, auth.GetEmail(), auth.GetPassword())
+		accessToken, err = srv.appl.LoginByEmail(ctx, auth.GetEmail(), sensitive.String(auth.GetPassword()))
 	}
 	if err != nil {
 		return nil, apiErr(err)

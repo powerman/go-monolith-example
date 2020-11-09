@@ -5,12 +5,14 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/powerman/sensitive"
+
 	"github.com/powerman/go-monolith-example/internal/dom"
 )
 
 var reValidUserID = regexp.MustCompile(`^[a-z0-9-]{4,63}$`)
 
-func (a *App) Register(ctx Ctx, userID, password string, user *User) error {
+func (a *App) Register(ctx Ctx, userID string, password sensitive.String, user *User) error {
 	if userID == "" {
 		userID = dom.NewID()
 	}
@@ -27,7 +29,7 @@ func (a *App) Register(ctx Ctx, userID, password string, user *User) error {
 	return a.repo.AddUser(ctx, *user)
 }
 
-func (a *App) LoginByUserID(ctx Ctx, userID, password string) (AccessToken, error) {
+func (a *App) LoginByUserID(ctx Ctx, userID string, password sensitive.String) (AccessToken, error) {
 	userName := dom.NewUserName(userID)
 	user, err := a.repo.GetUser(ctx, userName)
 	if err != nil {
@@ -39,7 +41,7 @@ func (a *App) LoginByUserID(ctx Ctx, userID, password string) (AccessToken, erro
 	return a.repo.AddAccessToken(ctx, user.Name)
 }
 
-func (a *App) LoginByEmail(ctx Ctx, email, password string) (AccessToken, error) {
+func (a *App) LoginByEmail(ctx Ctx, email string, password sensitive.String) (AccessToken, error) {
 	user, err := a.repo.GetUserByEmail(ctx, email)
 	if err != nil {
 		return "", err

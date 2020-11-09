@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/powerman/check"
+	"github.com/powerman/sensitive"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -75,18 +76,18 @@ func TestCreateAccount(tt *testing.T) {
 		}
 	)
 
-	mockAppl.EXPECT().Register(gomock.Any(), "", "",
+	mockAppl.EXPECT().Register(gomock.Any(), "", sensitive.String(""),
 		app.MatchUser{User: &app.User{}}).
 		SetArg(3, userRand1)
-	mockAppl.EXPECT().Register(gomock.Any(), "admin", "secret",
+	mockAppl.EXPECT().Register(gomock.Any(), "admin", sensitive.String("secret"),
 		app.MatchUser{User: &app.User{
 			Email:       "root@host",
 			DisplayName: "Root",
 		}}).
 		SetArg(3, userAdmin)
-	mockAppl.EXPECT().Register(gomock.Any(), "admin", "", app.MatchUser{User: &app.User{}}).
+	mockAppl.EXPECT().Register(gomock.Any(), "admin", sensitive.String(""), app.MatchUser{User: &app.User{}}).
 		Return(app.ErrAlreadyExist)
-	mockAppl.EXPECT().Register(gomock.Any(), "bad", "", app.MatchUser{User: &app.User{}}).
+	mockAppl.EXPECT().Register(gomock.Any(), "bad", sensitive.String(""), app.MatchUser{User: &app.User{}}).
 		Return(fmt.Errorf("%w: userID", app.ErrValidate))
 
 	tests := []struct {
@@ -146,14 +147,14 @@ func TestSigninIdentity(tt *testing.T) {
 		}
 	)
 
-	mockAppl.EXPECT().LoginByUserID(gomock.Any(), "admin", "secret").Return(app.AccessToken("token1"), nil)
+	mockAppl.EXPECT().LoginByUserID(gomock.Any(), "admin", sensitive.String("secret")).Return(app.AccessToken("token1"), nil)
 	mockAppl.EXPECT().Authenticate(gomock.Any(), app.AccessToken("token1")).Return(&userAdmin, nil)
-	mockAppl.EXPECT().LoginByEmail(gomock.Any(), "root@host", "secret").Return(app.AccessToken("token2"), nil)
+	mockAppl.EXPECT().LoginByEmail(gomock.Any(), "root@host", sensitive.String("secret")).Return(app.AccessToken("token2"), nil)
 	mockAppl.EXPECT().Authenticate(gomock.Any(), app.AccessToken("token2")).Return(&userAdmin, nil)
-	mockAppl.EXPECT().LoginByEmail(gomock.Any(), "root@host", "secret").Return(app.AccessToken("token3"), nil)
+	mockAppl.EXPECT().LoginByEmail(gomock.Any(), "root@host", sensitive.String("secret")).Return(app.AccessToken("token3"), nil)
 	mockAppl.EXPECT().Authenticate(gomock.Any(), app.AccessToken("token3")).Return(nil, app.ErrNotFound)
 	mockAppl.EXPECT().LoginByUserID(gomock.Any(), "admin", gomock.Any()).Return(app.AccessToken(""), app.ErrWrongPassword)
-	mockAppl.EXPECT().LoginByEmail(gomock.Any(), "user@host", "").Return(app.AccessToken(""), app.ErrNotFound)
+	mockAppl.EXPECT().LoginByEmail(gomock.Any(), "user@host", sensitive.String("")).Return(app.AccessToken(""), app.ErrNotFound)
 
 	tests := []struct {
 		auth     interface{}

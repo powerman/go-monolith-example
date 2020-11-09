@@ -14,7 +14,7 @@ import (
 
 // JSONRPC2Ctx describe JSON-RPC 2.0 Ctx param used by all API methods.
 type JSONRPC2Ctx struct {
-	AccessToken AccessToken
+	AccessToken string
 	jsonrpc2.Ctx
 }
 
@@ -42,8 +42,9 @@ func (c *JSONRPC2Ctx) NewContext(
 	ctx = context.WithValue(ctx, contextKeyMethodName, methodName)
 
 	if c.AccessToken != "" {
-		ctx = context.WithValue(ctx, contextKeyAccessToken, c.AccessToken)
-		auth, err = authn.Authenticate(ctx, c.AccessToken)
+		accessToken := AccessToken(c.AccessToken)
+		ctx = context.WithValue(ctx, contextKeyAccessToken, accessToken)
+		auth, err = authn.Authenticate(ctx, accessToken)
 		ctx = context.WithValue(ctx, contextKeyAuth, auth)
 	}
 

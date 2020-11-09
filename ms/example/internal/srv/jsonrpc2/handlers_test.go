@@ -25,7 +25,7 @@ func TestExample(tt *testing.T) {
 	mockAppl.EXPECT().Example(gomock.Any(), authAdmin, authUser.UserName).Return(exampleUser, nil)
 
 	tests := []struct {
-		token   apix.AccessToken
+		token   string
 		userID  dom.UserName
 		want    *api.Example
 		wantErr error

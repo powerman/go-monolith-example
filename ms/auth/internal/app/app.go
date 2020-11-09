@@ -6,7 +6,10 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
+
+	"github.com/powerman/sensitive"
 
 	"github.com/powerman/go-monolith-example/internal/dom"
 )
@@ -34,12 +37,12 @@ type Appl interface {
 	// Name, PassHash, Role, CreateTime.
 	// If userID=="admin" then user's role will be set to RoleAdmin.
 	// Errors: ErrAlreadyExist, ErrValidate.
-	Register(_ Ctx, userID, password string, _ *User) error
+	Register(_ Ctx, userID string, password sensitive.String, _ *User) error
 	// LoginByUserID creates and returns AccessToken for the user.
 	// Errors: ErrNotFound, ErrWrongPassword.
-	LoginByUserID(_ Ctx, userID, password string) (AccessToken, error)
+	LoginByUserID(_ Ctx, userID string, password sensitive.String) (AccessToken, error)
 	// LoginByEmail work in same way as LoginByUserID.
-	LoginByEmail(_ Ctx, email, password string) (AccessToken, error)
+	LoginByEmail(_ Ctx, email string, password sensitive.String) (AccessToken, error)
 	// Authenticate returns identity tied to AccessToken.
 	// Errors: ErrNotFound.
 	Authenticate(Ctx, AccessToken) (*User, error)
@@ -89,14 +92,23 @@ type (
 	}
 	// PassHash contains hashed password.
 	PassHash struct {
-		Salt []byte
-		Hash []byte
+		Salt sensitive.Bytes
+		Hash sensitive.Bytes
 	}
 	// Role defines possible roles for a user.
 	Role int
 	// AccessToken is a token tied to some identity and permissions.
 	AccessToken string
 )
+
+// Format wraps sensitive.String.
+func (s AccessToken) Format(f fmt.State, c rune) { sensitive.String(s).Format(f, c) }
+
+// MarshalJSON wraps sensitive.String.
+func (s AccessToken) MarshalJSON() ([]byte, error) { return sensitive.String(s).MarshalJSON() }
+
+// MarshalText wraps sensitive.String.
+func (s AccessToken) MarshalText() ([]byte, error) { return sensitive.String(s).MarshalText() }
 
 // Roles.
 const (

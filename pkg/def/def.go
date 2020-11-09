@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/powerman/getenv"
 	"github.com/powerman/must"
+	"github.com/powerman/sensitive"
 	"github.com/powerman/sqlxx"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -29,6 +30,8 @@ func Init() error {
 	must.AbortIf = must.PanicIf
 
 	sqlx.NameMapper = sqlxx.ToSnake
+
+	sensitive.Redact()
 
 	setupLog()
 

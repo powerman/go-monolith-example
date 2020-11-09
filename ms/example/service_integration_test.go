@@ -48,8 +48,8 @@ func TestSmoke(tt *testing.T) {
 	}()
 	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.Addr), "connect to service"))
 
-	mockAuthn.EXPECT().Authenticate(gomock.Any(), tokenAdmin).Return(authAdmin, nil).AnyTimes()
-	mockAuthn.EXPECT().Authenticate(gomock.Any(), tokenUser).Return(authUser, nil).AnyTimes()
+	mockAuthn.EXPECT().Authenticate(gomock.Any(), apix.AccessToken(tokenAdmin)).Return(authAdmin, nil).AnyTimes()
+	mockAuthn.EXPECT().Authenticate(gomock.Any(), apix.AccessToken(tokenUser)).Return(authUser, nil).AnyTimes()
 	mockAuthn.EXPECT().Authenticate(gomock.Any(), gomock.Any()).Return(dom.Auth{}, apix.ErrAccessTokenInvalid).AnyTimes()
 
 	rpcClient := jsonrpc2x.NewHTTPClient(fmt.Sprintf("http://%s/rpc", cfg.Addr))

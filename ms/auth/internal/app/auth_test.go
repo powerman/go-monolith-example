@@ -7,6 +7,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	"github.com/powerman/check"
+	"github.com/powerman/sensitive"
 
 	"github.com/powerman/go-monolith-example/internal/dom"
 	"github.com/powerman/go-monolith-example/ms/auth/internal/app"
@@ -57,7 +58,7 @@ func TestRegister(tt *testing.T) {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			err := a.Register(ctx, tc.userID, tc.password, tc.user)
+			err := a.Register(ctx, tc.userID, sensitive.String(tc.password), tc.user)
 			t.Err(err, tc.wantErr)
 			if err == nil {
 				t.DeepEqual(tc.user, tc.want)
@@ -84,7 +85,7 @@ func TestLoginByUserID(tt *testing.T) {
 	tests := []struct {
 		userID  string
 		pass    string
-		want    app.AccessToken
+		want    string
 		wantErr error
 	}{
 		{"user", "", "", app.ErrNotFound},
@@ -96,9 +97,9 @@ func TestLoginByUserID(tt *testing.T) {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			res, err := a.LoginByUserID(ctx, tc.userID, tc.pass)
+			res, err := a.LoginByUserID(ctx, tc.userID, sensitive.String(tc.pass))
 			t.Err(err, tc.wantErr)
-			t.Equal(res, tc.want)
+			t.Equal(res, app.AccessToken(tc.want))
 		})
 	}
 }
@@ -121,7 +122,7 @@ func TestLoginByEmail(tt *testing.T) {
 	tests := []struct {
 		email   string
 		pass    string
-		want    app.AccessToken
+		want    string
 		wantErr error
 	}{
 		{"user@host", "", "", app.ErrNotFound},
@@ -133,9 +134,9 @@ func TestLoginByEmail(tt *testing.T) {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
-			res, err := a.LoginByEmail(ctx, tc.email, tc.pass)
+			res, err := a.LoginByEmail(ctx, tc.email, sensitive.String(tc.pass))
 			t.Err(err, tc.wantErr)
-			t.Equal(res, tc.want)
+			t.Equal(res, app.AccessToken(tc.want))
 		})
 	}
 }
