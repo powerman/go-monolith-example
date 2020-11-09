@@ -5,7 +5,6 @@ import (
 
 	"github.com/powerman/check"
 
-	"github.com/powerman/go-monolith-example/internal/apix"
 	"github.com/powerman/go-monolith-example/internal/dom"
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
 	"github.com/powerman/go-monolith-example/ms/example/internal/config"
@@ -31,8 +30,8 @@ func (l tLogger) Print(v ...interface{}) { l.Log(v...) }
 var (
 	cfg        *config.ServeConfig
 	ctx        = def.NewContext(app.ServiceName)
-	tokenAdmin = apix.AccessToken("admin")
-	tokenUser  = apix.AccessToken("user")
+	tokenAdmin = "admin"
+	tokenUser  = "user"
 	authAdmin  = dom.Auth{
 		UserName: dom.NewUserName("1"),
 		Admin:    true,

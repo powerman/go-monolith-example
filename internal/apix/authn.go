@@ -4,6 +4,9 @@ package apix
 
 import (
 	"errors"
+	"fmt"
+
+	"github.com/powerman/sensitive"
 
 	"github.com/powerman/go-monolith-example/internal/dom"
 )
@@ -24,3 +27,12 @@ type Authn interface {
 
 // AccessToken is an access token.
 type AccessToken string
+
+// Format wraps sensitive.String.
+func (s AccessToken) Format(f fmt.State, c rune) { sensitive.String(s).Format(f, c) }
+
+// MarshalJSON wraps sensitive.String.
+func (s AccessToken) MarshalJSON() ([]byte, error) { return sensitive.String(s).MarshalJSON() }
+
+// MarshalText wraps sensitive.String.
+func (s AccessToken) MarshalText() ([]byte, error) { return sensitive.String(s).MarshalText() }

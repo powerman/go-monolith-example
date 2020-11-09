@@ -603,6 +603,8 @@ github.com/powerman/narada4d v1.7.1/go.mod h1:LUOXFkHgtSwPqtrZx+F/Ab1PqOiL96O3Gf
 github.com/powerman/pqx v0.6.1/go.mod h1:EJGFN0+vvTWFqwT1bTrnVWrJ8hO7RAW6rp2JVhYwrVE=
 github.com/powerman/rpc-codec v1.2.2 h1:BK0JScZivljhwW/vLLhZLtUgqSxc/CD3sHEs8LiwwKw=
 github.com/powerman/rpc-codec v1.2.2/go.mod h1:3Qr/y/+u3CwcSww9tfJMRn/95lB2qUdUeIQe7BYlLDo=
+github.com/powerman/sensitive v0.0.4 h1:gHwPy0Zq8byP/x7EJHezWM5+7AeQyOq8ENzeHTZfRVE=
+github.com/powerman/sensitive v0.0.4/go.mod h1:lCwA3f5jBGuULKT1BoikzN1/jNNvWnNFa1Kpr4u6nrw=
 github.com/powerman/sqlxx v0.2.0 h1:NA2Z+o7Q6Lu9UqwGFqqPePKWoPYZ5doOsBnfstCU1uU=
 github.com/powerman/sqlxx v0.2.0/go.mod h1:dsfudBeSTo0U61OEAC/WS0Ea7qityww7jvFvWt3U1Fw=
 github.com/powerman/structlog v0.7.1 h1:68xN/GdxU7SYbXu/7P4RWyK7lKaN7FXjncarf7wO+Wk=
@@ -647,6 +649,8 @@ github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40T
 github.com/quasilyte/go-consistent v0.0.0-20190521200055-c6f3937de18c/go.mod h1:5STLWrekHfjyYwxBRVRXNOSewLJ3PWfDJd1VyTS21fI=
 github.com/quasilyte/go-ruleguard v0.2.0 h1:UOVMyH2EKkxIfzrULvA9n/tO+HtEhqD9mrLSWMr5FwU=
 github.com/quasilyte/go-ruleguard v0.2.0/go.mod h1:2RT/tf0Ce0UDj5y243iWKosQogJd8+1G3Rs2fxmlYnw=
+github.com/quasilyte/go-ruleguard v0.2.1 h1:56eRm0daAyny9UhJnmtJW/UyLZQusukBAB8oT8AHKHo=
+github.com/quasilyte/go-ruleguard v0.2.1/go.mod h1:hN2rVc/uS4bQhQKTio2XaSJSafJwqBUWWwtssT3cQmc=
 github.com/quasilyte/regex/syntax v0.0.0-20200407221936-30656e2c4a95 h1:L8QM9bvf68pVdQ3bCFZMDmnt9yqcMBro1pC7F+IPYMY=
 github.com/quasilyte/regex/syntax v0.0.0-20200407221936-30656e2c4a95/go.mod h1:rlzQ04UMyJXu/aOvhd8qT+hvDrFpiwqp8MRXDY9szc0=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=

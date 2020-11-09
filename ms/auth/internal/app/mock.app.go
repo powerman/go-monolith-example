@@ -7,6 +7,7 @@ package app
 import (
 	gomock "github.com/golang/mock/gomock"
 	dom "github.com/powerman/go-monolith-example/internal/dom"
+	sensitive "github.com/powerman/sensitive"
 	reflect "reflect"
 )
 
@@ -34,7 +35,7 @@ func (m *MockAppl) EXPECT() *MockApplMockRecorder {
 }
 
 // Register mocks base method
-func (m *MockAppl) Register(arg0 Ctx, userID, password string, arg3 *User) error {
+func (m *MockAppl) Register(arg0 Ctx, userID string, password sensitive.String, arg3 *User) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Register", arg0, userID, password, arg3)
 	ret0, _ := ret[0].(error)
@@ -48,7 +49,7 @@ func (mr *MockApplMockRecorder) Register(arg0, userID, password, arg3 interface{
 }
 
 // LoginByUserID mocks base method
-func (m *MockAppl) LoginByUserID(arg0 Ctx, userID, password string) (AccessToken, error) {
+func (m *MockAppl) LoginByUserID(arg0 Ctx, userID string, password sensitive.String) (AccessToken, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LoginByUserID", arg0, userID, password)
 	ret0, _ := ret[0].(AccessToken)
@@ -63,7 +64,7 @@ func (mr *MockApplMockRecorder) LoginByUserID(arg0, userID, password interface{}
 }
 
 // LoginByEmail mocks base method
-func (m *MockAppl) LoginByEmail(arg0 Ctx, email, password string) (AccessToken, error) {
+func (m *MockAppl) LoginByEmail(arg0 Ctx, email string, password sensitive.String) (AccessToken, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LoginByEmail", arg0, email, password)
 	ret0, _ := ret[0].(AccessToken)

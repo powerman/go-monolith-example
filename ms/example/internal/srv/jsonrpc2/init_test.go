@@ -27,9 +27,9 @@ func TestMain(m *testing.M) {
 
 // Const shared by tests. Recommended naming scheme: <dataType><Variant>.
 var (
-	tokenEmpty = apix.AccessToken("")
-	tokenAdmin = apix.AccessToken("admin")
-	tokenUser  = apix.AccessToken("user")
+	tokenEmpty = ""
+	tokenAdmin = "admin"
+	tokenUser  = "user"
 	authAdmin  = dom.Auth{
 		UserName: dom.NewUserName("1"),
 		Admin:    true,
@@ -51,8 +51,8 @@ func testNew(t *check.C) (func(), *jsonrpc2x.Client, string, *app.MockAppl) {
 		StrictErr: true,
 	})
 
-	mockAuthn.EXPECT().Authenticate(gomock.Any(), tokenAdmin).Return(authAdmin, nil).AnyTimes()
-	mockAuthn.EXPECT().Authenticate(gomock.Any(), tokenUser).Return(authUser, nil).AnyTimes()
+	mockAuthn.EXPECT().Authenticate(gomock.Any(), apix.AccessToken(tokenAdmin)).Return(authAdmin, nil).AnyTimes()
+	mockAuthn.EXPECT().Authenticate(gomock.Any(), apix.AccessToken(tokenUser)).Return(authUser, nil).AnyTimes()
 	mockAuthn.EXPECT().Authenticate(gomock.Any(), gomock.Any()).Return(dom.Auth{}, apix.ErrAccessTokenInvalid).AnyTimes()
 
 	ts := httptest.NewServer(srv)
