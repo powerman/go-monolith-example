@@ -87,6 +87,8 @@ for more details.
 - [X] Example gRPC:
   - [X] External and internal APIs on different host/port.
   - [X] gRPC services with and without token-based authentication.
+  - [X] Access to gRPC using HTTP/1 API based on grpc-gateway.
+    - [X] Generate swagger.json and provide Swagger UI.
 - [X] Example tests, both unit and integration.
 - [X] Production logging using [structlog](https://github.com/powerman/structlog).
 - [X] Production metrics using Prometheus.
