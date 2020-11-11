@@ -9,4 +9,3 @@
     - 'core::0133::method-signature'        # Not useful in Go code.
     - 'core::0133::http-uri-parent'         # We mostly use top-level resources.
     - 'core::0133::request-parent-required' # We mostly use top-level resources.
-    - 'core::0127::http-annotation'         # We don't proxy gRPC to HTTP REST.

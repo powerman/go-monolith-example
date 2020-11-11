@@ -25,6 +25,7 @@ type Shared struct {
 	AuthAddrHostInt        appcfg.NotEmptyString `env:"AUTH_ADDR_HOST_INT"`
 	AuthAddrPort           appcfg.Port           `env:"AUTH_ADDR_PORT"`
 	AuthAddrPortInt        appcfg.Port           `env:"AUTH_ADDR_PORT_INT"`
+	AuthGRPCGWAddrPort     appcfg.Port           `env:"AUTH_GRPCGW_ADDR_PORT"`
 	AuthMetricsAddrPort    appcfg.Port           `env:"AUTH_METRICS_ADDR_PORT"`
 	ExampleAddrPort        appcfg.Port           `env:"EXAMPLE_ADDR_PORT"`
 	ExampleMetricsAddrPort appcfg.Port           `env:"EXAMPLE_METRICS_ADDR_PORT"`
@@ -43,6 +44,7 @@ const (
 	AuthPort
 	AuthPortInt
 	AuthMetricsPort
+	AuthGRPCGWPort
 )
 
 var shared = &Shared{ //nolint:gochecknoglobals // Config is global anyway.
@@ -51,6 +53,7 @@ var shared = &Shared{ //nolint:gochecknoglobals // Config is global anyway.
 	AuthAddrHostInt:        appcfg.MustNotEmptyString(def.Hostname),
 	AuthAddrPort:           appcfg.MustPort(strconv.Itoa(AuthPort)),
 	AuthAddrPortInt:        appcfg.MustPort(strconv.Itoa(AuthPortInt)),
+	AuthGRPCGWAddrPort:     appcfg.MustPort(strconv.Itoa(AuthGRPCGWPort)),
 	AuthMetricsAddrPort:    appcfg.MustPort(strconv.Itoa(AuthMetricsPort)),
 	ExampleAddrPort:        appcfg.MustPort(strconv.Itoa(ExamplePort)),
 	ExampleMetricsAddrPort: appcfg.MustPort(strconv.Itoa(ExampleMetricsPort)),

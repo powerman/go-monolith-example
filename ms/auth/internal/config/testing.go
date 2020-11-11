@@ -27,6 +27,7 @@ func MustGetServeTest() *ServeConfig {
 	const host = "localhost"
 	cfg.Addr = netx.NewAddr(host, netx.UnusedTCPPort(host))
 	cfg.AddrInt = netx.NewAddr(hostInt, netx.UnusedTCPPort(hostInt))
+	cfg.GRPCGWAddr = netx.NewAddr(host, netx.UnusedTCPPort(host))
 	cfg.MetricsAddr = netx.NewAddr(hostInt, 0)
 
 	rootDir, err := os.Getwd()

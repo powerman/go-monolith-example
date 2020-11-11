@@ -4,10 +4,14 @@ package auth
 
 import (
 	"context"
+	"crypto/tls"
+	"fmt"
+	"net/http"
 	"strings"
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/parnurzeal/gorequest"
 	"github.com/powerman/check"
 	"golang.org/x/oauth2"
 	grpcpkg "google.golang.org/grpc"
@@ -19,6 +23,21 @@ import (
 	api "github.com/powerman/go-monolith-example/api/proto/powerman/example/auth"
 	"github.com/powerman/go-monolith-example/pkg/def"
 	"github.com/powerman/go-monolith-example/pkg/netx"
+)
+
+type (
+	gwSigninIdentityResponse struct {
+		AccessToken string
+		User        gwUser
+	}
+	gwUser struct {
+		Name        string
+		DisplayName string
+		Access      gwAccess
+	}
+	gwAccess struct {
+		Role string
+	}
 )
 
 func TestSmoke(tt *testing.T) {
@@ -42,6 +61,7 @@ func TestSmoke(tt *testing.T) {
 	}()
 	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.Addr), "connect to gRPC service"))
 	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.AddrInt), "connect to internal gRPC service"))
+	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.GRPCGWAddr), "connect to grpc-gateway service"))
 
 	ca, err := netx.LoadCACert(cfg.TLSCACert)
 	t.Must(t.Nil(err))
@@ -58,6 +78,11 @@ func TestSmoke(tt *testing.T) {
 	clientNoAuth := api.NewNoAuthSvcClient(conn)
 	clientAuth := api.NewAuthSvcClient(conn)
 	clientAuthInt := api.NewAuthIntSvcClient(connInt)
+	clientGW := gorequest.New().
+		TLSClientConfig(&tls.Config{RootCAs: ca}).
+		Timeout(def.TestTimeout).
+		Retry(30, def.TestSecond/10, http.StatusServiceUnavailable)
+	endpointGW := fmt.Sprintf("https://%s/", s.cfg.GRPCGWAddr)
 
 	var (
 		userAdmin = &api.User{
@@ -72,8 +97,9 @@ func TestSmoke(tt *testing.T) {
 				Role: api.Access_ROLE_USER,
 			},
 		}
-		authAdmin grpcpkg.CallOption
-		authUser  grpcpkg.CallOption
+		authAdmin        grpcpkg.CallOption
+		authUser         grpcpkg.CallOption
+		accessTokenAdmin string
 	)
 
 	{ // register admin
@@ -148,5 +174,35 @@ func TestSmoke(tt *testing.T) {
 		res, err := clientAuthInt.CheckAccessToken(ctx, &api.CheckAccessTokenRequest{}, authUser)
 		t.Err(err, status.Error(codes.Unauthenticated, "invalid access token"))
 		t.Nil(res)
+	}
+	{ // grpc-gateway login
+		var body gwSigninIdentityResponse
+		resp, _, errs := clientGW.Clone().Post(endpointGW + "accounts:signinIdentity").
+			Send(`{"account":{"accountId":"admin"}}`).
+			EndStruct(&body)
+		t.Nil(errs)
+		t.Equal(resp.StatusCode, 200)
+		t.Len(body.AccessToken, 26)
+		t.DeepEqual(body.User, gwUser{
+			Name: "users/admin",
+			Access: gwAccess{
+				Role: "ROLE_ADMIN",
+			},
+		})
+		accessTokenAdmin = body.AccessToken
+	}
+	{ // grpc-gateway logout
+		resp, _, errs := clientGW.Clone().Post(endpointGW+"accounts:signoutIdentity").
+			Set("Authorization", "bearer "+accessTokenAdmin).
+			Send(`{}`).
+			End()
+		t.Nil(errs)
+		t.Equal(resp.StatusCode, 200)
+		resp, _, errs = clientGW.Clone().Post(endpointGW+"accounts:signoutIdentity").
+			Set("Authorization", "bearer "+accessTokenAdmin).
+			Send(`{}`).
+			End()
+		t.Nil(errs)
+		t.Equal(resp.StatusCode, 401)
 	}
 }

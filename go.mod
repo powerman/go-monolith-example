@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/bufbuild/buf v0.30.0
 	github.com/cheekybits/genny v1.0.1-0.20200709201058-3e22f1a88ff2
+	github.com/elazarl/goproxy v0.0.0-20201021153353-00ad82a08272 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/mock v1.4.4
 	github.com/golang/protobuf v1.4.3
@@ -12,12 +13,14 @@ require (
 	github.com/googleapis/api-linter v1.8.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.0.1
 	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
 	github.com/mattn/goveralls v0.0.7
 	github.com/nats-io/nats-streaming-server v0.18.0 // indirect
 	github.com/nats-io/nats.go v1.10.0
 	github.com/nats-io/stan.go v0.7.0
 	github.com/oklog/ulid v1.3.1
+	github.com/parnurzeal/gorequest v0.2.16
 	github.com/powerman/appcfg v0.5.0
 	github.com/powerman/check v1.3.0
 	github.com/powerman/dockerize v0.12.0
@@ -31,6 +34,7 @@ require (
 	github.com/powerman/sqlxx v0.2.0
 	github.com/powerman/structlog v0.7.1
 	github.com/prometheus/client_golang v1.8.0
+	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
 	github.com/sebest/xff v0.0.0-20160910043805-6c115e0ffa35
 	github.com/smartystreets/goconvey v1.6.4
@@ -44,4 +48,5 @@ require (
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.0.1
 	google.golang.org/protobuf v1.25.0
 	gotest.tools/gotestsum v0.6.0
+	moul.io/http2curl v1.0.0 // indirect
 )

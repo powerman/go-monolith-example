@@ -67,6 +67,7 @@ func Init(sharedCfg *SharedCfg, flagsets FlagSets) error {
 	appcfg.AddPFlag(fs.Serve, &shared.AddrHostInt, "host-int", "internal host to serve")
 	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrPort, pfx+"port", "port to serve")
 	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrPortInt, pfx+"port.int", "port to serve internal API")
+	appcfg.AddPFlag(fs.Serve, &shared.AuthGRPCGWAddrPort, pfx+"grpcgw.port", "port to serve grpc-gateway")
 	appcfg.AddPFlag(fs.Serve, &shared.AuthMetricsAddrPort, pfx+"metrics.port", "port to serve Prometheus metrics")
 	appcfg.AddPFlag(fs.Serve, &own.Secret, pfx+"secret", "secret used for hashing passwords")
 
@@ -77,6 +78,7 @@ func Init(sharedCfg *SharedCfg, flagsets FlagSets) error {
 type ServeConfig struct {
 	Addr        netx.Addr
 	AddrInt     netx.Addr
+	GRPCGWAddr  netx.Addr
 	MetricsAddr netx.Addr
 	Secret      []byte
 	TLSCACert   string
@@ -93,6 +95,7 @@ func GetServe() (c *ServeConfig, err error) {
 	c = &ServeConfig{
 		Addr:        netx.NewAddr(shared.AddrHost.Value(&err), shared.AuthAddrPort.Value(&err)),
 		AddrInt:     netx.NewAddr(shared.AddrHostInt.Value(&err), shared.AuthAddrPortInt.Value(&err)),
+		GRPCGWAddr:  netx.NewAddr(shared.AddrHost.Value(&err), shared.AuthGRPCGWAddrPort.Value(&err)),
 		MetricsAddr: netx.NewAddr(shared.AddrHostInt.Value(&err), shared.AuthMetricsAddrPort.Value(&err)),
 		Secret:      norm.NFD.Bytes([]byte(own.Secret.Value(&err))),
 		TLSCACert:   shared.TLSCACert.Value(&err),

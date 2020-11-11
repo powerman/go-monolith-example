@@ -21,13 +21,19 @@ service NoAuthSvc {
     // If account_id=="admin" then user's role will be set to ROLE_ADMIN.
     //
     // XXX No email validation.
-    rpc CreateAccount(CreateAccountRequest) returns (Account) {}
+    rpc CreateAccount(CreateAccountRequest) returns (Account) {
+        option (google.api.http).post = "/accounts";
+        option (google.api.http).body = "account";
+    }
 
     // Authenticates user by different credentials.
     //
     // Creates and returns access_token.
     // Also returns user's account details for convenience.
-    rpc SigninIdentity(SigninIdentityRequest) returns (SigninIdentityResponse) {}
+    rpc SigninIdentity(SigninIdentityRequest) returns (SigninIdentityResponse) {
+        option (google.api.http).post = "/accounts:signinIdentity";
+        option (google.api.http).body = "*";
+    }
 }
 
 // Public API, require authentication.
@@ -37,7 +43,10 @@ service AuthSvc {
     // Invalidates either current or all user's access_token.
     //
     // (-- api-linter: core::0136::verb-noun=disabled --)
-    rpc SignoutIdentity(SignoutIdentityRequest) returns (SignoutIdentityResponse) {}
+    rpc SignoutIdentity(SignoutIdentityRequest) returns (SignoutIdentityResponse) {
+        option (google.api.http).post = "/accounts:signoutIdentity";
+        option (google.api.http).body = "*";
+    }
 }
 
 // Request.
