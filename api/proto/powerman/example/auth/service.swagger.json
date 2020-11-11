@@ -1,0 +1,312 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Example: Auth",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/accounts": {
+      "post": {
+        "summary": "Registers new user account.",
+        "description": "User can provide optional account_id (username).\n\nThese fields will be ignored in input and set automatically:\naccount.name, account.user.name, account.user.access.\n\nIf account_id==\"admin\" then user's role will be set to ROLE_ADMIN.\n\nXXX No email validation.",
+        "operationId": "CreateAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authAccount"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "The account to create.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authAccount"
+            }
+          },
+          {
+            "name": "accountId",
+            "description": "The ID to use for the account.\nThis value should be 4-63 characters [a-z0-9-].",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "NoAuthSvc"
+        ],
+        "security": []
+      }
+    },
+    "/accounts:signinIdentity": {
+      "post": {
+        "summary": "Authenticates user by different credentials.",
+        "description": "Creates and returns access_token.\nAlso returns user's account details for convenience.",
+        "operationId": "SigninIdentity",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authSigninIdentityResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authSigninIdentityRequest"
+            }
+          }
+        ],
+        "tags": [
+          "NoAuthSvc"
+        ],
+        "security": []
+      }
+    },
+    "/accounts:signoutIdentity": {
+      "post": {
+        "summary": "Logout.",
+        "description": "Invalidates either current or all user's access_token.\n\n(-- api-linter: core::0136::verb-noun=disabled --)",
+        "operationId": "SignoutIdentity",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authSignoutIdentityResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authSignoutIdentityRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthSvc"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "AccessRole": {
+      "type": "string",
+      "enum": [
+        "ROLE_UNSPECIFIED",
+        "ROLE_ADMIN",
+        "ROLE_USER"
+      ],
+      "default": "ROLE_UNSPECIFIED",
+      "description": "Possible roles for a user.\nNew values may be added in the future.\n\n - ROLE_UNSPECIFIED: Default value. This value is unused.\n - ROLE_ADMIN: Full access to everything.\n - ROLE_USER: Full access only to user's own data.\nRead-only access to user's Access."
+    },
+    "SigninIdentityRequestAccountAuth": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "description": "This value should be 4-63 characters [a-z0-9-]."
+        },
+        "password": {
+          "type": "string",
+          "description": "Any value."
+        }
+      },
+      "description": "Authentication using username and password."
+    },
+    "SigninIdentityRequestEmailAuth": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "This value should contain [@]."
+        },
+        "password": {
+          "type": "string",
+          "description": "Any value."
+        }
+      },
+      "description": "Authentication user email and password."
+    },
+    "authAccess": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/AccessRole",
+          "description": "User's role."
+        }
+      },
+      "description": "Access describes identity's permissions."
+    },
+    "authAccount": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Format: \"accounts/{account_id}\"."
+        },
+        "user": {
+          "$ref": "#/definitions/authUser",
+          "description": "Default identity connected to the account."
+        },
+        "password": {
+          "type": "string",
+          "description": "Must be strong enough."
+        },
+        "email": {
+          "type": "string",
+          "description": "Primary email, needed to reset password."
+        },
+        "createTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Account create time.\nOutput only.",
+          "readOnly": true
+        }
+      },
+      "description": "Account contains data needed for authentication."
+    },
+    "authSigninIdentityRequest": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "$ref": "#/definitions/SigninIdentityRequestAccountAuth",
+          "description": "By username."
+        },
+        "email": {
+          "$ref": "#/definitions/SigninIdentityRequestEmailAuth",
+          "description": "By email."
+        }
+      },
+      "description": "Request."
+    },
+    "authSigninIdentityResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string",
+          "description": "Opaque."
+        },
+        "user": {
+          "$ref": "#/definitions/authUser",
+          "description": "User/Access details."
+        }
+      },
+      "description": "Response."
+    },
+    "authSignoutIdentityRequest": {
+      "type": "object",
+      "properties": {
+        "everywhere": {
+          "type": "boolean",
+          "description": "Set to true to invalidate all user's access_token."
+        }
+      },
+      "description": "Request."
+    },
+    "authSignoutIdentityResponse": {
+      "type": "object",
+      "description": "Response."
+    },
+    "authUser": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Format: \"users/{user_uid}\"."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "By default set to {account_id}."
+        },
+        "access": {
+          "$ref": "#/definitions/authAccess",
+          "description": "Permissions."
+        }
+      },
+      "description": "User is an identity tied to Account."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "access_token": {
+      "type": "apiKey",
+      "description": "Set header value to \"Bearer \u003caccess-token\u003e\".",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "access_token": []
+    }
+  ]
+}

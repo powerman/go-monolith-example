@@ -4,6 +4,8 @@ package auth
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
+	"net/http"
 
 	"github.com/powerman/structlog"
 	"github.com/prometheus/client_golang/prometheus"
@@ -14,7 +16,9 @@ import (
 	"github.com/powerman/go-monolith-example/ms/auth/internal/config"
 	"github.com/powerman/go-monolith-example/ms/auth/internal/dal"
 	"github.com/powerman/go-monolith-example/ms/auth/internal/srv/grpc"
+	"github.com/powerman/go-monolith-example/ms/auth/internal/srv/grpcgw"
 	"github.com/powerman/go-monolith-example/pkg/concurrent"
+	"github.com/powerman/go-monolith-example/pkg/netx"
 	"github.com/powerman/go-monolith-example/pkg/serve"
 )
 
@@ -26,12 +30,14 @@ var reg = prometheus.NewPedanticRegistry() //nolint:gochecknoglobals // Metrics 
 // Service implements main.embeddedService interface.
 type Service struct {
 	cfg     *config.ServeConfig
+	ca      *x509.CertPool
 	cert    tls.Certificate
 	certInt tls.Certificate
 	repo    *dal.Repo
 	appl    *app.App
 	srv     *grpcpkg.Server
 	srvInt  *grpcpkg.Server
+	mux     *http.ServeMux
 }
 
 // Name implements main.embeddedService interface.
@@ -53,6 +59,9 @@ func (s *Service) RunServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	log := structlog.FromContext(ctxShutdown, nil)
 	if s.cfg == nil {
 		s.cfg, err = config.GetServe()
+	}
+	if err == nil {
+		s.ca, err = netx.LoadCACert(s.cfg.TLSCACert)
 	}
 	if err == nil {
 		s.cert, err = tls.LoadX509KeyPair(s.cfg.TLSCert, s.cfg.TLSKey)
@@ -83,11 +92,23 @@ func (s *Service) RunServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 		CtxShutdown: ctxShutdown,
 		Cert:        &s.certInt,
 	})
+	s.mux, err = grpcgw.NewServer(grpcgw.Config{
+		CtxShutdown:      ctxShutdown,
+		Endpoint:         s.cfg.Addr,
+		CA:               s.ca,
+		GRPCGWPattern:    "/",
+		OpenAPIPattern:   "/openapi/", // Also hardcoded in web/static/swagger-ui/index.html.
+		SwaggerUIPattern: "/swagger-ui/",
+	})
+	if err != nil {
+		return log.Err("failed to setup grpc-gateway", "err", err)
+	}
 
 	err = concurrent.Serve(ctxShutdown, shutdown,
 		s.serveMetrics,
 		s.serveGRPC,
 		s.serveGRPCInt,
+		s.serveGRPCGW,
 	)
 	if err != nil {
 		return log.Err("failed to serve", "err", err)
@@ -109,4 +130,12 @@ func (s *Service) serveGRPC(ctx Ctx) error {
 
 func (s *Service) serveGRPCInt(ctx Ctx) error {
 	return serve.GRPC(ctx, s.cfg.AddrInt, s.srvInt, "gRPC internal")
+}
+
+func (s *Service) serveGRPCGW(ctx Ctx) error {
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{s.cert},
+		MinVersion:   tls.VersionTLS12,
+	}
+	return serve.HTTP(ctx, s.cfg.GRPCGWAddr, tlsConfig, s.mux, "grpc-gateway")
 }

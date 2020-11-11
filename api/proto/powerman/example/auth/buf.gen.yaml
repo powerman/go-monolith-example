@@ -6,3 +6,9 @@ plugins:
   - name: go-grpc
     out: api/proto
     opt: paths=source_relative,require_unimplemented_servers=false
+  - name: grpc-gateway
+    out: api/proto
+    opt: paths=source_relative,logtostderr=true
+  - name: openapiv2
+    out: api/proto
+    opt: simple_operation_ids=true,openapi_configuration=api/proto/powerman/example/auth/service.openapi.yml

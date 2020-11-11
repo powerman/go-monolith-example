@@ -15,6 +15,7 @@ func Test(t *testing.T) {
 	want := &ServeConfig{
 		Addr:        netx.NewAddr(def.Hostname, config.AuthPort),
 		AddrInt:     netx.NewAddr(def.Hostname, config.AuthPortInt),
+		GRPCGWAddr:  netx.NewAddr(def.Hostname, config.AuthGRPCGWPort),
 		MetricsAddr: netx.NewAddr(def.Hostname, config.AuthMetricsPort),
 		Secret:      []byte("s3cr3t"),
 		TLSCACert:   "ca.crt",
@@ -74,12 +75,14 @@ func Test(t *testing.T) {
 			"--host-int=hostint4",
 			"--auth.port=8004",
 			"--auth.port.int=9004",
+			"--auth.grpcgw.port=7004",
 			"--auth.metrics.port=4",
 			"--auth.secret=secret4", // TODO Test norm.NFD.
 		)
 		t.Nil(err)
 		want.Addr = netx.NewAddr("host4", 8004)
 		want.AddrInt = netx.NewAddr("hostint4", 9004)
+		want.GRPCGWAddr = netx.NewAddr("host4", 7004)
 		want.MetricsAddr = netx.NewAddr("hostint4", 4)
 		want.Secret = []byte("secret4")
 		t.DeepEqual(c, want)

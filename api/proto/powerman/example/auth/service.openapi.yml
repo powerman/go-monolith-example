@@ -1,0 +1,33 @@
+openapiOptions:
+  file:
+    - file: "powerman/example/auth/service.proto"
+      option:
+        info:
+          title: "Example: Auth"
+          version: "1.0.0"
+        basePath: /
+        schemes:
+          - HTTPS
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        securityDefinitions:
+          security:
+            access_token:
+              description: Set header value to "Bearer <access-token>".
+              type: TYPE_API_KEY
+              in: IN_HEADER
+              name: Authorization
+        security:
+          - securityRequirement:
+              access_token: {}
+  method:
+    - method: powerman.example.auth.NoAuthSvc.CreateAccount
+      option:
+        security:
+          - securityRequirement: {}
+    - method: powerman.example.auth.NoAuthSvc.SigninIdentity
+      option:
+        security:
+          - securityRequirement: {}
