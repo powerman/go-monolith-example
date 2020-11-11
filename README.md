@@ -70,7 +70,8 @@ for more details.
 
 ### Features
 
-- [X] Project structure (mostly) follow [Standard Go Project Layout](https://github.com/golang-standards/project-layout).
+- [X] Project structure (mostly) follows
+  [Standard Go Project Layout](https://github.com/golang-standards/project-layout).
 - [X] Strict but convenient golangci-lint configuration.
 - [X] Embedded microservices:
   - [X] Well isolated from each other.
@@ -84,11 +85,18 @@ for more details.
 - [X] Graceful shutdown support.
 - [X] Configuration defaults can be overwritten by env vars and flags.
 - [X] Example JSON-RPC 2.0 over HTTP API, with CORS support.
-- [X] Example gRPC:
+- [X] Example gRPC API:
   - [X] External and internal APIs on different host/port.
   - [X] gRPC services with and without token-based authentication.
-  - [X] Access to gRPC using HTTP/1 API based on grpc-gateway.
-    - [X] Generate swagger.json and provide Swagger UI.
+  - [X] API design (mostly) follows
+    [Google API Design Guide](https://cloud.google.com/apis/design) and
+    [Google API Improvement Proposals](https://google.aip.dev/).
+- [X] Example OpenAPI 2.0 using grpc-gateway, with CORS suport:
+  - [X] Access to gRPC using HTTP/1 (except bi-directional streaming).
+  - [X] Generates `swagger.json` from gRPC `.proto` files.
+  - [X] Embedded [Swagger UI](https://swagger.io/tools/swagger-ui/).
+- [X] Example DAL (data access layer):
+  - [X] MySQL 5.7.
 - [X] Example tests, both unit and integration.
 - [X] Production logging using [structlog](https://github.com/powerman/structlog).
 - [X] Production metrics using Prometheus.
@@ -125,7 +133,7 @@ curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v0.7.1/shell
 
 #### HTTPS
 
-1. This project requires https:// and will send HTST and CSP HTTP headers,
+1. This project requires https:// and will send HSTS and CSP HTTP headers,
    and also it uses gRPC with authentication which also require TLS certs,
    so you'll need to create certificate to run it on localhost - follow
    instructions in [Create local CA to issue localhost HTTPS
@@ -268,9 +276,16 @@ $ ./bin/mono serve
 
 ## TODO
 
-- [ ] Add OpenAPI service example.
-- [ ] Add NATS/STAN publish/subscribe example.
-- [ ] Add DAL implementation for Postgresql.
-- [ ] Add LPC (local procedure call API between embedded microservices).
+- [ ] Add security-related headers for HTTPS endpoints (HSTS, CSP, etc.),
+  also move default host from localhost to avoid poisoning it with HSTS.
+- [ ] Add DAL using PostgreSQL 11.
 - [ ] Embed https://github.com/powerman/go-service-example as an example
   of embedding microservices from another repo.
+- [ ] Add example of `internal/svc/*` adapters calling some other services.
+- [ ] Add LPC (local procedure call API between embedded microservices),
+  probably using https://github.com/fullstorydev/grpchan.
+- [ ] Add complete CRUD example as per Google API Design Guide (with
+  PATCH/FieldMask), probably with generation of models conversion code using
+  https://github.com/bold-commerce/protoc-gen-struct-transformer.
+- [ ] Add NATS/STAN publish/subscribe example in `internal/sub`
+  (or maybe use JetStream instead of STAN?).
