@@ -83,5 +83,5 @@ func (s *Service) RunServe(_, ctxShutdown Ctx, shutdown func()) (err error) {
 }
 
 func (s *Service) serveHTTP(ctx Ctx) error {
-	return serve.HTTP(ctx, s.cfg.addr, s.mux, "monolith introspection")
+	return serve.HTTP(ctx, s.cfg.addr, nil, s.mux, "monolith introspection")
 }

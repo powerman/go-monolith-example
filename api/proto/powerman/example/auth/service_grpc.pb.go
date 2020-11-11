@@ -62,7 +62,7 @@ func (c *noAuthSvcClient) SigninIdentity(ctx context.Context, in *SigninIdentity
 }
 
 // NoAuthSvcServer is the server API for NoAuthSvc service.
-// All implementations must embed UnimplementedNoAuthSvcServer
+// All implementations should embed UnimplementedNoAuthSvcServer
 // for forward compatibility
 type NoAuthSvcServer interface {
 	// Registers new user account.
@@ -81,10 +81,9 @@ type NoAuthSvcServer interface {
 	// Creates and returns access_token.
 	// Also returns user's account details for convenience.
 	SigninIdentity(context.Context, *SigninIdentityRequest) (*SigninIdentityResponse, error)
-	mustEmbedUnimplementedNoAuthSvcServer()
 }
 
-// UnimplementedNoAuthSvcServer must be embedded to have forward compatible implementations.
+// UnimplementedNoAuthSvcServer should be embedded to have forward compatible implementations.
 type UnimplementedNoAuthSvcServer struct {
 }
 
@@ -94,7 +93,6 @@ func (UnimplementedNoAuthSvcServer) CreateAccount(context.Context, *CreateAccoun
 func (UnimplementedNoAuthSvcServer) SigninIdentity(context.Context, *SigninIdentityRequest) (*SigninIdentityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SigninIdentity not implemented")
 }
-func (UnimplementedNoAuthSvcServer) mustEmbedUnimplementedNoAuthSvcServer() {}
 
 // UnsafeNoAuthSvcServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to NoAuthSvcServer will
@@ -190,7 +188,7 @@ func (c *authSvcClient) SignoutIdentity(ctx context.Context, in *SignoutIdentity
 }
 
 // AuthSvcServer is the server API for AuthSvc service.
-// All implementations must embed UnimplementedAuthSvcServer
+// All implementations should embed UnimplementedAuthSvcServer
 // for forward compatibility
 type AuthSvcServer interface {
 	// Logout.
@@ -199,17 +197,15 @@ type AuthSvcServer interface {
 	//
 	// (-- api-linter: core::0136::verb-noun=disabled --)
 	SignoutIdentity(context.Context, *SignoutIdentityRequest) (*SignoutIdentityResponse, error)
-	mustEmbedUnimplementedAuthSvcServer()
 }
 
-// UnimplementedAuthSvcServer must be embedded to have forward compatible implementations.
+// UnimplementedAuthSvcServer should be embedded to have forward compatible implementations.
 type UnimplementedAuthSvcServer struct {
 }
 
 func (UnimplementedAuthSvcServer) SignoutIdentity(context.Context, *SignoutIdentityRequest) (*SignoutIdentityResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignoutIdentity not implemented")
 }
-func (UnimplementedAuthSvcServer) mustEmbedUnimplementedAuthSvcServer() {}
 
 // UnsafeAuthSvcServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to AuthSvcServer will
