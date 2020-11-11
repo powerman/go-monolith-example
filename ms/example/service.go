@@ -4,9 +4,6 @@ package example
 import (
 	"context"
 	"crypto/x509"
-	"errors"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/powerman/structlog"
@@ -23,6 +20,7 @@ import (
 	"github.com/powerman/go-monolith-example/pkg/concurrent"
 	"github.com/powerman/go-monolith-example/pkg/def"
 	"github.com/powerman/go-monolith-example/pkg/natsx"
+	"github.com/powerman/go-monolith-example/pkg/netx"
 	"github.com/powerman/go-monolith-example/pkg/serve"
 )
 
@@ -30,8 +28,6 @@ import (
 type Ctx = context.Context
 
 var reg = prometheus.NewPedanticRegistry() //nolint:gochecknoglobals // Metrics are global anyway.
-
-var errPEM = errors.New("unable to load PEM certs")
 
 // Service implements main.embeddedService interface.
 type Service struct {
@@ -70,12 +66,7 @@ func (s *Service) RunServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 		s.cfg, err = config.GetServe()
 	}
 	if err == nil {
-		s.ca = x509.NewCertPool()
-		var caCert []byte
-		caCert, err = ioutil.ReadFile(s.cfg.TLSCACert)
-		if err == nil && !s.ca.AppendCertsFromPEM(caCert) {
-			err = fmt.Errorf("%w: %q", errPEM, s.cfg.TLSCACert)
-		}
+		s.ca, err = netx.LoadCACert(s.cfg.TLSCACert)
 	}
 	if err != nil {
 		return log.Err("failed to get config", "err", err)
@@ -136,5 +127,5 @@ func (s *Service) serveMetrics(ctx Ctx) error {
 }
 
 func (s *Service) serveHTTP(ctx Ctx) error {
-	return serve.HTTP(ctx, s.cfg.Addr, s.mux, "JSON-RPC 2.0")
+	return serve.HTTP(ctx, s.cfg.Addr, nil, s.mux, "JSON-RPC 2.0")
 }

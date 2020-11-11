@@ -3,8 +3,6 @@ package grpc_test
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
-	"io/ioutil"
 	"net"
 	"strings"
 	"testing"
@@ -21,6 +19,7 @@ import (
 	"github.com/powerman/go-monolith-example/ms/auth/internal/config"
 	"github.com/powerman/go-monolith-example/ms/auth/internal/srv/grpc"
 	"github.com/powerman/go-monolith-example/pkg/def"
+	"github.com/powerman/go-monolith-example/pkg/netx"
 )
 
 func TestMain(m *testing.M) {
@@ -43,10 +42,8 @@ func testNew(t *check.C) (func(), api.NoAuthSvcClient, api.AuthSvcClient, api.Au
 
 	mockAppl := app.NewMockAppl(ctrl)
 
-	ca := x509.NewCertPool()
-	caCert, err := ioutil.ReadFile(cfg.TLSCACert)
+	ca, err := netx.LoadCACert(cfg.TLSCACert)
 	t.Must(t.Nil(err))
-	t.Must(t.True(ca.AppendCertsFromPEM(caCert)))
 
 	cert, err := tls.LoadX509KeyPair(cfg.TLSCert, cfg.TLSKey)
 	t.Must(t.Nil(err))

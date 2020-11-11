@@ -59,7 +59,7 @@ func testNewServer(t *check.C) string {
 	rpcAddr := netx.NewAddr("localhost", netx.UnusedTCPPort("localhost"))
 	ctx, cancel := context.WithCancel(context.Background())
 	errc := make(chan error, 1)
-	go func() { errc <- serve.RPC(ctx, rpcAddr, &TestRPC{}) }()
+	go func() { errc <- serve.RPC(ctx, rpcAddr, nil, &TestRPC{}) }()
 
 	t.Cleanup(func() {
 		t.Helper()

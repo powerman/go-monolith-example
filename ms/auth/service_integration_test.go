@@ -4,8 +4,6 @@ package auth
 
 import (
 	"context"
-	"crypto/x509"
-	"io/ioutil"
 	"strings"
 	"testing"
 
@@ -42,15 +40,12 @@ func TestSmoke(tt *testing.T) {
 		// 	s.repo.Close() // TODO
 		// }
 	}()
-	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.Addr), "connect to service"))
-	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.AddrInt), "connect to internal service"))
+	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.Addr), "connect to gRPC service"))
+	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.AddrInt), "connect to internal gRPC service"))
 
-	ca := x509.NewCertPool()
-	caCert, err := ioutil.ReadFile(cfg.TLSCACert)
+	ca, err := netx.LoadCACert(cfg.TLSCACert)
 	t.Must(t.Nil(err))
-	t.Must(t.True(ca.AppendCertsFromPEM(caCert)))
-
-	conn, err := grpcpkg.DialContext(ctx, strings.Replace(cfg.Addr.String(), "127.0.0.1:", "localhost:", 1),
+	conn, err := grpcpkg.DialContext(ctx, cfg.Addr.String(),
 		grpcpkg.WithTransportCredentials(credentials.NewClientTLSFromCert(ca, "")),
 		grpcpkg.WithBlock(),
 	)

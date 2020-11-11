@@ -21,9 +21,6 @@ type Config struct {
 }
 
 type server struct {
-	api.UnimplementedNoAuthSvcServer
-	api.UnimplementedAuthSvcServer
-	api.UnimplementedAuthIntSvcServer
 	appl        app.Appl
 	ctxShutdown Ctx
 }

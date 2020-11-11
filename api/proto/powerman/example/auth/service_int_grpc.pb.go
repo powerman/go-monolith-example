@@ -39,22 +39,20 @@ func (c *authIntSvcClient) CheckAccessToken(ctx context.Context, in *CheckAccess
 }
 
 // AuthIntSvcServer is the server API for AuthIntSvc service.
-// All implementations must embed UnimplementedAuthIntSvcServer
+// All implementations should embed UnimplementedAuthIntSvcServer
 // for forward compatibility
 type AuthIntSvcServer interface {
 	// Returns identity tied to access_token.
 	CheckAccessToken(context.Context, *CheckAccessTokenRequest) (*CheckAccessTokenResponse, error)
-	mustEmbedUnimplementedAuthIntSvcServer()
 }
 
-// UnimplementedAuthIntSvcServer must be embedded to have forward compatible implementations.
+// UnimplementedAuthIntSvcServer should be embedded to have forward compatible implementations.
 type UnimplementedAuthIntSvcServer struct {
 }
 
 func (UnimplementedAuthIntSvcServer) CheckAccessToken(context.Context, *CheckAccessTokenRequest) (*CheckAccessTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckAccessToken not implemented")
 }
-func (UnimplementedAuthIntSvcServer) mustEmbedUnimplementedAuthIntSvcServer() {}
 
 // UnsafeAuthIntSvcServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to AuthIntSvcServer will

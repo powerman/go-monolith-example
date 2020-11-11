@@ -2,7 +2,6 @@ package def
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/powerman/structlog"
 	"google.golang.org/grpc/grpclog"
@@ -59,15 +58,17 @@ func setupLog() {
 
 type grpcLog struct{ *structlog.Logger }
 
-func (g grpcLog) Info(args ...interface{}) { g.Debug(fmt.Sprint(args...)) }
-func (g grpcLog) Infoln(args ...interface{}) {
-	g.Debug(strings.TrimSuffix(fmt.Sprintln(args...), "\n"))
-}
+func (g grpcLog) Info(args ...interface{})                    { g.Debug(fmt.Sprint(args...)) }
+func (g grpcLog) Infoln(args ...interface{})                  { g.Debug(g.sprintln(args...)) }
 func (g grpcLog) Infof(format string, args ...interface{})    { g.Debug(fmt.Sprintf(format, args...)) }
 func (g grpcLog) Warning(args ...interface{})                 { g.Warn(fmt.Sprint(args...)) }
-func (g grpcLog) Warningln(args ...interface{})               { g.Warn(fmt.Sprintln(args...)) }
+func (g grpcLog) Warningln(args ...interface{})               { g.Warn(g.sprintln(args...)) }
 func (g grpcLog) Warningf(format string, args ...interface{}) { g.Warn(fmt.Sprintf(format, args...)) }
 func (g grpcLog) Error(args ...interface{})                   { g.PrintErr(fmt.Sprint(args...)) }
-func (g grpcLog) Errorln(args ...interface{})                 { g.PrintErr(fmt.Sprintln(args...)) }
+func (g grpcLog) Errorln(args ...interface{})                 { g.PrintErr(g.sprintln(args...)) }
 func (g grpcLog) Errorf(format string, args ...interface{})   { g.PrintErr(fmt.Sprintf(format, args...)) }
 func (g grpcLog) V(l int) bool                                { return false }
+func (g grpcLog) sprintln(args ...interface{}) string {
+	s := fmt.Sprintln(args...)
+	return s[:len(s)-1]
+}

@@ -3,6 +3,7 @@ package serve
 
 import (
 	"context"
+	"crypto/tls"
 	"net"
 	"net/http"
 	"net/rpc"
@@ -22,17 +23,22 @@ type Ctx = context.Context
 
 // HTTP starts HTTP server on addr using handler logged as service.
 // It runs until failed or ctx.Done.
-func HTTP(ctx Ctx, addr netx.Addr, handler http.Handler, service string) error {
+func HTTP(ctx Ctx, addr netx.Addr, tlsConfig *tls.Config, handler http.Handler, service string) error {
 	log := structlog.FromContext(ctx, nil).New(def.LogServer, service)
 
 	srv := &http.Server{
-		Addr:    addr.String(),
-		Handler: handler,
+		Addr:      addr.String(),
+		Handler:   handler,
+		TLSConfig: tlsConfig,
 	}
 
 	log.Info("serve", def.LogHost, addr.Host(), def.LogPort, addr.Port())
 	errc := make(chan error, 1)
-	go func() { errc <- srv.ListenAndServe() }()
+	if srv.TLSConfig == nil {
+		go func() { errc <- srv.ListenAndServe() }()
+	} else {
+		go func() { errc <- srv.ListenAndServeTLS("", "") }()
+	}
 
 	var err error
 	select {
@@ -52,7 +58,7 @@ func HTTP(ctx Ctx, addr netx.Addr, handler http.Handler, service string) error {
 func Metrics(ctx Ctx, addr netx.Addr, reg *prometheus.Registry) error {
 	mux := http.NewServeMux()
 	HandleMetrics(mux, reg)
-	return HTTP(ctx, addr, mux, "Prometheus metrics")
+	return HTTP(ctx, addr, nil, mux, "Prometheus metrics")
 }
 
 // HandleMetrics adds reg's prometheus handler on /metrics at mux.
@@ -63,14 +69,14 @@ func HandleMetrics(mux *http.ServeMux, reg *prometheus.Registry) {
 
 // RPC starts HTTP server on addr path /rpc using rcvr as JSON-RPC 2.0
 // handler.
-func RPC(ctx Ctx, addr netx.Addr, rcvr interface{}) error {
-	return RPCName(ctx, addr, rcvr, "")
+func RPC(ctx Ctx, addr netx.Addr, tlsConfig *tls.Config, rcvr interface{}) error {
+	return RPCName(ctx, addr, tlsConfig, rcvr, "")
 }
 
 // RPCName starts HTTP server on addr path /rpc using rcvr as JSON-RPC 2.0
 // handler but uses the provided name for the type instead of the
 // receiver's concrete type.
-func RPCName(ctx Ctx, addr netx.Addr, rcvr interface{}, name string) (err error) {
+func RPCName(ctx Ctx, addr netx.Addr, tlsConfig *tls.Config, rcvr interface{}, name string) (err error) {
 	srv := rpc.NewServer()
 	if name != "" {
 		err = srv.RegisterName(name, rcvr)
@@ -82,7 +88,7 @@ func RPCName(ctx Ctx, addr netx.Addr, rcvr interface{}, name string) (err error)
 	}
 	mux := http.NewServeMux()
 	mux.Handle("/rpc", jsonrpc2.HTTPHandler(srv))
-	return HTTP(ctx, addr, mux, "JSON-RPC 2.0")
+	return HTTP(ctx, addr, tlsConfig, mux, "JSON-RPC 2.0")
 }
 
 // GRPC starts gRPC server on addr, logged as service.

@@ -16,16 +16,18 @@ import (
 // GRPCNewContext returns a new context.Context that carries values describing
 // this request without any deadline, plus result of authn.Authenticate.
 func GRPCNewContext(ctx Ctx, fullMethod string, authn Authn) (_ Ctx, auth dom.Auth, err error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+
 	if p, ok := peer.FromContext(ctx); ok {
 		ctx = context.WithValue(ctx, contextKeyRemote, p.Addr.String())
 	}
 
 	ctx = context.WithValue(ctx, contextKeyMethodName, path.Base(fullMethod))
 
-	md, _ := metadata.FromIncomingContext(ctx)
 	vals := md.Get("authorization")
-	if len(vals) > 0 && strings.HasPrefix(vals[0], "Bearer ") {
-		accessToken := AccessToken(strings.TrimPrefix(vals[0], "Bearer "))
+	const pfx = "Bearer " // OAuth require case-sensitive "Bearer", but RFC require case-insensitive https://tools.ietf.org/html/rfc7235#section-2.1
+	if len(vals) > 0 && len(vals[0]) > len(pfx) && strings.EqualFold(pfx, vals[0][:len(pfx)]) {
+		accessToken := AccessToken(vals[0][len(pfx):])
 		ctx = context.WithValue(ctx, contextKeyAccessToken, accessToken)
 		auth, err = authn.Authenticate(ctx, accessToken)
 		if err == nil {
