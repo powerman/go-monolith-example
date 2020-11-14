@@ -43,8 +43,8 @@ Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
 `
 
 var (
-	reGooseCommand    = regexp.MustCompile(`^(?:up|up-by-one|up-to\s+\d+|down|down-to\s+\d+|redo|reset|status|version|create\s+\S+\s+(?:go|sql)|fix)$`) //nolint:gochecknoglobals // Regexp.
-	errInvalidCommand = errors.New("invalid goose command")
+	reGooseCommand         = regexp.MustCompile(`^(?:up|up-by-one|up-to\s+\d+|down|down-to\s+\d+|redo|reset|status|version|create\s+\S+\s+(?:go|sql)|fix)$`) //nolint:gochecknoglobals // Regexp.
+	errInvalidGooseCommand = errors.New("invalid goose command")
 )
 
 // validGooseCommand returns true if command is a valid goose command.
@@ -57,7 +57,7 @@ func gooseArgs(cmd *cobra.Command, args []string) error {
 	if gooseCmd == "" {
 		return ErrRequireFlagOrCommand
 	} else if !validGooseCommand(gooseCmd) {
-		return fmt.Errorf("%w: %s", errInvalidCommand, gooseCmd)
+		return fmt.Errorf("%w: %s", errInvalidGooseCommand, gooseCmd)
 	}
 	return nil
 }

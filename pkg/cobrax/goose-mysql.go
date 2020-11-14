@@ -15,7 +15,7 @@ import (
 // GooseMySQLConfig contain configuration for goose command.
 type GooseMySQLConfig struct {
 	MySQL         *mysql.Config
-	MySQLGooseDir string
+	GooseMySQLDir string
 }
 
 // NewGooseMySQLCmd creates new goose command executed by run.
@@ -32,7 +32,8 @@ func NewGooseMySQLCmd(ctx context.Context, goose *goosepkg.Instance, getCfg func
 				return fmt.Errorf("failed to get config: %w", err)
 			}
 
-			err = migrate.Run(ctx, goose, cfg.MySQLGooseDir, gooseCmd, cfg.MySQL)
+			connector := &migrate.MySQL{Config: cfg.MySQL}
+			err = migrate.Run(ctx, goose, cfg.GooseMySQLDir, gooseCmd, connector)
 			if err != nil {
 				return fmt.Errorf("failed to run goose %s: %w", gooseCmd, err)
 			}

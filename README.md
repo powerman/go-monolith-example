@@ -96,7 +96,7 @@ for more details.
   - [X] Generates `swagger.json` from gRPC `.proto` files.
   - [X] Embedded [Swagger UI](https://swagger.io/tools/swagger-ui/).
 - [X] Example DAL (data access layer):
-  - [X] MySQL 5.7.
+  - [X] MySQL 5.7 (strictest SQL mode).
 - [X] Example tests, both unit and integration.
 - [X] Production logging using [structlog](https://github.com/powerman/structlog).
 - [X] Production metrics using Prometheus.

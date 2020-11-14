@@ -38,7 +38,6 @@ jobs:
           MONO__AUTH_TLS_KEY_INT: "configs/pki/private/ms-auth-int.key"
           MONO__EXAMPLE_MYSQL_AUTH_LOGIN: "root"
           MONO__EXAMPLE_MYSQL_AUTH_PASS: ""
-          NARADA4D_TEST_MYSQL: "goose-mysql://root@127.0.0.1"
       - image: "mysql:5.7"
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: "yes"

@@ -45,7 +45,7 @@ func newTestRepo(t *check.C) (cleanup func(), r *dal.Repo) {
 
 	tempDBCfg, cleanupDB, err := mysqlx.EnsureTempDB(tLogger(*t), suffix, cfg.MySQL)
 	t.Must(t.Nil(err))
-	r, err = dal.New(ctx, cfg.MySQLGooseDir, tempDBCfg)
+	r, err = dal.New(ctx, cfg.GooseMySQLDir, tempDBCfg)
 	t.Must(t.Nil(err))
 
 	cleanup = func() {
