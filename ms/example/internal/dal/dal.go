@@ -34,9 +34,9 @@ func New(ctx Ctx, dir string, cfg *mysql.Config) (_ *Repo, err error) {
 	}
 
 	r := &Repo{}
-	r.Repo, err = repo.New(ctx, migrations.Goose(), repo.Config{
+	r.Repo, err = repo.NewMySQL(ctx, migrations.Goose(), repo.MySQLConfig{
 		MySQL:         cfg,
-		GooseDir:      dir,
+		GooseMySQLDir: dir,
 		SchemaVersion: schemaVersion,
 		Metric:        metric,
 		ReturnErrs:    returnErrs,

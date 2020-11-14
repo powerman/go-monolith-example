@@ -14,7 +14,7 @@ env:
 jobs:
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest'
     timeout-minutes: 30
     services:
       mysql:
@@ -22,11 +22,11 @@ jobs:
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
         ports:
-          - 3306:3306
+          - '3306:3306'
       nats:
         image: 'nats:2.1.4'
         ports:
-          - 4222:4222
+          - '4222:4222'
     env:
       HADOLINT_VER: '1.18.0'
       SHELLCHECK_VER: '0.7.1'
@@ -41,7 +41,6 @@ jobs:
       MONO__AUTH_TLS_KEY_INT: 'configs/pki/private/ms-auth-int.key'
       MONO__EXAMPLE_MYSQL_AUTH_LOGIN: 'root'
       MONO__EXAMPLE_MYSQL_AUTH_PASS: ''
-      NARADA4D_TEST_MYSQL: 'goose-mysql://root@127.0.0.1'
     steps:
       - name: Run STAN service
         run: |

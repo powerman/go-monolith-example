@@ -38,7 +38,7 @@ func MustGetServeTest() *ServeConfig {
 	}
 
 	for _, path := range []*string{
-		&cfg.MySQLGooseDir,
+		&cfg.GooseMySQLDir,
 		&cfg.TLSCACert,
 	} {
 		if !strings.HasPrefix(*path, "/") {

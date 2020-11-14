@@ -37,16 +37,16 @@ var shared *SharedCfg //nolint:gochecknoglobals // Config is global anyway.
 // If microservice may runs in different ways (e.g. using CLI subcommands)
 // then these subcommands may use subset of these values.
 var own = &struct { //nolint:gochecknoglobals // Config is global anyway.
-	MySQLUser appcfg.NotEmptyString `env:"MYSQL_AUTH_LOGIN"`
-	MySQLPass appcfg.String         `env:"MYSQL_AUTH_PASS"`
-	MySQLName appcfg.NotEmptyString `env:"MYSQL_DB"`
-	GooseDir  appcfg.NotEmptyString
-	Path      appcfg.NotEmptyString
+	MySQLUser     appcfg.NotEmptyString `env:"MYSQL_AUTH_LOGIN"`
+	MySQLPass     appcfg.String         `env:"MYSQL_AUTH_PASS"`
+	MySQLDBName   appcfg.NotEmptyString `env:"MYSQL_DB_NAME"`
+	GooseMySQLDir appcfg.NotEmptyString
+	Path          appcfg.NotEmptyString
 }{ // Defaults, if any:
-	MySQLUser: appcfg.MustNotEmptyString(app.ServiceName),
-	MySQLName: appcfg.MustNotEmptyString(app.ServiceName),
-	GooseDir:  appcfg.MustNotEmptyString(fmt.Sprintf("ms/%s/internal/migrations", app.ServiceName)),
-	Path:      appcfg.MustNotEmptyString("/rpc"),
+	MySQLUser:     appcfg.MustNotEmptyString(app.ServiceName),
+	MySQLDBName:   appcfg.MustNotEmptyString(app.ServiceName),
+	GooseMySQLDir: appcfg.MustNotEmptyString(fmt.Sprintf("ms/%s/internal/migrations", app.ServiceName)),
+	Path:          appcfg.MustNotEmptyString("/rpc"),
 }
 
 // FlagSets for all CLI subcommands which use flags to set config values.
@@ -73,14 +73,14 @@ func Init(sharedCfg *SharedCfg, flagsets FlagSets) error {
 	appcfg.AddPFlag(fs.GooseMySQL, &shared.XMySQLAddrPort, "mysql.port", "port to connect to MySQL")
 	appcfg.AddPFlag(fs.GooseMySQL, &own.MySQLUser, "mysql.user", "MySQL username")
 	appcfg.AddPFlag(fs.GooseMySQL, &own.MySQLPass, "mysql.pass", "MySQL password")
-	appcfg.AddPFlag(fs.GooseMySQL, &own.MySQLName, "mysql.dbname", "MySQL database name")
+	appcfg.AddPFlag(fs.GooseMySQL, &own.MySQLDBName, "mysql.dbname", "MySQL database name")
 
 	pfx := app.ServiceName + "."
 	appcfg.AddPFlag(fs.Serve, &shared.XMySQLAddrHost, "mysql.host", "host to connect to MySQL")
 	appcfg.AddPFlag(fs.Serve, &shared.XMySQLAddrPort, "mysql.port", "port to connect to MySQL")
 	appcfg.AddPFlag(fs.Serve, &own.MySQLUser, pfx+"mysql.user", "MySQL username")
 	appcfg.AddPFlag(fs.Serve, &own.MySQLPass, pfx+"mysql.pass", "MySQL password")
-	appcfg.AddPFlag(fs.Serve, &own.MySQLName, pfx+"mysql.dbname", "MySQL database name")
+	appcfg.AddPFlag(fs.Serve, &own.MySQLDBName, pfx+"mysql.dbname", "MySQL database name")
 	appcfg.AddPFlag(fs.Serve, &shared.XNATSAddrUrls, "nats.urls", "URLs to connect to NATS (separated by comma)")
 	appcfg.AddPFlag(fs.Serve, &shared.XSTANClusterID, "stan.cluster_id", "STAN cluster ID")
 	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrHostInt, "auth.host-int", "host to connect to ms/auth internal API")
@@ -96,7 +96,7 @@ func Init(sharedCfg *SharedCfg, flagsets FlagSets) error {
 // ServeConfig contains configuration for subcommand.
 type ServeConfig struct {
 	MySQL         *mysql.Config
-	MySQLGooseDir string
+	GooseMySQLDir string
 	NATSURLs      string
 	STANClusterID string
 	AuthAddrInt   netx.Addr
@@ -112,12 +112,12 @@ func GetServe() (c *ServeConfig, err error) {
 
 	c = &ServeConfig{
 		MySQL: def.NewMySQLConfig(def.MySQLConfig{
-			Addr: netx.NewAddr(shared.XMySQLAddrHost.Value(&err), shared.XMySQLAddrPort.Value(&err)),
-			User: own.MySQLUser.Value(&err),
-			Pass: own.MySQLPass.Value(&err),
-			DB:   own.MySQLName.Value(&err),
+			Addr:   netx.NewAddr(shared.XMySQLAddrHost.Value(&err), shared.XMySQLAddrPort.Value(&err)),
+			User:   own.MySQLUser.Value(&err),
+			Pass:   own.MySQLPass.Value(&err),
+			DBName: own.MySQLDBName.Value(&err),
 		}),
-		MySQLGooseDir: own.GooseDir.Value(&err),
+		GooseMySQLDir: own.GooseMySQLDir.Value(&err),
 		NATSURLs:      shared.XNATSAddrUrls.Value(&err),
 		STANClusterID: shared.XSTANClusterID.Value(&err),
 		AuthAddrInt:   netx.NewAddr(shared.AuthAddrHostInt.Value(&err), shared.AuthAddrPortInt.Value(&err)),
@@ -137,12 +137,12 @@ func GetGooseMySQL() (c *cobrax.GooseMySQLConfig, err error) {
 
 	c = &cobrax.GooseMySQLConfig{
 		MySQL: def.NewMySQLConfig(def.MySQLConfig{
-			Addr: netx.NewAddr(shared.XMySQLAddrHost.Value(&err), shared.XMySQLAddrPort.Value(&err)),
-			User: own.MySQLUser.Value(&err),
-			Pass: own.MySQLPass.Value(&err),
-			DB:   own.MySQLName.Value(&err),
+			Addr:   netx.NewAddr(shared.XMySQLAddrHost.Value(&err), shared.XMySQLAddrPort.Value(&err)),
+			User:   own.MySQLUser.Value(&err),
+			Pass:   own.MySQLPass.Value(&err),
+			DBName: own.MySQLDBName.Value(&err),
 		}),
-		MySQLGooseDir: own.GooseDir.Value(&err),
+		GooseMySQLDir: own.GooseMySQLDir.Value(&err),
 	}
 	if err != nil {
 		return nil, appcfg.WrapPErr(err, fs.GooseMySQL, own, shared)

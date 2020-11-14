@@ -14,12 +14,12 @@ import (
 func Test(t *testing.T) {
 	want := &ServeConfig{
 		MySQL: def.NewMySQLConfig(def.MySQLConfig{
-			Addr: netx.NewAddr("localhost", 3306),
-			User: "example",
-			Pass: "",
-			DB:   "example",
+			Addr:   netx.NewAddr("localhost", 3306),
+			User:   "example",
+			Pass:   "",
+			DBName: "example",
 		}),
-		MySQLGooseDir: "ms/example/internal/migrations",
+		GooseMySQLDir: "ms/example/internal/migrations",
 		NATSURLs:      "nats://localhost:4222",
 		STANClusterID: "cluster",
 		AuthAddrInt:   netx.NewAddr(def.Hostname, config.AuthPortInt),
@@ -43,20 +43,20 @@ func Test(t *testing.T) {
 	t.Run("constraint", func(tt *testing.T) {
 		t := check.T(tt)
 		constraint(t, "MONO__EXAMPLE_MYSQL_AUTH_LOGIN", "", `^MySQLUser .* empty`)
-		constraint(t, "MONO__EXAMPLE_MYSQL_DB", "", `^MySQLName .* empty`)
+		constraint(t, "MONO__EXAMPLE_MYSQL_DB_NAME", "", `^MySQLDBName .* empty`)
 	})
 	t.Run("env", func(tt *testing.T) {
 		t := check.T(tt)
 		os.Setenv("MONO__EXAMPLE_MYSQL_AUTH_LOGIN", "user3")
 		os.Setenv("MONO__EXAMPLE_MYSQL_AUTH_PASS", "pass3")
-		os.Setenv("MONO__EXAMPLE_MYSQL_DB", "db3")
+		os.Setenv("MONO__EXAMPLE_MYSQL_DB_NAME", "db3")
 		c, err := testGetServe()
 		t.Nil(err)
 		want.MySQL = def.NewMySQLConfig(def.MySQLConfig{
-			Addr: netx.NewAddr("localhost", 3306),
-			User: "user3",
-			Pass: "pass3",
-			DB:   "db3",
+			Addr:   netx.NewAddr("localhost", 3306),
+			User:   "user3",
+			Pass:   "pass3",
+			DBName: "db3",
 		})
 		t.DeepEqual(c, want)
 	})
@@ -79,10 +79,10 @@ func Test(t *testing.T) {
 		)
 		t.Nil(err)
 		want.MySQL = def.NewMySQLConfig(def.MySQLConfig{
-			Addr: netx.NewAddr("mysql4", 43306),
-			User: "user4",
-			Pass: "pass4",
-			DB:   "db4",
+			Addr:   netx.NewAddr("mysql4", 43306),
+			User:   "user4",
+			Pass:   "pass4",
+			DBName: "db4",
 		})
 		want.NATSURLs = "nats://nats4:4222"
 		want.STANClusterID = "cluster4"

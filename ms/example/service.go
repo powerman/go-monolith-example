@@ -50,7 +50,8 @@ func (s *Service) Init(sharedCfg *config.SharedCfg, cmd, serveCmd *cobra.Command
 	app.InitMetrics(reg)
 	jsonrpc2.InitMetrics(reg)
 
-	gooseMySQLCmd := cobrax.NewGooseMySQLCmd(def.NewContext(app.ServiceName), migrations.Goose(), config.GetGooseMySQL)
+	ctx := def.NewContext(app.ServiceName)
+	gooseMySQLCmd := cobrax.NewGooseMySQLCmd(ctx, migrations.Goose(), config.GetGooseMySQL)
 	cmd.AddCommand(gooseMySQLCmd)
 
 	return config.Init(sharedCfg, config.FlagSets{
@@ -115,7 +116,7 @@ func (s *Service) connectNATS(ctx Ctx) (interface{}, error) {
 }
 
 func (s *Service) connectRepo(ctx Ctx) (interface{}, error) {
-	return dal.New(ctx, s.cfg.MySQLGooseDir, s.cfg.MySQL)
+	return dal.New(ctx, s.cfg.GooseMySQLDir, s.cfg.MySQL)
 }
 
 func (s *Service) setupAuthn(ctx Ctx) (interface{}, error) {

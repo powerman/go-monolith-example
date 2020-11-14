@@ -8,8 +8,8 @@ services:
 
   mysql:
     image: "mysql:5.7" # We're using 5.7.
-    container_name: mono_mysql
-    restart: always
+    container_name: "mono_mysql"
+    restart: "always"
     ports:
       - "${mono_mysql_addr_port:-0}:3306"
     volumes:
@@ -65,6 +65,6 @@ services:
       MONO_X_MYSQL_ADDR_HOST: "mysql"
       MONO_X_NATS_ADDR_URLS: "nats://nats:4222"
       MONO_X_STAN_CLUSTER_ID: "local"
-      MONO__EXAMPLE_MYSQL_AUTH_LOGIN: "root"
-      MONO__EXAMPLE_MYSQL_AUTH_PASS: ""
       MONO__AUTH_SECRET: "s3cr3t"
+      MONO__EXAMPLE_MYSQL_AUTH_LOGIN: "${MONO__EXAMPLE_MYSQL_AUTH_LOGIN}"
+      MONO__EXAMPLE_MYSQL_AUTH_PASS: "${MONO__EXAMPLE_MYSQL_AUTH_PASS}"
