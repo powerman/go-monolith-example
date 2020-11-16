@@ -1,100 +1,49 @@
+// Package dal implements Data Access Layer using PostgreSQL DB.
 package dal
 
 import (
 	"context"
-	"sync"
+	"time"
 
-	"github.com/powerman/go-monolith-example/internal/dom"
 	"github.com/powerman/go-monolith-example/ms/auth/internal/app"
+	"github.com/powerman/go-monolith-example/ms/auth/internal/migrations"
+	"github.com/powerman/go-monolith-example/pkg/def"
+	"github.com/powerman/go-monolith-example/pkg/repo"
+)
+
+const (
+	schemaVersion  = 4
+	dbMaxOpenConns = 100 / 10 // Use up to 1/10 of server's max_connections.
+	dbMaxIdleConns = 5        // A bit more than default (2).
 )
 
 type Ctx = context.Context
 
 type Repo struct {
-	sync.Mutex
-	users  map[dom.UserName]app.User
-	tokens map[app.AccessToken]dom.UserName
+	*repo.Repo
 }
 
-func New() *Repo {
-	return &Repo{
-		users:  make(map[dom.UserName]app.User),
-		tokens: make(map[app.AccessToken]dom.UserName),
+// New creates and returns new Repo.
+// It will also run required DB migrations and connects to DB.
+func New(ctx Ctx, dir string, cfg *def.PostgresConfig) (_ *Repo, err error) {
+	returnErrs := []error{ // List of app.Err… returned by Repo methods.
+		app.ErrAlreadyExist,
+		app.ErrNotFound,
 	}
-}
 
-func (r *Repo) AddUser(ctx Ctx, user app.User) error {
-	r.Lock()
-	defer r.Unlock()
-	if _, ok := r.users[user.Name]; ok {
-		return app.ErrAlreadyExist
+	r := &Repo{}
+	r.Repo, err = repo.NewPostgres(ctx, migrations.Goose(), repo.PostgresConfig{
+		Postgres:         cfg,
+		GoosePostgresDir: dir,
+		SchemaVersion:    schemaVersion,
+		Metric:           metric,
+		ReturnErrs:       returnErrs,
+	})
+	if err != nil {
+		return nil, err
 	}
-	for i := range r.users {
-		if user.Email == r.users[i].Email {
-			return app.ErrAlreadyExist
-		}
-	}
-	r.users[user.Name] = user
-	return nil
-}
-
-func (r *Repo) GetUser(ctx Ctx, userName dom.UserName) (*app.User, error) {
-	r.Lock()
-	defer r.Unlock()
-	user, ok := r.users[userName]
-	if !ok {
-		return nil, app.ErrNotFound
-	}
-	return &user, nil
-}
-
-func (r *Repo) GetUserByEmail(ctx Ctx, email string) (*app.User, error) {
-	r.Lock()
-	defer r.Unlock()
-	for _, user := range r.users { //nolint:gocritic // rangeValCopy.
-		if user.Email == email {
-			return &user, nil
-		}
-	}
-	return nil, app.ErrNotFound
-}
-
-func (r *Repo) GetUserByAccessToken(ctx Ctx, accessToken app.AccessToken) (*app.User, error) {
-	r.Lock()
-	defer r.Unlock()
-	userName, ok := r.tokens[accessToken]
-	if !ok {
-		return nil, app.ErrNotFound
-	}
-	user, ok := r.users[userName]
-	if !ok {
-		return nil, app.ErrNotFound
-	}
-	return &user, nil
-}
-
-func (r *Repo) AddAccessToken(ctx Ctx, userName dom.UserName) (app.AccessToken, error) {
-	r.Lock()
-	defer r.Unlock()
-	accessToken := app.AccessToken(dom.NewID())
-	r.tokens[accessToken] = userName // XXX May overwrite existing record.
-	return accessToken, nil
-}
-
-func (r *Repo) DelAccessToken(ctx Ctx, accessToken app.AccessToken) error {
-	r.Lock()
-	defer r.Unlock()
-	delete(r.tokens, accessToken)
-	return nil
-}
-
-func (r *Repo) DelAccessTokens(ctx Ctx, userName dom.UserName) error {
-	r.Lock()
-	defer r.Unlock()
-	for accessToken, name := range r.tokens { //nolint:gocritic // rangeValCopy.
-		if name.String() == userName.String() {
-			delete(r.tokens, accessToken)
-		}
-	}
-	return nil
+	r.DB.SetMaxOpenConns(dbMaxOpenConns)
+	r.DB.SetMaxIdleConns(dbMaxIdleConns)
+	r.SchemaVer.HoldSharedLock(ctx, time.Second)
+	return r, nil
 }

@@ -33,6 +33,9 @@ type Shared struct {
 	XMySQLAddrHost         appcfg.NotEmptyString `env:"X_MYSQL_ADDR_HOST"`
 	XMySQLAddrPort         appcfg.Port           `env:"X_MYSQL_ADDR_PORT"`
 	XNATSAddrUrls          appcfg.NotEmptyString `env:"X_NATS_ADDR_URLS"`
+	XPostgresAddrHost      appcfg.NotEmptyString `env:"X_POSTGRES_ADDR_HOST"`
+	XPostgresAddrPort      appcfg.Port           `env:"X_POSTGRES_ADDR_PORT"`
+	XPostgresDBName        appcfg.NotEmptyString `env:"X_POSTGRES_DB_NAME"`
 	XSTANClusterID         appcfg.NotEmptyString `env:"X_STAN_CLUSTER_ID"`
 }
 
@@ -58,6 +61,8 @@ var shared = &Shared{ //nolint:gochecknoglobals // Config is global anyway.
 	ExampleAddrPort:        appcfg.MustPort(strconv.Itoa(ExamplePort)),
 	ExampleMetricsAddrPort: appcfg.MustPort(strconv.Itoa(ExampleMetricsPort)),
 	XMySQLAddrPort:         appcfg.MustPort("3306"),
+	XPostgresAddrPort:      appcfg.MustPort("5432"),
+	XPostgresDBName:        appcfg.MustNotEmptyString("postgres"),
 }
 
 // Get updates config defaults (from env) and returns shared config.

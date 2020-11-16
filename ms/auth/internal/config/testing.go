@@ -17,7 +17,8 @@ func MustGetServeTest() *ServeConfig {
 	sharedCfg, err := config.Get()
 	must.NoErr(err)
 	err = Init(sharedCfg, FlagSets{
-		Serve: pflag.NewFlagSet("", pflag.ContinueOnError),
+		Serve:         pflag.NewFlagSet("", pflag.ContinueOnError),
+		GoosePostgres: pflag.NewFlagSet("", pflag.ContinueOnError),
 	})
 	must.NoErr(err)
 	cfg, err := GetServe()
@@ -37,6 +38,7 @@ func MustGetServeTest() *ServeConfig {
 	}
 
 	for _, path := range []*string{
+		&cfg.GoosePostgresDir,
 		&cfg.TLSCACert,
 		&cfg.TLSCert,
 		&cfg.TLSCertInt,

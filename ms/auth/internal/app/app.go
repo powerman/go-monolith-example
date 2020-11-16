@@ -23,10 +23,10 @@ type Ctx = context.Context
 // Errors.
 var (
 	ErrAccessDenied  = errors.New("access denied")
-	ErrNotFound      = errors.New("not found")
 	ErrAlreadyExist  = errors.New("already exists")
-	ErrWrongPassword = errors.New("wrong password")
+	ErrNotFound      = errors.New("not found")
 	ErrValidate      = errors.New("validate")
+	ErrWrongPassword = errors.New("wrong password")
 )
 
 // Appl provides application features (use cases) service.
@@ -70,7 +70,7 @@ type Repo interface {
 	GetUserByAccessToken(Ctx, AccessToken) (*User, error)
 	// AddAccessToken creates and returns AccessToken for given user.
 	// Errors: ErrNotFound.
-	AddAccessToken(Ctx, dom.UserName) (AccessToken, error)
+	AddAccessToken(Ctx, AccessToken, dom.UserName) error
 	// DelAccessToken deletes given AccessToken.
 	// Errors: none.
 	DelAccessToken(Ctx, AccessToken) error

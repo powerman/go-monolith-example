@@ -7,12 +7,14 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"runtime"
 	"strings"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/parnurzeal/gorequest"
 	"github.com/powerman/check"
+	"github.com/powerman/pqx"
 	"golang.org/x/oauth2"
 	grpcpkg "google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -47,6 +49,14 @@ func TestSmoke(tt *testing.T) {
 
 	s := &Service{cfg: cfg}
 
+	pc, _, _, _ := runtime.Caller(1)
+	suffix := runtime.FuncForPC(pc).Name()
+	suffix = suffix[:strings.LastIndex(suffix, ".")]
+	_, cleanup, err := pqx.EnsureTempDB(tLogger(*t), suffix, cfg.Postgres.Config)
+	t.Must(t.Nil(err))
+	defer cleanup()
+	cfg.Postgres.DBName += "_" + suffix // Assign to cfg and not s.cfg as a reminder: they are the same.
+
 	ctxStartup, cancel := context.WithTimeout(ctx, def.TestTimeout)
 	defer cancel()
 	ctxShutdown, shutdown := context.WithCancel(ctx)
@@ -55,9 +65,9 @@ func TestSmoke(tt *testing.T) {
 	defer func() {
 		shutdown()
 		t.Nil(<-errc, "RunServe")
-		// if s.repo != nil {
-		// 	s.repo.Close() // TODO
-		// }
+		if s.repo != nil {
+			s.repo.Close()
+		}
 	}()
 	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.Addr), "connect to gRPC service"))
 	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.AddrInt), "connect to internal gRPC service"))

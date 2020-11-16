@@ -2,6 +2,7 @@ version: "3.8"
 
 volumes:
   mysql:
+  postgres:
   stan:
 
 services:
@@ -16,6 +17,54 @@ services:
       - "mysql:/var/lib/mysql"
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+
+  postgres:
+    image: "postgres:11.10" # We're using 11.
+    container_name: "mono_postgres"
+    restart: "always"
+    shm_size: "256m"
+    ports:
+      - "${mono_postgres_addr_port:-0}:5432"
+    volumes:
+      - "postgres:/var/lib/postgresql/data"
+      - "${mono_postgres_tls_cert}:/dev.crt"
+      - "${mono_postgres_tls_key}:/dev.key"
+    environment:
+      POSTGRES_PASSWORD: "postgres"
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -x -e -o pipefail
+        install -m 0440 -o root -g postgres /dev.crt /server.crt
+        install -m 0440 -o root -g postgres /dev.key /server.key
+        exec docker-entrypoint.sh postgres -c ssl=on \
+            --ssl_cert_file=/server.crt --ssl_key_file=/server.key
+
+  postgres-setup:
+    depends_on:
+      - postgres
+    image: "postgres:11.10" # We're using 11.
+    container_name: "mono_postgres-setup"
+    restart: "no"
+    volumes:
+      - "./scripts/postgres-setup:/usr/local/bin/postgres-setup"
+    environment:
+      MONO__AUTH_POSTGRES_AUTH_LOGIN: "${MONO__AUTH_POSTGRES_AUTH_LOGIN}"
+      MONO__AUTH_POSTGRES_AUTH_PASS: "${MONO__AUTH_POSTGRES_AUTH_PASS}"
+      PGHOST: "postgres"
+      PGUSER: "postgres"
+      PGPASSWORD: "postgres"
+    command:
+      - bash
+      - -c
+      - |
+        while ! timeout --foreground 0.5 bash -c "echo -n >/dev/tcp/$${PGHOST}/$${PGPORT:-5432}" 2>/dev/null; do
+            echo waiting for postgres
+            sleep 0.5
+        done
+        set -x -e -o pipefail
+        postgres-setup | psql
 
   nats:
     image: "nats:2.1.4" # This is the latest version at the moment.
@@ -64,7 +113,10 @@ services:
     environment:
       MONO_X_MYSQL_ADDR_HOST: "mysql"
       MONO_X_NATS_ADDR_URLS: "nats://nats:4222"
+      MONO_X_POSTGRES_ADDR_HOST: "postgres"
       MONO_X_STAN_CLUSTER_ID: "local"
+      MONO__AUTH_POSTGRES_AUTH_LOGIN: "${MONO__AUTH_POSTGRES_AUTH_LOGIN}"
+      MONO__AUTH_POSTGRES_AUTH_PASS: "${MONO__AUTH_POSTGRES_AUTH_PASS}"
       MONO__AUTH_SECRET: "s3cr3t"
       MONO__EXAMPLE_MYSQL_AUTH_LOGIN: "${MONO__EXAMPLE_MYSQL_AUTH_LOGIN}"
       MONO__EXAMPLE_MYSQL_AUTH_PASS: "${MONO__EXAMPLE_MYSQL_AUTH_PASS}"
