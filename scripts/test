@@ -42,6 +42,5 @@ dockerize \
 	-wait "tcp://${MONO_X_MYSQL_ADDR_HOST}:${MONO_X_MYSQL_ADDR_PORT:-3306}" \
 	-wait "tcp://${MONO_X_POSTGRES_ADDR_HOST}:${MONO_X_POSTGRES_ADDR_PORT:-5432}" \
 	-timeout 30s
-test -z "$CI" || scripts/postgres-setup | docker run -i --rm --net=host \
-	-e PGHOST -e PGPORT -e PGUSER -e PGPASSWORD -e PGDATABASE --entrypoint=psql postgres:11.10
+test -z "$CI" || scripts/postgres-setup | psql
 gotestsum -- -race -tags=integration "$@" ./...
