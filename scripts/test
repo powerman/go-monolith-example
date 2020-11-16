@@ -43,4 +43,8 @@ dockerize \
 	-wait "tcp://${MONO_X_POSTGRES_ADDR_HOST}:${MONO_X_POSTGRES_ADDR_PORT:-5432}" \
 	-timeout 30s
 test -z "$CI" || scripts/postgres-setup | psql
+pwd
+ls -al
+ls -al configs
+ls -al configs/pki
 gotestsum -- -race -tags=integration "$@" ./...

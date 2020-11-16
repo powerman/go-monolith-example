@@ -5,3 +5,4 @@
 *
 !bin
 !ms/example/internal/migrations/*.sql
+!ms/auth/internal/migrations/*.sql
