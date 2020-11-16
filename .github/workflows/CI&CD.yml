@@ -117,8 +117,8 @@ jobs:
             curl -sSfL https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VER}/hadolint-$(uname)-x86_64 | install /dev/stdin $(go env GOPATH)/bin/hadolint
           shellcheck --version | tee /dev/stderr | grep -wq $SHELLCHECK_VER ||
             curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VER}/shellcheck-v${SHELLCHECK_VER}.$(uname).x86_64.tar.xz | tar xJf - -C $(go env GOPATH)/bin --strip-components=1 shellcheck-v${SHELLCHECK_VER}/shellcheck
-          apt update
-          apt install -y postgresql-client
+          sudo apt update
+          sudo apt install -y postgresql-client
 
       - name: Ensure API spec match auto-generated code
         run: |
