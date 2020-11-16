@@ -38,6 +38,7 @@ func MustGetServeTest() *ServeConfig {
 	}
 
 	for _, path := range []*string{
+		&cfg.Postgres.Config.SSLRootCert,
 		&cfg.GoosePostgresDir,
 		&cfg.TLSCACert,
 		&cfg.TLSCert,
