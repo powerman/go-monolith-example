@@ -38,7 +38,12 @@ func (a *App) LoginByUserID(ctx Ctx, userID string, password sensitive.String) (
 	if !a.equalPassHash(password, user.PassHash) {
 		return "", ErrWrongPassword
 	}
-	return a.repo.AddAccessToken(ctx, user.Name)
+	accessToken := AccessToken(dom.NewID())
+	err = a.repo.AddAccessToken(ctx, accessToken, user.Name)
+	if err != nil {
+		return "", err
+	}
+	return accessToken, nil
 }
 
 func (a *App) LoginByEmail(ctx Ctx, email string, password sensitive.String) (AccessToken, error) {

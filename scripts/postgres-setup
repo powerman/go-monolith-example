@@ -1,0 +1,23 @@
+#!/bin/sh
+# Enforce secure schema usage pattern https://www.postgresql.org/docs/11/ddl-schemas.html#DDL-SCHEMAS-PATTERNS
+cat <<EOSQL
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+EOSQL
+
+for pfx in $(env | grep "^MONO_\w\+_POSTGRES_AUTH_LOGIN=" | sed "s/_LOGIN=.*//"); do
+	user=$(printenv "${pfx}_LOGIN")
+	if ! echo "$user" | grep -q '^[a-z_][a-z_0-9]*$'; then
+		echo "failed to match /^[a-z_][a-z_0-9]*$/: ${pfx}_LOGIN='$user'" >&2
+		exit 1
+	fi
+	pass=$(printenv "${pfx}_PASS" | sed "s/'/''/g")
+	cat <<EOSQL
+DO \$\$
+BEGIN
+    CREATE USER $user;
+    EXCEPTION WHEN duplicate_object THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
+END \$\$;
+ALTER ROLE $user PASSWORD '$pass' CREATEDB;
+CREATE SCHEMA IF NOT EXISTS AUTHORIZATION $user;
+EOSQL
+done

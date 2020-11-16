@@ -97,6 +97,7 @@ for more details.
   - [X] Embedded [Swagger UI](https://swagger.io/tools/swagger-ui/).
 - [X] Example DAL (data access layer):
   - [X] MySQL 5.7 (strictest SQL mode).
+  - [X] PostgreSQL 11 (secure schema usage pattern).
 - [X] Example tests, both unit and integration.
 - [X] Production logging using [structlog](https://github.com/powerman/structlog).
 - [X] Production metrics using Prometheus.
@@ -145,6 +146,7 @@ $ /path/to/easyrsa init-pki
 $ echo Dev CA $(go list -m) | /path/to/easyrsa build-ca nopass
 $ /path/to/easyrsa --days=3650 "--subject-alt-name=DNS:localhost" build-server-full ms-auth nopass
 $ /path/to/easyrsa --days=3650 "--subject-alt-name=IP:127.0.0.1" build-server-full ms-auth-int nopass
+$ /path/to/easyrsa --days=3650 "--subject-alt-name=DNS:postgres" build-server-full postgres nopass
 ```
 
 ### Usage
@@ -278,7 +280,6 @@ $ ./bin/mono serve
 
 - [ ] Add security-related headers for HTTPS endpoints (HSTS, CSP, etc.),
   also move default host from localhost to avoid poisoning it with HSTS.
-- [ ] Add DAL using PostgreSQL 11.
 - [ ] Embed https://github.com/powerman/go-service-example as an example
   of embedding microservices from another repo.
 - [ ] Add example of `internal/svc/*` adapters calling some other services.

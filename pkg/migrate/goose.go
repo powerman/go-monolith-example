@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 
 	goosepkg "github.com/powerman/goose/v2"
 	"github.com/powerman/narada4d/schemaver"
@@ -17,6 +18,11 @@ import (
 type Ctx = context.Context
 
 var errSelfCheck = errors.New("unexpected db schema version")
+
+// Tests often runs in parallel using same goose instance and may trigger
+// -race detector on SetDialect. So, use this mutex to work around.
+//nolint:gochecknoglobals // By design.
+var gooseMu sync.Mutex
 
 // Connector provides a way to connect to any database with schemaver.
 type Connector interface {

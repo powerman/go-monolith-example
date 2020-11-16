@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/powerman/check"
+	"github.com/powerman/pqx"
 
 	"github.com/powerman/go-monolith-example/internal/config"
 	"github.com/powerman/go-monolith-example/pkg/def"
@@ -13,16 +14,25 @@ import (
 
 func Test(t *testing.T) {
 	want := &ServeConfig{
-		Addr:        netx.NewAddr(def.Hostname, config.AuthPort),
-		AddrInt:     netx.NewAddr(def.Hostname, config.AuthPortInt),
-		GRPCGWAddr:  netx.NewAddr(def.Hostname, config.AuthGRPCGWPort),
-		MetricsAddr: netx.NewAddr(def.Hostname, config.AuthMetricsPort),
-		Secret:      []byte("s3cr3t"),
-		TLSCACert:   "ca.crt",
-		TLSCert:     "tls.crt",
-		TLSCertInt:  "tls-int.crt",
-		TLSKey:      "tls.key",
-		TLSKeyInt:   "tls-int.key",
+		Postgres: def.NewPostgresConfig(pqx.Config{
+			Host:        "postgres",
+			Port:        5432,
+			DBName:      "postgres",
+			User:        "auth",
+			Pass:        "authpass",
+			SSLRootCert: "ca.crt",
+		}),
+		GoosePostgresDir: "ms/auth/internal/migrations",
+		Addr:             netx.NewAddr(def.Hostname, config.AuthPort),
+		AddrInt:          netx.NewAddr(def.Hostname, config.AuthPortInt),
+		GRPCGWAddr:       netx.NewAddr(def.Hostname, config.AuthGRPCGWPort),
+		MetricsAddr:      netx.NewAddr(def.Hostname, config.AuthMetricsPort),
+		Secret:           []byte("s3cr3t"),
+		TLSCACert:        "ca.crt",
+		TLSCert:          "tls.crt",
+		TLSCertInt:       "tls-int.crt",
+		TLSKey:           "tls.key",
+		TLSKeyInt:        "tls-int.key",
 	}
 
 	t.Run("required", func(tt *testing.T) {
@@ -37,6 +47,8 @@ func Test(t *testing.T) {
 		os.Setenv("MONO__AUTH_TLS_CERT", "tls.crt")
 		require(t, "Secret")
 		os.Setenv("MONO__AUTH_SECRET", "s3cr3t")
+		require(t, "PostgresPass")
+		os.Setenv("MONO__AUTH_POSTGRES_AUTH_PASS", "authpass")
 	})
 	t.Run("default", func(tt *testing.T) {
 		t := check.T(tt)
@@ -46,6 +58,8 @@ func Test(t *testing.T) {
 	})
 	t.Run("constraint", func(tt *testing.T) {
 		t := check.T(tt)
+		constraint(t, "MONO__AUTH_POSTGRES_AUTH_LOGIN", "", `^PostgresUser .* empty`)
+		constraint(t, "MONO__AUTH_POSTGRES_AUTH_PASS", "", `^PostgresPass .* empty`)
 		constraint(t, "MONO__AUTH_SECRET", "", `^Secret .* empty`)
 		constraint(t, "MONO__AUTH_TLS_CERT", "", `^TLSCert .* empty`)
 		constraint(t, "MONO__AUTH_TLS_CERT_INT", "", `^TLSCertInt .* empty`)
@@ -54,6 +68,8 @@ func Test(t *testing.T) {
 	})
 	t.Run("env", func(tt *testing.T) {
 		t := check.T(tt)
+		os.Setenv("MONO__AUTH_POSTGRES_AUTH_LOGIN", "auth3")
+		os.Setenv("MONO__AUTH_POSTGRES_AUTH_PASS", "authpass3")
 		os.Setenv("MONO__AUTH_SECRET", "secret3")
 		os.Setenv("MONO__AUTH_TLS_CERT", "tls3.crt")
 		os.Setenv("MONO__AUTH_TLS_CERT_INT", "tls3-int.crt")
@@ -61,6 +77,8 @@ func Test(t *testing.T) {
 		os.Setenv("MONO__AUTH_TLS_KEY_INT", "tls3-int.key")
 		c, err := testGetServe()
 		t.Nil(err)
+		want.Postgres.User = "auth3"
+		want.Postgres.Pass = "authpass3"
 		want.Secret = []byte("secret3")
 		want.TLSCert = "tls3.crt"
 		want.TLSCertInt = "tls3-int.crt"
@@ -71,6 +89,11 @@ func Test(t *testing.T) {
 	t.Run("flag", func(tt *testing.T) {
 		t := check.T(tt)
 		c, err := testGetServe(
+			"--postgres.host=localhost4",
+			"--postgres.port=45432",
+			"--postgres.dbname=postgres4",
+			"--auth.postgres.user=auth4",
+			"--auth.postgres.pass=authpass4",
 			"--host=host4",
 			"--host-int=hostint4",
 			"--auth.port=8004",
@@ -80,6 +103,11 @@ func Test(t *testing.T) {
 			"--auth.secret=secret4", // TODO Test norm.NFD.
 		)
 		t.Nil(err)
+		want.Postgres.Host = "localhost4"
+		want.Postgres.Port = 45432
+		want.Postgres.DBName = "postgres4"
+		want.Postgres.User = "auth4"
+		want.Postgres.Pass = "authpass4"
 		want.Addr = netx.NewAddr("host4", 8004)
 		want.AddrInt = netx.NewAddr("hostint4", 9004)
 		want.GRPCGWAddr = netx.NewAddr("host4", 7004)

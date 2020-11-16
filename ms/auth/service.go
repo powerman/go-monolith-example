@@ -15,9 +15,12 @@ import (
 	"github.com/powerman/go-monolith-example/ms/auth/internal/app"
 	"github.com/powerman/go-monolith-example/ms/auth/internal/config"
 	"github.com/powerman/go-monolith-example/ms/auth/internal/dal"
+	"github.com/powerman/go-monolith-example/ms/auth/internal/migrations"
 	"github.com/powerman/go-monolith-example/ms/auth/internal/srv/grpc"
 	"github.com/powerman/go-monolith-example/ms/auth/internal/srv/grpcgw"
+	"github.com/powerman/go-monolith-example/pkg/cobrax"
 	"github.com/powerman/go-monolith-example/pkg/concurrent"
+	"github.com/powerman/go-monolith-example/pkg/def"
 	"github.com/powerman/go-monolith-example/pkg/netx"
 	"github.com/powerman/go-monolith-example/pkg/serve"
 )
@@ -45,12 +48,17 @@ func (s *Service) Name() string { return app.ServiceName }
 
 // Init implements main.embeddedService interface.
 func (s *Service) Init(sharedCfg *config.SharedCfg, cmd, serveCmd *cobra.Command) error {
-	// dal.InitMetrics(reg) TODO
+	dal.InitMetrics(reg)
 	app.InitMetrics(reg)
 	grpc.InitMetrics(reg)
 
+	ctx := def.NewContext(app.ServiceName)
+	goosePostgresCmd := cobrax.NewGoosePostgresCmd(ctx, migrations.Goose(), config.GetGoosePostgres)
+	cmd.AddCommand(goosePostgresCmd)
+
 	return config.Init(sharedCfg, config.FlagSets{
-		Serve: serveCmd.Flags(),
+		Serve:         serveCmd.Flags(),
+		GoosePostgres: goosePostgresCmd.Flags(),
 	})
 }
 
@@ -117,7 +125,7 @@ func (s *Service) RunServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 }
 
 func (s *Service) connectRepo(ctx Ctx) (interface{}, error) {
-	return dal.New(), nil
+	return dal.New(ctx, s.cfg.GoosePostgresDir, s.cfg.Postgres)
 }
 
 func (s *Service) serveMetrics(ctx Ctx) error {

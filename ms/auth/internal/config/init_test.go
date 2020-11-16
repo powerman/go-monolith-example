@@ -16,7 +16,8 @@ var (
 	testShared   *SharedCfg
 	testOwn      = own
 	testFlagsets = FlagSets{
-		Serve: pflag.NewFlagSet("", 0),
+		Serve:         pflag.NewFlagSet("", 0),
+		GoosePostgres: pflag.NewFlagSet("", 0),
 	}
 )
 
@@ -24,6 +25,7 @@ func TestMain(m *testing.M) {
 	def.Init()
 	os.Clearenv()
 	os.Setenv("MONO_TLS_CA_CERT", "ca.crt")
+	os.Setenv("MONO_X_POSTGRES_ADDR_HOST", "postgres")
 	testShared, _ = config.Get()
 	check.TestMain(m)
 }

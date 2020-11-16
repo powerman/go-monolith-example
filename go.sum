@@ -592,8 +592,8 @@ github.com/powerman/check v1.1.0/go.mod h1:nX1qs/UsVgnQrkebazvKUJzMrtOItv4O0+Y79
 github.com/powerman/check v1.2.1/go.mod h1:IW+hYd9ihaKn7ri1+NGS8WWwrKdytbU8hgNC1wbcurc=
 github.com/powerman/check v1.3.0 h1:GsncV4RbbC4nZEzLTVpUIdp1rgZil4N36D/XuPZUA60=
 github.com/powerman/check v1.3.0/go.mod h1:k/8NCUQwepaKJKctBBKjQo84jvGEvKiumD9pDl87RB0=
-github.com/powerman/dockerize v0.13.0 h1:zzFj55fDFnaAZv/BhbQhuu5JA/S/f3STbJn/uanegg4=
-github.com/powerman/dockerize v0.13.0/go.mod h1:YkBME3AB6+8VK6ixwAOCUTHACucQG0H/LabRErUzA48=
+github.com/powerman/dockerize v0.13.1 h1:FKmOVH6hef9e95VclWCjl2oveMg+I71dEq+pAqMM6uY=
+github.com/powerman/dockerize v0.13.1/go.mod h1:YkBME3AB6+8VK6ixwAOCUTHACucQG0H/LabRErUzA48=
 github.com/powerman/getenv v0.1.0 h1:GTqwBYwtjoxjK/kB+qDyfUiqSz7vZ5431x002ftW13s=
 github.com/powerman/getenv v0.1.0/go.mod h1:kTSy/ckmNA/gYTbH6+XOUaGWUCeS9k7QzSol+LsOsZM=
 github.com/powerman/goose v2.7.0-rc4.0.20200329145851-5c15923690fa+incompatible h1:50EFIy0MsWcUXblSAkgRxbJRA67gz+LPSmwLaqgMHhI=
@@ -609,7 +609,10 @@ github.com/powerman/mysqlx v0.3.3 h1:eBTeJvrLY+mcacJZekzM3VKCUT8gj/5KKG8f2KYXqzg
 github.com/powerman/mysqlx v0.3.3/go.mod h1:ZSl17PWU2DgwM2KjN8OrdAq9tYC5p4Xm3lTN6W7j3SA=
 github.com/powerman/narada4d v1.7.1 h1:G6hkEQxfCBWIsrUtB4MyWq4c84qcS/3XsBQLWUuUyik=
 github.com/powerman/narada4d v1.7.1/go.mod h1:LUOXFkHgtSwPqtrZx+F/Ab1PqOiL96O3GfYnoKfg6T0=
+github.com/powerman/pqx v0.6.1 h1:tlFOKQvVTiWG3FCb1jmGUzxcNzw7Ep1K5KBbSa5If/g=
 github.com/powerman/pqx v0.6.1/go.mod h1:EJGFN0+vvTWFqwT1bTrnVWrJ8hO7RAW6rp2JVhYwrVE=
+github.com/powerman/pqx v0.7.0 h1:2oOW6h3IIx/WGkY9tlfJjhovBQ6zv9bEYXXtW/zUf3U=
+github.com/powerman/pqx v0.7.0/go.mod h1:iLUZqSDdr+p1j+Ut6UPb2KHmaMziUHWb3L6pSSIwoHI=
 github.com/powerman/rpc-codec v1.2.2 h1:BK0JScZivljhwW/vLLhZLtUgqSxc/CD3sHEs8LiwwKw=
 github.com/powerman/rpc-codec v1.2.2/go.mod h1:3Qr/y/+u3CwcSww9tfJMRn/95lB2qUdUeIQe7BYlLDo=
 github.com/powerman/sensitive v0.0.4 h1:gHwPy0Zq8byP/x7EJHezWM5+7AeQyOq8ENzeHTZfRVE=

@@ -15,6 +15,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.0.1
 	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
+	github.com/lib/pq v1.8.0
 	github.com/mattn/goveralls v0.0.7
 	github.com/nats-io/nats-streaming-server v0.18.0 // indirect
 	github.com/nats-io/nats.go v1.10.0
@@ -23,12 +24,13 @@ require (
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/powerman/appcfg v0.5.0
 	github.com/powerman/check v1.3.0
-	github.com/powerman/dockerize v0.13.0
+	github.com/powerman/dockerize v0.13.1
 	github.com/powerman/getenv v0.1.0
 	github.com/powerman/goose/v2 v2.7.0
 	github.com/powerman/must v0.1.0
 	github.com/powerman/mysqlx v0.3.3
 	github.com/powerman/narada4d v1.7.1
+	github.com/powerman/pqx v0.7.0
 	github.com/powerman/rpc-codec v1.2.2
 	github.com/powerman/sensitive v0.0.4
 	github.com/powerman/sqlxx v0.2.0

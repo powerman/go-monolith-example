@@ -204,18 +204,17 @@ func (mr *MockRepoMockRecorder) GetUserByAccessToken(arg0, arg1 interface{}) *go
 }
 
 // AddAccessToken mocks base method
-func (m *MockRepo) AddAccessToken(arg0 Ctx, arg1 dom.UserName) (AccessToken, error) {
+func (m *MockRepo) AddAccessToken(arg0 Ctx, arg1 AccessToken, arg2 dom.UserName) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddAccessToken", arg0, arg1)
-	ret0, _ := ret[0].(AccessToken)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "AddAccessToken", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // AddAccessToken indicates an expected call of AddAccessToken
-func (mr *MockRepoMockRecorder) AddAccessToken(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockRepoMockRecorder) AddAccessToken(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAccessToken", reflect.TypeOf((*MockRepo)(nil).AddAccessToken), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAccessToken", reflect.TypeOf((*MockRepo)(nil).AddAccessToken), arg0, arg1, arg2)
 }
 
 // DelAccessToken mocks base method

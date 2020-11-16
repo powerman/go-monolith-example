@@ -79,19 +79,18 @@ func TestLoginByUserID(tt *testing.T) {
 	t.Nil(a.Register(ctx, "admin", "secret", uAdmin))
 	mockRepo.EXPECT().GetUser(gomock.Any(), uAdmin.Name).Return(uAdmin, nil).AnyTimes()
 	mockRepo.EXPECT().GetUser(gomock.Any(), gomock.Any()).Return(nil, app.ErrNotFound)
-	mockRepo.EXPECT().AddAccessToken(gomock.Any(), uAdmin.Name).Return(app.AccessToken("token"), nil)
-	mockRepo.EXPECT().AddAccessToken(gomock.Any(), uAdmin.Name).Return(app.AccessToken(""), io.EOF)
+	mockRepo.EXPECT().AddAccessToken(gomock.Any(), gomock.Any(), uAdmin.Name).Return(nil)
+	mockRepo.EXPECT().AddAccessToken(gomock.Any(), gomock.Any(), uAdmin.Name).Return(io.EOF)
 
 	tests := []struct {
 		userID  string
 		pass    string
-		want    string
 		wantErr error
 	}{
-		{"user", "", "", app.ErrNotFound},
-		{"admin", "wrong", "", app.ErrWrongPassword},
-		{"admin", "secret", "token", nil},
-		{"admin", "secret", "", io.EOF},
+		{"user", "", app.ErrNotFound},
+		{"admin", "wrong", app.ErrWrongPassword},
+		{"admin", "secret", nil},
+		{"admin", "secret", io.EOF},
 	}
 	for _, tc := range tests {
 		tc := tc
@@ -99,7 +98,11 @@ func TestLoginByUserID(tt *testing.T) {
 			t := check.T(tt)
 			res, err := a.LoginByUserID(ctx, tc.userID, sensitive.String(tc.pass))
 			t.Err(err, tc.wantErr)
-			t.Equal(res, app.AccessToken(tc.want))
+			if tc.wantErr == nil {
+				t.Len(res, 26)
+			} else {
+				t.Len(res, 0)
+			}
 		})
 	}
 }
@@ -116,19 +119,18 @@ func TestLoginByEmail(tt *testing.T) {
 	mockRepo.EXPECT().GetUserByEmail(gomock.Any(), uAdmin.Email).Return(uAdmin, nil).AnyTimes()
 	mockRepo.EXPECT().GetUserByEmail(gomock.Any(), gomock.Any()).Return(nil, app.ErrNotFound)
 	mockRepo.EXPECT().GetUser(gomock.Any(), uAdmin.Name).Return(uAdmin, nil).AnyTimes()
-	mockRepo.EXPECT().AddAccessToken(gomock.Any(), uAdmin.Name).Return(app.AccessToken("token"), nil)
-	mockRepo.EXPECT().AddAccessToken(gomock.Any(), uAdmin.Name).Return(app.AccessToken(""), io.EOF)
+	mockRepo.EXPECT().AddAccessToken(gomock.Any(), gomock.Any(), uAdmin.Name).Return(nil)
+	mockRepo.EXPECT().AddAccessToken(gomock.Any(), gomock.Any(), uAdmin.Name).Return(io.EOF)
 
 	tests := []struct {
 		email   string
 		pass    string
-		want    string
 		wantErr error
 	}{
-		{"user@host", "", "", app.ErrNotFound},
-		{"admin@host", "wrong", "", app.ErrWrongPassword},
-		{"admin@host", "secret", "token", nil},
-		{"admin@host", "secret", "", io.EOF},
+		{"user@host", "", app.ErrNotFound},
+		{"admin@host", "wrong", app.ErrWrongPassword},
+		{"admin@host", "secret", nil},
+		{"admin@host", "secret", io.EOF},
 	}
 	for _, tc := range tests {
 		tc := tc
@@ -136,7 +138,11 @@ func TestLoginByEmail(tt *testing.T) {
 			t := check.T(tt)
 			res, err := a.LoginByEmail(ctx, tc.email, sensitive.String(tc.pass))
 			t.Err(err, tc.wantErr)
-			t.Equal(res, app.AccessToken(tc.want))
+			if tc.wantErr == nil {
+				t.Len(res, 26)
+			} else {
+				t.Len(res, 0)
+			}
 		})
 	}
 }
