@@ -592,8 +592,8 @@ github.com/powerman/check v1.1.0/go.mod h1:nX1qs/UsVgnQrkebazvKUJzMrtOItv4O0+Y79
 github.com/powerman/check v1.2.1/go.mod h1:IW+hYd9ihaKn7ri1+NGS8WWwrKdytbU8hgNC1wbcurc=
 github.com/powerman/check v1.3.0 h1:GsncV4RbbC4nZEzLTVpUIdp1rgZil4N36D/XuPZUA60=
 github.com/powerman/check v1.3.0/go.mod h1:k/8NCUQwepaKJKctBBKjQo84jvGEvKiumD9pDl87RB0=
-github.com/powerman/dockerize v0.13.0 h1:zzFj55fDFnaAZv/BhbQhuu5JA/S/f3STbJn/uanegg4=
-github.com/powerman/dockerize v0.13.0/go.mod h1:YkBME3AB6+8VK6ixwAOCUTHACucQG0H/LabRErUzA48=
+github.com/powerman/dockerize v0.13.1 h1:FKmOVH6hef9e95VclWCjl2oveMg+I71dEq+pAqMM6uY=
+github.com/powerman/dockerize v0.13.1/go.mod h1:YkBME3AB6+8VK6ixwAOCUTHACucQG0H/LabRErUzA48=
 github.com/powerman/getenv v0.1.0 h1:GTqwBYwtjoxjK/kB+qDyfUiqSz7vZ5431x002ftW13s=
 github.com/powerman/getenv v0.1.0/go.mod h1:kTSy/ckmNA/gYTbH6+XOUaGWUCeS9k7QzSol+LsOsZM=
 github.com/powerman/goose v2.7.0-rc4.0.20200329145851-5c15923690fa+incompatible h1:50EFIy0MsWcUXblSAkgRxbJRA67gz+LPSmwLaqgMHhI=
