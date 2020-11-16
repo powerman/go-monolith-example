@@ -67,6 +67,8 @@ func (c *Postgres) Connect(ctx Ctx, goose *goosepkg.Instance) (db *sql.DB, ver *
 		err = nextErr
 	}
 
+	gooseMu.Lock()
+	defer gooseMu.Unlock()
 	must.NoErr(goose.SetDialect("postgres"))
 	_, _ = goose.EnsureDBVersion(db) // Race on CREATE TABLE, so allowed to fail.
 

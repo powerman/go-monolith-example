@@ -71,6 +71,8 @@ func (c *MySQL) Connect(ctx Ctx, goose *goosepkg.Instance) (db *sql.DB, ver *sch
 		err = nextErr
 	}
 
+	gooseMu.Lock()
+	defer gooseMu.Unlock()
 	must.NoErr(goose.SetDialect("mysql"))
 	_, _ = goose.EnsureDBVersion(db) // Race on CREATE TABLE, so allowed to fail.
 
