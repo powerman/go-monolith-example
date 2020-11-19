@@ -119,7 +119,7 @@ for more details.
 
 ```sh
 GO111MODULE=off go get -u github.com/myitcv/gobin
-curl -sSfL https://github.com/hadolint/hadolint/releases/download/v1.18.0/hadolint-$(uname)-x86_64 | sudo install /dev/stdin /usr/local/bin/hadolint
+curl -sSfL https://github.com/hadolint/hadolint/releases/download/v1.19.0/hadolint-$(uname)-x86_64 | sudo install /dev/stdin /usr/local/bin/hadolint
 curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v0.7.1/shellcheck-v0.7.1.$(uname).x86_64.tar.xz | sudo tar xJf - -C /usr/local/bin --strip-components=1 shellcheck-v0.7.1/shellcheck
 ```
 
