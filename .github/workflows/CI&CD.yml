@@ -28,7 +28,7 @@ jobs:
         ports:
           - '4222:4222'
     env:
-      HADOLINT_VER: '1.18.0'
+      HADOLINT_VER: '1.19.0'
       SHELLCHECK_VER: '0.7.1'
       MONO_TLS_CA_CERT: 'configs/pki/ca.crt'
       MONO_X_MYSQL_ADDR_HOST: 'localhost'

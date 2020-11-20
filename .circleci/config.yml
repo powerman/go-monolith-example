@@ -7,7 +7,7 @@ setup_env: &setup_env
     command: |
       env | sort > /tmp/env.old
 
-      export HADOLINT_VER=1.18.0
+      export HADOLINT_VER=1.19.0
       export SHELLCHECK_VER=0.7.1
 
       env | sort > /tmp/env.new
