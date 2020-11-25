@@ -21,4 +21,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: technote-space/toc-generator@v2
+      - uses: technote-space/toc-generator@v3.0.1
