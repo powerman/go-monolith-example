@@ -75,6 +75,9 @@ output:
   # add a prefix to the output file references; default is no prefix
   #path-prefix: ""
 
+  # sorts results by: filepath, line and column
+  sort-results: false
+
 
 # all available settings of specific linters
 linters-settings:
@@ -163,8 +166,10 @@ linters-settings:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
     min-complexity: 15
   godot:
-    # check all top-level comments, not only declarations
-    check-all: false
+    # comments to be checked: `declarations`, `toplevel`, or `all`
+    scope: declarations
+    # check that each sentence starts with a capital letter
+    capital: false
   godox:
     # report any comments starting with keywords, this is useful for TODO or FIXME comments that
     # might be left in the code accidentally and should be resolved before merging
@@ -378,6 +383,7 @@ linters:
     - lll
     - maligned # premature optimization
     - nlreturn
+    - paralleltest # questionable
     - prealloc
     - wrapcheck # enable after implementing https://github.com/tomarrell/wrapcheck/issues/1
     - wsl # questionable
