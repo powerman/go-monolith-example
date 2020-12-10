@@ -100,7 +100,7 @@ func Test(t *testing.T) {
 			"--auth.port.int=9004",
 			"--auth.grpcgw.port=7004",
 			"--auth.metrics.port=4",
-			"--auth.secret=secret4", // TODO Test norm.NFD.
+			"--auth.secret=secret4\u212B\u0041\u030A\u00C5", // From https://www.unicode.org/reports/tr15/#Singletons_Figure.
 		)
 		t.Nil(err)
 		want.Postgres.Host = "localhost4"
@@ -112,7 +112,7 @@ func Test(t *testing.T) {
 		want.AddrInt = netx.NewAddr("hostint4", 9004)
 		want.GRPCGWAddr = netx.NewAddr("host4", 7004)
 		want.MetricsAddr = netx.NewAddr("hostint4", 4)
-		want.Secret = []byte("secret4")
+		want.Secret = []byte("secret4\u0041\u030A\u0041\u030A\u0041\u030A") // NFD form.
 		t.DeepEqual(c, want)
 	})
 	t.Run("cleanup", func(tt *testing.T) {

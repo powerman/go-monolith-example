@@ -158,8 +158,8 @@ convenience only.
 - Always load `env.sh` *in every terminal* used to run any project-related
   commands (including `go test`): `source env.sh`.
     - When `env.sh.dist` change (e.g. by `git pull`) next run of `source
-      env.sh` will fail and remind you to manually update `env.sh` to
-      match current `env.sh.dist`.
+    env.sh` will fail and remind you to manually update `env.sh` to match
+    current `env.sh.dist`.
 - `go generate ./...` - do not forget to run after making changes related
   to auto-generated code
 - `go test ./...` - test project (excluding integration tests), fast
@@ -167,8 +167,8 @@ convenience only.
 - `./scripts/test-ci-circle` - run tests locally like CircleCI will do
 - `./scripts/cover` - analyse and show coverage
 - `./scripts/build` - build docker image and binaries in `bin/`
-    - Then use mentioned above `dc` (or `docker-compose`) to run and
-      control the project.
+  - Then use mentioned above `dc` (or `docker-compose`) to run and control
+    the project.
     - Access project at host/port(s) defined in `env.sh`.
 
 #### Cheatsheet
