@@ -89,7 +89,9 @@ func (s *Service) RunServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	}
 
 	if s.appl == nil {
-		s.appl = app.New(s.repo, app.Config{})
+		s.appl = app.New(s.repo, app.Config{
+			Secret: s.cfg.Secret,
+		})
 	}
 
 	s.srv = grpc.NewServer(s.appl, grpc.Config{
