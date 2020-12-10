@@ -83,13 +83,13 @@ func (r *Repo) schemaLock(f func() error) func() error {
 // - wrapping errors with DAL method name.
 func (r *Repo) NoTx(f func() error) (err error) {
 	methodName := reflectx.CallerMethodName(1)
-	return r.strict(r.serialize(r.schemaLock(r.metric.instrument(methodName, func() error {
+	return r.strict(r.schemaLock(r.metric.instrument(methodName, func() error {
 		err := f()
 		if err != nil {
 			err = fmt.Errorf("%s: %w", methodName, err)
 		}
 		return err
-	}))))
+	}))())
 }
 
 // Tx provides DAL method wrapper with:
