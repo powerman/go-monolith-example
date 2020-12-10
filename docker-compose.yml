@@ -19,7 +19,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 
   postgres:
-    image: "postgres:11.10" # We're using 11.
+    image: "postgres:12.5" # We're using 12.
     container_name: "mono_postgres"
     restart: "always"
     shm_size: "256m"
@@ -44,7 +44,7 @@ services:
   postgres-setup:
     depends_on:
       - postgres
-    image: "postgres:11.10" # We're using 11.
+    image: "postgres:12.5" # We're using 12.
     container_name: "mono_postgres-setup"
     restart: "no"
     volumes:

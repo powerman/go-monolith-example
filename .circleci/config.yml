@@ -47,7 +47,7 @@ jobs:
       - image: "mysql:5.7"
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      - image: "postgres:11.10"
+      - image: "postgres:12.5"
         environment:
           POSTGRES_PASSWORD: "postgres"
           # configs/pki/issued/postgres.crt

@@ -78,7 +78,7 @@ jobs:
             -e POSTGRES_PASSWORD=postgres \
             -v $PWD/configs/pki/issued/postgres.crt:/dev.crt \
             -v $PWD/configs/pki/private/postgres.key:/dev.key \
-            --entrypoint=bash postgres:11.10 -c '
+            --entrypoint=bash postgres:12.5 -c '
                 set -x -e -o pipefail
                 install -m 0440 -o root -g postgres /dev.crt /server.crt
                 install -m 0440 -o root -g postgres /dev.key /server.key
