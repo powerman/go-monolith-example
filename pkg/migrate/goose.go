@@ -45,6 +45,8 @@ func UpTo(ctx Ctx, goose *goosepkg.Instance, dir string, version int64, c Connec
 	_ = ver.ExclusiveLock()
 	defer ver.Unlock()
 
+	gooseMu.Lock()
+	defer gooseMu.Unlock()
 	err = goose.UpTo(db, dir, version)
 	if err != nil {
 		return nil, fmt.Errorf("goose.UpTo %d: %w", version, err)
@@ -70,6 +72,8 @@ func Run(ctx Ctx, goose *goosepkg.Instance, dir string, command string, c Connec
 	_ = ver.ExclusiveLock()
 	defer ver.Unlock()
 
+	gooseMu.Lock()
+	defer gooseMu.Unlock()
 	cmdArgs := strings.Fields(command)
 	cmd, args := cmdArgs[0], cmdArgs[1:]
 	err = goose.Run(cmd, db, dir, args...)

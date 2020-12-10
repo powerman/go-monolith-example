@@ -103,7 +103,7 @@ services:
     container_name: mono_mono
     restart: always
     ports:
-      - "${MONO_ADDR_PORT:-0}:17000"
+      - "${MONO_MONO_ADDR_PORT:-0}:17000"
       - "${MONO_AUTH_ADDR_PORT:-0}:17003"
       - "${MONO_AUTH_ADDR_PORT_INT:-0}:17004"
       - "${MONO_AUTH_GRPCGW_ADDR_PORT:-0}:17006"
