@@ -3,7 +3,7 @@ module github.com/powerman/go-monolith-example
 go 1.15
 
 require (
-	github.com/bufbuild/buf v0.32.1
+	github.com/bufbuild/buf v0.33.0
 	github.com/cheekybits/genny v1.0.1-0.20200709201058-3e22f1a88ff2
 	github.com/elazarl/goproxy v0.0.0-20201021153353-00ad82a08272 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
@@ -11,14 +11,14 @@ require (
 	github.com/golang/protobuf v1.4.3
 	github.com/golangci/golangci-lint v1.33.0
 	github.com/googleapis/api-linter v1.9.0
-	github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4
+	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.0.1
 	github.com/jackc/pgtype v1.6.2
 	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
 	github.com/lib/pq v1.9.0
 	github.com/mattn/goveralls v0.0.7
-	github.com/nats-io/nats-streaming-server v0.18.0 // indirect
+	github.com/nats-io/nats-streaming-server v0.19.0 // indirect
 	github.com/nats-io/nats.go v1.10.0
 	github.com/nats-io/stan.go v0.7.0
 	github.com/oklog/ulid v1.3.1
@@ -43,10 +43,10 @@ require (
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
-	golang.org/x/oauth2 v0.0.0-20200902213428-5d25da1a8d43
+	golang.org/x/crypto v0.0.0-20201208171446-5f87f3452ae9
+	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5
 	golang.org/x/text v0.3.4
-	google.golang.org/genproto v0.0.0-20201210142538-e3217bee35cc
+	google.golang.org/genproto v0.0.0-20201211151036-40ec1c210f7a
 	google.golang.org/grpc v1.34.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.0.1
 	google.golang.org/protobuf v1.25.1-0.20201020201750-d3470999428b
