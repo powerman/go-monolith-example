@@ -7,17 +7,17 @@ default_ca	= CA_default		# The default ca section
 ####################################################################
 [ CA_default ]
 
-dir		= configs/pki	# Where everything is kept
-certs		= configs/pki			# Where the issued certs are kept
-crl_dir		= configs/pki			# Where the issued crl are kept
-database	= configs/pki/index.txt	# database index file.
-new_certs_dir	= configs/pki/certs_by_serial	# default place for new certs.
+dir		= configs/insecure-dev-pki	# Where everything is kept
+certs		= configs/insecure-dev-pki			# Where the issued certs are kept
+crl_dir		= configs/insecure-dev-pki			# Where the issued crl are kept
+database	= configs/insecure-dev-pki/index.txt	# database index file.
+new_certs_dir	= configs/insecure-dev-pki/certs_by_serial	# default place for new certs.
 
-certificate	= configs/pki/ca.crt	 	# The CA certificate
-serial		= configs/pki/serial 		# The current serial number
-crl		= configs/pki/crl.pem 		# The current CRL
-private_key	= configs/pki/private/ca.key	# The private key
-RANDFILE	= configs/pki/.rand		# private random number file
+certificate	= configs/insecure-dev-pki/ca.crt	 	# The CA certificate
+serial		= configs/insecure-dev-pki/serial 		# The current serial number
+crl		= configs/insecure-dev-pki/crl.pem 		# The current CRL
+private_key	= configs/insecure-dev-pki/private/ca.key	# The private key
+RANDFILE	= configs/insecure-dev-pki/.rand		# private random number file
 
 x509_extensions	= basic_exts		# The extensions to add to the cert
 
