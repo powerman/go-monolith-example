@@ -27,7 +27,7 @@ jobs:
       - image: "cimg/go:1.15"
         environment:
           GOFLAGS: "-mod=readonly"
-          MONO_TLS_CA_CERT: "configs/pki/ca.crt"
+          MONO_TLS_CA_CERT: "configs/insecure-dev-pki/ca.crt"
           MONO_X_MYSQL_ADDR_HOST: "localhost"
           MONO_X_NATS_ADDR_URLS: "nats://localhost:4222"
           MONO_X_POSTGRES_ADDR_HOST: "localhost"
@@ -35,10 +35,10 @@ jobs:
           MONO__AUTH_POSTGRES_AUTH_LOGIN: "auth"
           MONO__AUTH_POSTGRES_AUTH_PASS: "authpass"
           MONO__AUTH_SECRET: "s3cr3t"
-          MONO__AUTH_TLS_CERT: "configs/pki/issued/ms-auth.crt"
-          MONO__AUTH_TLS_CERT_INT: "configs/pki/issued/ms-auth-int.crt"
-          MONO__AUTH_TLS_KEY: "configs/pki/private/ms-auth.key"
-          MONO__AUTH_TLS_KEY_INT: "configs/pki/private/ms-auth-int.key"
+          MONO__AUTH_TLS_CERT: "configs/insecure-dev-pki/issued/ms-auth.crt"
+          MONO__AUTH_TLS_CERT_INT: "configs/insecure-dev-pki/issued/ms-auth-int.crt"
+          MONO__AUTH_TLS_KEY: "configs/insecure-dev-pki/private/ms-auth.key"
+          MONO__AUTH_TLS_KEY_INT: "configs/insecure-dev-pki/private/ms-auth-int.key"
           MONO__EXAMPLE_MYSQL_AUTH_LOGIN: "root"
           MONO__EXAMPLE_MYSQL_AUTH_PASS: ""
           PGHOST: "localhost"
@@ -50,7 +50,7 @@ jobs:
       - image: "postgres:12.5"
         environment:
           POSTGRES_PASSWORD: "postgres"
-          # configs/pki/issued/postgres.crt
+          # configs/insecure-dev-pki/issued/postgres.crt
           CRT: |
             -----BEGIN CERTIFICATE-----
             MIIDsjCCApqgAwIBAgIRAMEzbE/A4QDHc5a7EH0yT1YwDQYJKoZIhvcNAQELBQAw
@@ -74,7 +74,7 @@ jobs:
             PTJRcAMjJaCUA4aWA4FyBkR8BdKaolYO0lxBouqtcucqYvChfM2qz+irJhlVYMT+
             LuA2cFt802y28PXbeGpxCACmsxwriEy2D/hBfoPiScCifWFywPM=
             -----END CERTIFICATE-----
-          # configs/pki/private/postgres.key
+          # configs/insecure-dev-pki/private/postgres.key
           KEY: |
             -----BEGIN PRIVATE KEY-----
             MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDGnI5GuV7saoGu

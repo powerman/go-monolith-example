@@ -30,7 +30,7 @@ jobs:
     env:
       HADOLINT_VER: '1.19.0'
       SHELLCHECK_VER: '0.7.1'
-      MONO_TLS_CA_CERT: 'configs/pki/ca.crt'
+      MONO_TLS_CA_CERT: 'configs/insecure-dev-pki/ca.crt'
       MONO_X_MYSQL_ADDR_HOST: 'localhost'
       MONO_X_NATS_ADDR_URLS: 'nats://localhost:4222'
       MONO_X_POSTGRES_ADDR_HOST: 'localhost'
@@ -38,10 +38,10 @@ jobs:
       MONO__AUTH_POSTGRES_AUTH_LOGIN: 'auth'
       MONO__AUTH_POSTGRES_AUTH_PASS: 'authpass'
       MONO__AUTH_SECRET: 's3cr3t'
-      MONO__AUTH_TLS_CERT: 'configs/pki/issued/ms-auth.crt'
-      MONO__AUTH_TLS_CERT_INT: 'configs/pki/issued/ms-auth-int.crt'
-      MONO__AUTH_TLS_KEY: 'configs/pki/private/ms-auth.key'
-      MONO__AUTH_TLS_KEY_INT: 'configs/pki/private/ms-auth-int.key'
+      MONO__AUTH_TLS_CERT: 'configs/insecure-dev-pki/issued/ms-auth.crt'
+      MONO__AUTH_TLS_CERT_INT: 'configs/insecure-dev-pki/issued/ms-auth-int.crt'
+      MONO__AUTH_TLS_KEY: 'configs/insecure-dev-pki/private/ms-auth.key'
+      MONO__AUTH_TLS_KEY_INT: 'configs/insecure-dev-pki/private/ms-auth-int.key'
       MONO__EXAMPLE_MYSQL_AUTH_LOGIN: 'root'
       MONO__EXAMPLE_MYSQL_AUTH_PASS: ''
       PGHOST: 'localhost'
@@ -76,8 +76,8 @@ jobs:
         run: |
           docker run -d --net=host \
             -e POSTGRES_PASSWORD=postgres \
-            -v $PWD/configs/pki/issued/postgres.crt:/dev.crt \
-            -v $PWD/configs/pki/private/postgres.key:/dev.key \
+            -v $PWD/configs/insecure-dev-pki/issued/postgres.crt:/dev.crt \
+            -v $PWD/configs/insecure-dev-pki/private/postgres.key:/dev.key \
             --entrypoint=bash postgres:12.5 -c '
                 set -x -e -o pipefail
                 install -m 0440 -o root -g postgres /dev.crt /server.crt
