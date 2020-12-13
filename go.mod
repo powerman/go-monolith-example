@@ -3,7 +3,7 @@ module github.com/powerman/go-monolith-example
 go 1.15
 
 require (
-	github.com/bufbuild/buf v0.32.0
+	github.com/bufbuild/buf v0.32.1
 	github.com/cheekybits/genny v1.0.1-0.20200709201058-3e22f1a88ff2
 	github.com/elazarl/goproxy v0.0.0-20201021153353-00ad82a08272 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
@@ -46,7 +46,7 @@ require (
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
 	golang.org/x/oauth2 v0.0.0-20200902213428-5d25da1a8d43
 	golang.org/x/text v0.3.4
-	google.golang.org/genproto v0.0.0-20201202151023-55d61f90c1ce
+	google.golang.org/genproto v0.0.0-20201210142538-e3217bee35cc
 	google.golang.org/grpc v1.34.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.0.1
 	google.golang.org/protobuf v1.25.1-0.20201020201750-d3470999428b
