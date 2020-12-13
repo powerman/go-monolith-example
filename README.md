@@ -146,9 +146,9 @@ curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v0.7.1/shell
 $ . ./env.sh   # Sets $EASYRSA_PKI=configs/insecure-dev-pki.
 $ /path/to/easyrsa init-pki
 $ echo Dev CA $(go list -m) | /path/to/easyrsa build-ca nopass
+$ /path/to/easyrsa --days=3650 "--subject-alt-name=DNS:postgres" build-server-full postgres nopass
 $ /path/to/easyrsa --days=3650 "--subject-alt-name=DNS:localhost" build-server-full ms-auth nopass
 $ /path/to/easyrsa --days=3650 "--subject-alt-name=IP:127.0.0.1" build-server-full ms-auth-int nopass
-$ /path/to/easyrsa --days=3650 "--subject-alt-name=DNS:postgres" build-server-full postgres nopass
 ```
 
 ### Usage
@@ -292,3 +292,4 @@ $ ./bin/mono serve
   https://github.com/bold-commerce/protoc-gen-struct-transformer.
 - [ ] Add NATS/STAN publish/subscribe example in `internal/sub`
   (or maybe use JetStream instead of STAN?).
+- [ ] Switch from github.com/lib/pq to github.com/jackc/pgx.
