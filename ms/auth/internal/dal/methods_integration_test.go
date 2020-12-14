@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lib/pq"
 	"github.com/powerman/check"
 
 	"github.com/powerman/go-monolith-example/internal/dom"
@@ -88,7 +87,7 @@ func TestUser(tt *testing.T) {
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
 			err := r.AddUser(ctx, tc.given)
-			t.Err(err, tc.wantErr)
+			matchErr(t, err, tc.wantErr)
 			if err == nil {
 				if tc.given.PassHash.Salt == nil {
 					tc.given.PassHash.Salt = []byte{}
@@ -144,11 +143,7 @@ func TestAccessToken(tt *testing.T) {
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt) //nolint:govet // False positive.
 			err := r.AddAccessToken(ctx, tc.AccessToken, tc.userName)
-			if pqErr := new(*pq.Error); errors.As(err, pqErr) {
-				t.Match(err, tc.wantErr.Error())
-			} else {
-				t.Err(err, tc.wantErr)
-			}
+			matchErr(t, err, tc.wantErr)
 		})
 	}
 
@@ -180,7 +175,7 @@ func TestAccessToken(tt *testing.T) {
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
 			res, err := r.GetUserByAccessToken(ctx, tc.AccessToken)
-			t.Err(err, tc.wantErr)
+			matchErr(t, err, tc.wantErr)
 			t.DeepEqual(res, tc.want)
 		})
 	}

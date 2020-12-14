@@ -5,9 +5,9 @@ import (
 	"github.com/powerman/go-monolith-example/ms/example/internal/app"
 )
 
-func protoExample(v app.Example) api.Example {
+func protoExample(m app.Example) api.Example {
 	return api.Example{
-		Counter:   v.Counter,
-		UpdatedAt: v.Mtime,
+		Counter:   m.Counter,
+		UpdatedAt: m.Mtime,
 	}
 }

@@ -10,36 +10,36 @@ import (
 	"github.com/powerman/go-monolith-example/ms/auth/internal/app"
 )
 
-func apiAccount(v app.User) *api.Account {
+func apiAccount(m app.User) *api.Account {
 	return &api.Account{
-		Name:       dom.NewName("accounts", v.Name.ID()).String(),
-		User:       apiUser(v),
-		Email:      v.Email,
-		CreateTime: timestamppb.New(v.CreateTime),
+		Name:       dom.NewName("accounts", m.Name.ID()).String(),
+		User:       apiUser(m),
+		Email:      m.Email,
+		CreateTime: timestamppb.New(m.CreateTime),
 	}
 }
 
-func apiUser(v app.User) *api.User {
+func apiUser(m app.User) *api.User {
 	return &api.User{
-		Name:        v.Name.String(),
-		DisplayName: v.DisplayName,
-		Access:      apiAccess(v),
+		Name:        m.Name.String(),
+		DisplayName: m.DisplayName,
+		Access:      apiAccess(m),
 	}
 }
 
-func apiAccess(v app.User) *api.Access {
+func apiAccess(m app.User) *api.Access {
 	return &api.Access{
-		Role: apiRole(v.Role),
+		Role: apiRole(m.Role),
 	}
 }
 
-func apiRole(v app.Role) api.Access_Role {
-	switch v {
+func apiRole(m app.Role) api.Access_Role {
+	switch m {
 	case app.RoleAdmin:
 		return api.Access_ROLE_ADMIN
 	case app.RoleUser:
 		return api.Access_ROLE_USER
 	default:
-		panic(fmt.Sprintf("unknown app.Role: %v", v))
+		panic(fmt.Sprintf("unknown app.Role: %v", m))
 	}
 }

@@ -2,7 +2,8 @@
 
 -- Usage:
 --      CREATE TABLE {table} (
---          updated_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+--          updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+--          ... other fields
 --      );
 --      CREATE TRIGGER {table}_updated_at
 --          BEFORE UPDATE ON {table}

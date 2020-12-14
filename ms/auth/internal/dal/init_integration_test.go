@@ -3,10 +3,12 @@
 package dal_test
 
 import (
+	"errors"
 	"runtime"
 	"strings"
 	"testing"
 
+	"github.com/lib/pq"
 	"github.com/powerman/check"
 	"github.com/powerman/pqx"
 	"github.com/prometheus/client_golang/prometheus"
@@ -60,4 +62,13 @@ func newTestRepo(t *check.C) (cleanup func(), r *dal.Repo) {
 		cleanupDB()
 	}
 	return cleanup, r
+}
+
+func matchErr(t *check.C, err, wantErr error) {
+	t.Helper()
+	if pqErr := new(*pq.Error); errors.As(err, pqErr) && wantErr != nil {
+		t.Match(err, wantErr.Error())
+	} else {
+		t.Err(err, wantErr)
+	}
 }
