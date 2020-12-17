@@ -36,7 +36,7 @@ require (
 	github.com/powerman/sensitive v0.0.4
 	github.com/powerman/sqlxx v0.2.0
 	github.com/powerman/structlog v0.7.1
-	github.com/prometheus/client_golang v1.8.0
+	github.com/prometheus/client_golang v1.9.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
 	github.com/sebest/xff v0.0.0-20160910043805-6c115e0ffa35
