@@ -669,8 +669,8 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/polyfloyd/go-errorlint v0.0.0-20201006195004-351e25ade6e3 h1:Amgs0nbayPhBNGh1qPqqr2e7B2qNAcBgRjnBH/lmn8k=
 github.com/polyfloyd/go-errorlint v0.0.0-20201006195004-351e25ade6e3/go.mod h1:wi9BfjxjF/bwiZ701TzmfKu6UKC357IOAtNr0Td0Lvw=
 github.com/posener/complete v1.1.1/go.mod h1:em0nMJCgc9GFtwrmVmEMR/ZL6WyhyjMBndrE9hABlRI=
-github.com/powerman/appcfg v0.5.0 h1:89ITgn7/nTEO+pn92PSqT9hzgZZ6BUTC+rTo3Z7WMew=
-github.com/powerman/appcfg v0.5.0/go.mod h1:jsBjFCRGB54w0EAUtDkbSnuxG6Y5YI//0v+Dq/LUgSY=
+github.com/powerman/appcfg v0.6.0 h1:CVyF6aEOF8/YxwB7tfFQlvOj8oBfmB+dH/J+JTeqrpc=
+github.com/powerman/appcfg v0.6.0/go.mod h1:eTd+qShWtoXkEiaI0no5CiK23xq6z4+BBymjB5szTD4=
 github.com/powerman/check v1.0.1/go.mod h1:wOYaLZeuhk6i79TDfPcqkDx70tbaVLEiE0aqMhMKojc=
 github.com/powerman/check v1.1.0/go.mod h1:nX1qs/UsVgnQrkebazvKUJzMrtOItv4O0+Y79nhVi3Y=
 github.com/powerman/check v1.2.1/go.mod h1:IW+hYd9ihaKn7ri1+NGS8WWwrKdytbU8hgNC1wbcurc=

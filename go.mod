@@ -23,7 +23,7 @@ require (
 	github.com/nats-io/stan.go v0.7.0
 	github.com/oklog/ulid v1.3.1
 	github.com/parnurzeal/gorequest v0.2.16
-	github.com/powerman/appcfg v0.5.0
+	github.com/powerman/appcfg v0.6.0
 	github.com/powerman/check v1.3.0
 	github.com/powerman/dockerize v0.13.1
 	github.com/powerman/getenv v0.1.0
