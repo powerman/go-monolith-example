@@ -242,7 +242,7 @@ func TestSignoutIdentity(tt *testing.T) {
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
 			arg := &api.SignoutIdentityRequest{Everywhere: tc.everywhere}
-			_, err := clientAuth.SignoutIdentity(ctx, arg, grpcx.Token(tc.token))
+			_, err := clientAuth.SignoutIdentity(ctx, arg, grpcx.AccessTokenCreds(tc.token))
 			if tc.wantCode == codes.OK {
 				t.Nil(err)
 			} else {
@@ -281,7 +281,7 @@ func TestCheckAccessToken(tt *testing.T) {
 		t.Run("", func(tt *testing.T) {
 			t := check.T(tt)
 			arg := &api.CheckAccessTokenRequest{}
-			msg, err := clientAuthInt.CheckAccessToken(ctx, arg, grpcx.Token(tc.token))
+			msg, err := clientAuthInt.CheckAccessToken(ctx, arg, grpcx.AccessTokenCreds(tc.token))
 			if tc.wantCode == codes.OK {
 				t.Nil(err)
 				t.DeepEqual(msg, tc.want)

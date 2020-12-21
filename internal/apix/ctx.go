@@ -12,18 +12,18 @@ type contextKey int
 
 const (
 	_ contextKey = iota
-	contextKeyRemote
+	contextKeyRemoteIP
 	contextKeyMethodName
-	contextKeyAuth
 	contextKeyAccessToken
+	contextKeyAuth
 )
 
 // FromContext returns values describing request stored in ctx, if any.
-func FromContext(ctx Ctx) (remote, methodName string, auth dom.Auth) {
-	remote, _ = ctx.Value(contextKeyRemote).(string)
+func FromContext(ctx Ctx) (remoteIP, methodName string, auth dom.Auth) {
+	remoteIP, _ = ctx.Value(contextKeyRemoteIP).(string)
 	methodName, _ = ctx.Value(contextKeyMethodName).(string)
 	auth, _ = ctx.Value(contextKeyAuth).(dom.Auth)
-	return remote, methodName, auth
+	return remoteIP, methodName, auth
 }
 
 // AccessTokenFromContext returns AccessToken stored in ctx, if any.

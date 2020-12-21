@@ -13,4 +13,5 @@ const (
 	keepaliveTime    = 50 * time.Second
 	keepaliveTimeout = 10 * time.Second
 	keepaliveMinTime = 30 * time.Second
+	xForwardedFor    = "X-Forwarded-For"
 )

@@ -9,12 +9,12 @@ import (
 
 // Log field names.
 const (
-	LogServer   = "server" // "OpenAPI", "gRPC", "Prometheus metrics", etc.
-	LogRemote   = "remote" // Aligned IPv4:Port "   192.168.0.42:1234 ".
-	LogAddr     = "addr"   // host:port.
-	LogHost     = "host"   // DNS hostname or IPv4/IPv6 address.
-	LogPort     = "port"   // TCP/UDP port number.
-	LogFunc     = "func"   // RPC/event handler method name, REST resource path.
+	LogServer   = "server"   // "OpenAPI", "gRPC", "Prometheus metrics", etc.
+	LogRemoteIP = "remoteIP" // IP address.
+	LogAddr     = "addr"     // host:port.
+	LogHost     = "host"     // DNS hostname or IPv4/IPv6 address.
+	LogPort     = "port"     // TCP/UDP port number.
+	LogFunc     = "func"     // RPC/event handler method name, REST resource path.
 	LogUserName = "userName"
 	LogGRPCCode = "grpcCode"
 )
@@ -22,7 +22,7 @@ const (
 func setupLog() {
 	structlog.DefaultLogger.
 		AppendPrefixKeys(
-			LogRemote,
+			LogRemoteIP,
 			LogGRPCCode,
 			LogFunc,
 		).
@@ -37,7 +37,7 @@ func setupLog() {
 		SetKeysFormat(map[string]string{
 			structlog.KeyApp:  " %12.12[2]s:", // set to max microservice name length
 			structlog.KeyUnit: " %9.9[2]s:",   // set to max KeyUnit/package length
-			LogRemote:         " %-21[2]s",
+			LogRemoteIP:       " %-15[2]s",    // set to 19.19 or 39 or 45 for IPv6
 			LogGRPCCode:       " %-16.16[2]s",
 			LogFunc:           " %[2]s:",
 			LogHost:           " %[2]s",

@@ -36,7 +36,7 @@ func (c *JSONRPC2Ctx) NewContext(
 	if r := jsonrpc2.HTTPRequestFromContext(ctx); r != nil {
 		remote = xff.GetRemoteAddr(r)
 	}
-	ctx = context.WithValue(ctx, contextKeyRemote, remote)
+	ctx = context.WithValue(ctx, contextKeyRemoteIP, remote)
 
 	methodName = reflectx.CallerMethodName(1)
 	ctx = context.WithValue(ctx, contextKeyMethodName, methodName)
@@ -50,7 +50,7 @@ func (c *JSONRPC2Ctx) NewContext(
 
 	log = structlog.New(
 		structlog.KeyApp, service,
-		def.LogRemote, remote,
+		def.LogRemoteIP, remote,
 		def.LogFunc, methodName,
 		def.LogUserName, auth.UserName,
 	)

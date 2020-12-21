@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/oauth"
 	"google.golang.org/grpc/keepalive"
+	"google.golang.org/grpc/metadata"
 )
 
 // Dial creates a gRPC client connection to the given target.
@@ -48,11 +49,18 @@ func DialOptions(ca *x509.CertPool) []grpc.DialOption {
 	}
 }
 
-// Token returns option with "Bearer" token.
-func Token(token string) grpc.CallOption {
-	perRPC := oauth.NewOauthAccess(&oauth2.Token{AccessToken: token})
-	if token == "" {
-		perRPC = nil
+// AppendXFF returns a new context with the provided X-Forwarded-For value
+// merged with any existing metadata in the outgoing context.
+func AppendXFF(ctx Ctx, xff string) Ctx {
+	return metadata.AppendToOutgoingContext(ctx, xForwardedFor, xff)
+}
+
+// AccessTokenCreds returns a CallOption that sets
+// credentials.PerRPCCredentials using OAuth2 "Bearer" AccessToken.
+func AccessTokenCreds(accessToken string) grpc.CallOption {
+	var creds credentials.PerRPCCredentials
+	if accessToken != "" {
+		creds = oauth.NewOauthAccess(&oauth2.Token{AccessToken: accessToken})
 	}
-	return grpc.PerRPCCredentials(perRPC)
+	return grpc.PerRPCCredentials(creds)
 }

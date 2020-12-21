@@ -2,51 +2,36 @@ package apix
 
 import (
 	"context"
-	"net/http"
+	"net"
 	"path"
-	"strings"
 
 	"github.com/powerman/structlog"
-	"github.com/sebest/xff"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/peer"
 
 	"github.com/powerman/go-monolith-example/internal/dom"
 	"github.com/powerman/go-monolith-example/pkg/def"
+	"github.com/powerman/go-monolith-example/pkg/grpcx"
 )
 
-const (
-	grpcGatewayIP = "127.0.0.1"
-	xForwardedFor = "X-Forwarded-For"
-)
+const grpcGatewayIP = "127.0.0.1"
 
-func isGRPCGateway(sip string) bool { return sip == grpcGatewayIP }
+func isGRPCGateway(peerIP string) bool { return peerIP == grpcGatewayIP }
 
 // GRPCNewContext returns a new context.Context that carries values describing
 // this request without any deadline, plus result of authn.Authenticate.
 func GRPCNewContext(ctx Ctx, fullMethod string, authn Authn) (_ Ctx, auth dom.Auth, err error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-
-	if p, ok := peer.FromContext(ctx); ok {
-		remote := p.Addr.String()
-		if vals := md.Get(xForwardedFor); len(vals) > 0 {
-			r := &http.Request{
-				RemoteAddr: p.Addr.String(),
-				Header:     http.Header{xForwardedFor: vals},
-			}
-			remote = xff.GetRemoteAddrIfAllowed(r, isGRPCGateway)
-			structlog.FromContext(ctx, nil).SetDefaultKeyvals(def.LogRemote, remote)
-		}
-		ctx = context.WithValue(ctx, contextKeyRemote, remote)
+	remoteIP := net.ParseIP(grpcx.RemoteIP(ctx, isGRPCGateway)).String()
+	if remoteIP != "<nil>" {
+		ctx = context.WithValue(ctx, contextKeyRemoteIP, remoteIP)
+		ctx = grpcx.AppendXFF(ctx, remoteIP)
+		structlog.FromContext(ctx, nil).SetDefaultKeyvals(def.LogRemoteIP, remoteIP)
 	}
 
 	ctx = context.WithValue(ctx, contextKeyMethodName, path.Base(fullMethod))
 
-	vals := md.Get("authorization")
-	const pfx = "Bearer " // OAuth require case-sensitive "Bearer", but RFC require case-insensitive https://tools.ietf.org/html/rfc7235#section-2.1
-	if len(vals) > 0 && len(vals[0]) > len(pfx) && strings.EqualFold(pfx, vals[0][:len(pfx)]) {
-		accessToken := AccessToken(vals[0][len(pfx):])
-		ctx = context.WithValue(ctx, contextKeyAccessToken, accessToken)
+	accessToken := AccessToken(grpcx.AccessToken(ctx))
+	ctx = context.WithValue(ctx, contextKeyAccessToken, accessToken)
+
+	if accessToken != "" {
 		auth, err = authn.Authenticate(ctx, accessToken)
 		if err == nil {
 			ctx = context.WithValue(ctx, contextKeyAuth, auth)

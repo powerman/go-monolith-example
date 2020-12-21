@@ -1,6 +1,7 @@
 package grpcx
 
 import (
+	"net"
 	"path"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -175,7 +176,10 @@ func newLogger(ctx Ctx, service, pkg, fullMethod string) *structlog.Logger {
 		def.LogGRPCCode, "",
 	}
 	if p, ok := peer.FromContext(ctx); ok {
-		kvs = append(kvs, def.LogRemote, p.Addr.String())
+		ip, _, err := net.SplitHostPort(p.Addr.String())
+		if err == nil {
+			kvs = append(kvs, def.LogRemoteIP, ip)
+		}
 	}
 	return structlog.New(kvs...)
 }

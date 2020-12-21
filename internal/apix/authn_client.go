@@ -1,7 +1,9 @@
 package apix
 
 import (
+	"context"
 	"crypto/x509"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
@@ -35,7 +37,12 @@ func NewAuthnClient(
 }
 
 func (c *authnClient) Authenticate(ctx Ctx, accessToken AccessToken) (auth dom.Auth, err error) {
-	resp, err := c.client.CheckAccessToken(ctx, &api.CheckAccessTokenRequest{}, grpcx.Token(string(accessToken)))
+	const rpcTimeout = 5 * time.Second
+	ctx, cancel := context.WithTimeout(ctx, rpcTimeout)
+	defer cancel()
+
+	creds := grpcx.AccessTokenCreds(string(accessToken))
+	resp, err := c.client.CheckAccessToken(ctx, &api.CheckAccessTokenRequest{}, creds)
 	var userName *dom.UserName
 	if err == nil {
 		userName, err = dom.ParseUserName(resp.GetUser().GetName())
