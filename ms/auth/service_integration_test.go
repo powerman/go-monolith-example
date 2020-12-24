@@ -11,7 +11,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/parnurzeal/gorequest"
 	"github.com/powerman/check"
 	"github.com/powerman/pqx"
@@ -44,8 +43,6 @@ type (
 
 func TestSmoke(tt *testing.T) {
 	t := check.T(tt)
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	s := &Service{cfg: cfg}
 
@@ -69,18 +66,18 @@ func TestSmoke(tt *testing.T) {
 			s.repo.Close()
 		}
 	}()
-	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.Addr), "connect to gRPC service"))
-	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.AddrInt), "connect to internal gRPC service"))
-	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.GRPCGWAddr), "connect to grpc-gateway service"))
+	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.BindAddr), "connect to gRPC service"))
+	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.BindAddrInt), "connect to internal gRPC service"))
+	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.BindGRPCGWAddr), "connect to grpc-gateway service"))
 
 	ca, err := netx.LoadCACert(cfg.TLSCACert)
 	t.Must(t.Nil(err))
-	conn, err := grpcpkg.DialContext(ctx, cfg.Addr.String(),
+	conn, err := grpcpkg.DialContext(ctx, cfg.BindAddr.String(),
 		grpcpkg.WithTransportCredentials(credentials.NewClientTLSFromCert(ca, "")),
 		grpcpkg.WithBlock(),
 	)
 	t.Must(t.Nil(err, "grpc.Dial"))
-	connInt, err := grpcpkg.DialContext(ctx, cfg.AddrInt.String(),
+	connInt, err := grpcpkg.DialContext(ctx, cfg.BindAddrInt.String(),
 		grpcpkg.WithTransportCredentials(credentials.NewClientTLSFromCert(ca, "")),
 		grpcpkg.WithBlock(),
 	)
@@ -92,7 +89,7 @@ func TestSmoke(tt *testing.T) {
 		TLSClientConfig(&tls.Config{RootCAs: ca}).
 		Timeout(def.TestTimeout).
 		Retry(30, def.TestSecond/10, http.StatusServiceUnavailable)
-	endpointGW := fmt.Sprintf("https://%s/", s.cfg.GRPCGWAddr)
+	endpointGW := fmt.Sprintf("https://%s/", s.cfg.BindGRPCGWAddr)
 
 	var (
 		userAdmin = &api.User{

@@ -124,9 +124,9 @@ func (s *Service) setupAuthn(ctx Ctx) (interface{}, error) {
 }
 
 func (s *Service) serveMetrics(ctx Ctx) error {
-	return serve.Metrics(ctx, s.cfg.MetricsAddr, reg)
+	return serve.Metrics(ctx, s.cfg.BindMetricsAddr, reg)
 }
 
 func (s *Service) serveHTTP(ctx Ctx) error {
-	return serve.HTTP(ctx, s.cfg.Addr, nil, s.mux, "JSON-RPC 2.0")
+	return serve.HTTP(ctx, s.cfg.BindAddr, nil, s.mux, "JSON-RPC 2.0")
 }

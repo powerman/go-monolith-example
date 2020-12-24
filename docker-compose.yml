@@ -119,6 +119,7 @@ services:
     environment:
       MONO_ADDR_HOST: "${MONO_ADDR_HOST}"
       MONO_ADDR_HOST_INT: "${MONO_ADDR_HOST_INT}"
+      MONO_AUTH_ADDR_HOST: "${MONO_AUTH_ADDR_HOST}"
       MONO_AUTH_ADDR_HOST_INT: "${MONO_AUTH_ADDR_HOST_INT}"
       MONO_TLS_CA_CERT: "/ca.crt"
       MONO_X_MYSQL_ADDR_HOST: "mysql"

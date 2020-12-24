@@ -27,9 +27,11 @@ func MustGetServeTest() *ServeConfig {
 
 	cfg.MySQL.Timeout = def.TestTimeout
 
-	const host = "127.0.0.1"
-	cfg.Addr = netx.NewAddr(host, netx.UnusedTCPPort(host))
-	cfg.MetricsAddr = netx.NewAddr(host, 0)
+	const hostInt = "127.0.0.1"
+	const host = "localhost"
+	cfg.AuthAddrInt = netx.NewAddr(hostInt, 0) // Invalid value for easier bug detection if not changed.
+	cfg.BindAddr = netx.NewAddr(host, netx.UnusedTCPPort(host))
+	cfg.BindMetricsAddr = netx.NewAddr(hostInt, 0)
 
 	rootDir, err := os.Getwd()
 	must.NoErr(err)

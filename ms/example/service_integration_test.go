@@ -46,13 +46,13 @@ func TestSmoke(tt *testing.T) {
 			s.repo.Close()
 		}
 	}()
-	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.Addr), "connect to service"))
+	t.Must(t.Nil(netx.WaitTCPPort(ctxStartup, cfg.BindAddr), "connect to service"))
 
 	mockAuthn.EXPECT().Authenticate(gomock.Any(), apix.AccessToken(tokenAdmin)).Return(authAdmin, nil).AnyTimes()
 	mockAuthn.EXPECT().Authenticate(gomock.Any(), apix.AccessToken(tokenUser)).Return(authUser, nil).AnyTimes()
 	mockAuthn.EXPECT().Authenticate(gomock.Any(), gomock.Any()).Return(dom.Auth{}, apix.ErrAccessTokenInvalid).AnyTimes()
 
-	rpcClient := jsonrpc2x.NewHTTPClient(fmt.Sprintf("http://%s/rpc", cfg.Addr))
+	rpcClient := jsonrpc2x.NewHTTPClient(fmt.Sprintf("http://%s/rpc", cfg.BindAddr))
 
 	var (
 		argIncExample api.RPCIncExampleReq

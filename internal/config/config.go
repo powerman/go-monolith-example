@@ -22,6 +22,7 @@ const EnvPrefix = "MONO_"
 type Shared struct {
 	AddrHost               appcfg.NotEmptyString `env:"ADDR_HOST"`
 	AddrHostInt            appcfg.NotEmptyString `env:"ADDR_HOST_INT"`
+	AuthAddrHost           appcfg.NotEmptyString `env:"AUTH_ADDR_HOST"`
 	AuthAddrHostInt        appcfg.NotEmptyString `env:"AUTH_ADDR_HOST_INT"`
 	AuthAddrPort           appcfg.Port           `env:"AUTH_ADDR_PORT"`
 	AuthAddrPortInt        appcfg.Port           `env:"AUTH_ADDR_PORT_INT"`
@@ -53,6 +54,7 @@ const (
 var shared = &Shared{ //nolint:gochecknoglobals // Config is global anyway.
 	AddrHost:               appcfg.MustNotEmptyString(def.Hostname),
 	AddrHostInt:            appcfg.MustNotEmptyString(def.Hostname),
+	AuthAddrHost:           appcfg.MustNotEmptyString(def.Hostname),
 	AuthAddrHostInt:        appcfg.MustNotEmptyString(def.Hostname),
 	AuthAddrPort:           appcfg.MustPort(strconv.Itoa(AuthPort)),
 	AuthAddrPortInt:        appcfg.MustPort(strconv.Itoa(AuthPortInt)),

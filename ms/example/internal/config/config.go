@@ -83,27 +83,27 @@ func Init(sharedCfg *SharedCfg, flagsets FlagSets) error {
 	appcfg.AddPFlag(fs.Serve, &own.MySQLDBName, pfx+"mysql.dbname", "MySQL database name")
 	appcfg.AddPFlag(fs.Serve, &shared.XNATSAddrUrls, "nats.urls", "URLs to connect to NATS (separated by comma)")
 	appcfg.AddPFlag(fs.Serve, &shared.XSTANClusterID, "stan.cluster_id", "STAN cluster ID")
-	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrHostInt, "auth.host-int", "host to connect to ms/auth internal API")
-	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrPortInt, "auth.port-int", "port to connect to ms/auth internal API")
 	appcfg.AddPFlag(fs.Serve, &shared.AddrHost, "host", "host to serve")
 	appcfg.AddPFlag(fs.Serve, &shared.AddrHostInt, "host-int", "internal host to serve")
-	appcfg.AddPFlag(fs.Serve, &shared.ExampleAddrPort, pfx+"port", "port to serve")
-	appcfg.AddPFlag(fs.Serve, &shared.ExampleMetricsAddrPort, pfx+"metrics.port", "port to serve Prometheus metrics")
+	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrHostInt, "auth.host-int", "ms/auth internal API host")
+	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrPortInt, "auth.port-int", "ms/auth internal API port")
+	appcfg.AddPFlag(fs.Serve, &shared.ExampleAddrPort, "example.port", "ms/example API port")
+	appcfg.AddPFlag(fs.Serve, &shared.ExampleMetricsAddrPort, "example.metrics.port", "ms/example Prometheus metrics port")
 
 	return nil
 }
 
 // ServeConfig contains configuration for subcommand.
 type ServeConfig struct {
-	MySQL         *mysql.Config
-	GooseMySQLDir string
-	NATSURLs      string
-	STANClusterID string
-	AuthAddrInt   netx.Addr
-	Addr          netx.Addr
-	MetricsAddr   netx.Addr
-	Path          string
-	TLSCACert     string
+	MySQL           *mysql.Config
+	GooseMySQLDir   string
+	NATSURLs        string
+	STANClusterID   string
+	AuthAddrInt     netx.Addr
+	BindAddr        netx.Addr
+	BindMetricsAddr netx.Addr
+	Path            string
+	TLSCACert       string
 }
 
 // GetServe validates and returns configuration for subcommand.
@@ -117,14 +117,14 @@ func GetServe() (c *ServeConfig, err error) {
 			Pass:   own.MySQLPass.Value(&err),
 			DBName: own.MySQLDBName.Value(&err),
 		}),
-		GooseMySQLDir: own.GooseMySQLDir.Value(&err),
-		NATSURLs:      shared.XNATSAddrUrls.Value(&err),
-		STANClusterID: shared.XSTANClusterID.Value(&err),
-		AuthAddrInt:   netx.NewAddr(shared.AuthAddrHostInt.Value(&err), shared.AuthAddrPortInt.Value(&err)),
-		Addr:          netx.NewAddr(shared.AddrHost.Value(&err), shared.ExampleAddrPort.Value(&err)),
-		MetricsAddr:   netx.NewAddr(shared.AddrHostInt.Value(&err), shared.ExampleMetricsAddrPort.Value(&err)),
-		Path:          own.Path.Value(&err),
-		TLSCACert:     shared.TLSCACert.Value(&err),
+		GooseMySQLDir:   own.GooseMySQLDir.Value(&err),
+		NATSURLs:        shared.XNATSAddrUrls.Value(&err),
+		STANClusterID:   shared.XSTANClusterID.Value(&err),
+		AuthAddrInt:     netx.NewAddr(shared.AuthAddrHostInt.Value(&err), shared.AuthAddrPortInt.Value(&err)),
+		BindAddr:        netx.NewAddr(shared.AddrHost.Value(&err), shared.ExampleAddrPort.Value(&err)),
+		BindMetricsAddr: netx.NewAddr(shared.AddrHostInt.Value(&err), shared.ExampleMetricsAddrPort.Value(&err)),
+		Path:            own.Path.Value(&err),
+		TLSCACert:       shared.TLSCACert.Value(&err),
 	}
 	if err != nil {
 		return nil, appcfg.WrapPErr(err, fs.Serve, own, shared)

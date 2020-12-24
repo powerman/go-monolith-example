@@ -23,10 +23,11 @@ func Test(t *testing.T) {
 			SSLRootCert: "ca.crt",
 		}),
 		GoosePostgresDir: "ms/auth/internal/migrations",
-		Addr:             netx.NewAddr(def.Hostname, config.AuthPort),
-		AddrInt:          netx.NewAddr(def.Hostname, config.AuthPortInt),
-		GRPCGWAddr:       netx.NewAddr(def.Hostname, config.AuthGRPCGWPort),
-		MetricsAddr:      netx.NewAddr(def.Hostname, config.AuthMetricsPort),
+		AuthAddr:         netx.NewAddr(def.Hostname, config.AuthPort),
+		BindAddr:         netx.NewAddr(def.Hostname, config.AuthPort),
+		BindAddrInt:      netx.NewAddr(def.Hostname, config.AuthPortInt),
+		BindGRPCGWAddr:   netx.NewAddr(def.Hostname, config.AuthGRPCGWPort),
+		BindMetricsAddr:  netx.NewAddr(def.Hostname, config.AuthMetricsPort),
 		Secret:           []byte("s3cr3t"),
 		TLSCACert:        "ca.crt",
 		TLSCert:          "tls.crt",
@@ -90,28 +91,30 @@ func Test(t *testing.T) {
 		t := check.T(tt)
 		c, err := testGetServe(
 			"--postgres.host=localhost4",
-			"--postgres.port=45432",
+			"--postgres.port=4200",
 			"--postgres.dbname=postgres4",
 			"--auth.postgres.user=auth4",
 			"--auth.postgres.pass=authpass4",
 			"--host=host4",
 			"--host-int=hostint4",
-			"--auth.port=8004",
-			"--auth.port.int=9004",
-			"--auth.grpcgw.port=7004",
-			"--auth.metrics.port=4",
+			"--auth.host=authhost4",
+			"--auth.port=4102",
+			"--auth.port-int=4103",
+			"--auth.grpcgw.port=4104",
+			"--auth.metrics.port=4101",
 			"--auth.secret=secret4\u212B\u0041\u030A\u00C5", // From https://www.unicode.org/reports/tr15/#Singletons_Figure.
 		)
 		t.Nil(err)
 		want.Postgres.Host = "localhost4"
-		want.Postgres.Port = 45432
+		want.Postgres.Port = 4200
 		want.Postgres.DBName = "postgres4"
 		want.Postgres.User = "auth4"
 		want.Postgres.Pass = "authpass4"
-		want.Addr = netx.NewAddr("host4", 8004)
-		want.AddrInt = netx.NewAddr("hostint4", 9004)
-		want.GRPCGWAddr = netx.NewAddr("host4", 7004)
-		want.MetricsAddr = netx.NewAddr("hostint4", 4)
+		want.AuthAddr = netx.NewAddr("authhost4", 4102)
+		want.BindAddr = netx.NewAddr("host4", 4102)
+		want.BindAddrInt = netx.NewAddr("hostint4", 4103)
+		want.BindGRPCGWAddr = netx.NewAddr("host4", 4104)
+		want.BindMetricsAddr = netx.NewAddr("hostint4", 4101)
 		want.Secret = []byte("secret4\u0041\u030A\u0041\u030A\u0041\u030A") // NFD form.
 		t.DeepEqual(c, want)
 	})

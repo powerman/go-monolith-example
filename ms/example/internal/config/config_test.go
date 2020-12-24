@@ -19,14 +19,14 @@ func Test(t *testing.T) {
 			Pass:   "",
 			DBName: "example",
 		}),
-		GooseMySQLDir: "ms/example/internal/migrations",
-		NATSURLs:      "nats://localhost:4222",
-		STANClusterID: "cluster",
-		AuthAddrInt:   netx.NewAddr(def.Hostname, config.AuthPortInt),
-		Addr:          netx.NewAddr(def.Hostname, config.ExamplePort),
-		MetricsAddr:   netx.NewAddr(def.Hostname, config.ExampleMetricsPort),
-		Path:          "/rpc",
-		TLSCACert:     "ca.crt",
+		GooseMySQLDir:   "ms/example/internal/migrations",
+		NATSURLs:        "nats://localhost:4222",
+		STANClusterID:   "cluster",
+		AuthAddrInt:     netx.NewAddr(def.Hostname, config.AuthPortInt),
+		BindAddr:        netx.NewAddr(def.Hostname, config.ExamplePort),
+		BindMetricsAddr: netx.NewAddr(def.Hostname, config.ExampleMetricsPort),
+		Path:            "/rpc",
+		TLSCACert:       "ca.crt",
 	}
 
 	t.Run("required", func(tt *testing.T) {
@@ -63,32 +63,32 @@ func Test(t *testing.T) {
 	t.Run("flag", func(tt *testing.T) {
 		t := check.T(tt)
 		c, err := testGetServe(
-			"--mysql.host=mysql4",
-			"--mysql.port=43306",
+			"--mysql.host=localhost4",
+			"--mysql.port=4200",
 			"--example.mysql.user=user4",
 			"--example.mysql.pass=pass4",
 			"--example.mysql.dbname=db4",
 			"--nats.urls=nats://nats4:4222",
 			"--stan.cluster_id=cluster4",
-			"--auth.host-int=authhost4",
-			"--auth.port-int=44",
 			"--host=host4",
-			"--host-int=metrics4",
-			"--example.port=8004",
-			"--example.metrics.port=4",
+			"--host-int=hostint4",
+			"--auth.host-int=authhost4int",
+			"--auth.port-int=4104",
+			"--example.port=4101",
+			"--example.metrics.port=4102",
 		)
 		t.Nil(err)
 		want.MySQL = def.NewMySQLConfig(def.MySQLConfig{
-			Addr:   netx.NewAddr("mysql4", 43306),
+			Addr:   netx.NewAddr("localhost4", 4200),
 			User:   "user4",
 			Pass:   "pass4",
 			DBName: "db4",
 		})
 		want.NATSURLs = "nats://nats4:4222"
 		want.STANClusterID = "cluster4"
-		want.AuthAddrInt = netx.NewAddr("authhost4", 44)
-		want.Addr = netx.NewAddr("host4", 8004)
-		want.MetricsAddr = netx.NewAddr("metrics4", 4)
+		want.AuthAddrInt = netx.NewAddr("authhost4int", 4104)
+		want.BindAddr = netx.NewAddr("host4", 4101)
+		want.BindMetricsAddr = netx.NewAddr("hostint4", 4102)
 		t.DeepEqual(c, want)
 	})
 	t.Run("cleanup", func(tt *testing.T) {

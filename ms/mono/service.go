@@ -39,7 +39,7 @@ var (
 // Service implements main.embeddedService interface.
 type Service struct {
 	cfg struct {
-		addr netx.Addr
+		BindAddr netx.Addr
 	}
 	mux *http.ServeMux
 }
@@ -64,7 +64,7 @@ func (s *Service) Init(sharedCfg *config.Shared, _, serveCmd *cobra.Command) err
 // RunServe implements main.embeddedService interface.
 func (s *Service) RunServe(_, ctxShutdown Ctx, shutdown func()) (err error) {
 	log := structlog.FromContext(ctxShutdown, nil)
-	s.cfg.addr = netx.NewAddr(shared.AddrHostInt.Value(&err), own.Port.Value(&err))
+	s.cfg.BindAddr = netx.NewAddr(shared.AddrHostInt.Value(&err), own.Port.Value(&err))
 	if err != nil {
 		return log.Err("failed to get config", "err", appcfg.WrapPErr(err, fs, shared, own))
 	}
@@ -83,5 +83,5 @@ func (s *Service) RunServe(_, ctxShutdown Ctx, shutdown func()) (err error) {
 }
 
 func (s *Service) serveHTTP(ctx Ctx) error {
-	return serve.HTTP(ctx, s.cfg.addr, nil, s.mux, "monolith introspection")
+	return serve.HTTP(ctx, s.cfg.BindAddr, nil, s.mux, "monolith introspection")
 }

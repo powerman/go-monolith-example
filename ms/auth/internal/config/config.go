@@ -85,10 +85,11 @@ func Init(sharedCfg *SharedCfg, flagsets FlagSets) error {
 	appcfg.AddPFlag(fs.Serve, &own.PostgresPass, pfx+"postgres.pass", "PostgreSQL password")
 	appcfg.AddPFlag(fs.Serve, &shared.AddrHost, "host", "host to serve")
 	appcfg.AddPFlag(fs.Serve, &shared.AddrHostInt, "host-int", "internal host to serve")
-	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrPort, pfx+"port", "port to serve")
-	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrPortInt, pfx+"port.int", "port to serve internal API")
-	appcfg.AddPFlag(fs.Serve, &shared.AuthGRPCGWAddrPort, pfx+"grpcgw.port", "port to serve grpc-gateway")
-	appcfg.AddPFlag(fs.Serve, &shared.AuthMetricsAddrPort, pfx+"metrics.port", "port to serve Prometheus metrics")
+	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrHost, "auth.host", "ms/auth API host")
+	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrPort, "auth.port", "ms/auth API port")
+	appcfg.AddPFlag(fs.Serve, &shared.AuthAddrPortInt, "auth.port-int", "ms/auth internal API port")
+	appcfg.AddPFlag(fs.Serve, &shared.AuthGRPCGWAddrPort, "auth.grpcgw.port", "ms/auth OpenAPI port")
+	appcfg.AddPFlag(fs.Serve, &shared.AuthMetricsAddrPort, "auth.metrics.port", "ms/auth Prometheus metrics port")
 	appcfg.AddPFlag(fs.Serve, &own.Secret, pfx+"secret", "secret used for hashing passwords")
 
 	return nil
@@ -98,10 +99,11 @@ func Init(sharedCfg *SharedCfg, flagsets FlagSets) error {
 type ServeConfig struct {
 	Postgres         *def.PostgresConfig
 	GoosePostgresDir string
-	Addr             netx.Addr
-	AddrInt          netx.Addr
-	GRPCGWAddr       netx.Addr
-	MetricsAddr      netx.Addr
+	AuthAddr         netx.Addr
+	BindAddr         netx.Addr
+	BindAddrInt      netx.Addr
+	BindGRPCGWAddr   netx.Addr
+	BindMetricsAddr  netx.Addr
 	Secret           []byte
 	TLSCACert        string
 	TLSCert          string
@@ -124,10 +126,11 @@ func GetServe() (c *ServeConfig, err error) {
 			SSLRootCert: shared.TLSCACert.Value(&err),
 		}),
 		GoosePostgresDir: own.GoosePostgresDir.Value(&err),
-		Addr:             netx.NewAddr(shared.AddrHost.Value(&err), shared.AuthAddrPort.Value(&err)),
-		AddrInt:          netx.NewAddr(shared.AddrHostInt.Value(&err), shared.AuthAddrPortInt.Value(&err)),
-		GRPCGWAddr:       netx.NewAddr(shared.AddrHost.Value(&err), shared.AuthGRPCGWAddrPort.Value(&err)),
-		MetricsAddr:      netx.NewAddr(shared.AddrHostInt.Value(&err), shared.AuthMetricsAddrPort.Value(&err)),
+		AuthAddr:         netx.NewAddr(shared.AuthAddrHost.Value(&err), shared.AuthAddrPort.Value(&err)),
+		BindAddr:         netx.NewAddr(shared.AddrHost.Value(&err), shared.AuthAddrPort.Value(&err)),
+		BindAddrInt:      netx.NewAddr(shared.AddrHostInt.Value(&err), shared.AuthAddrPortInt.Value(&err)),
+		BindGRPCGWAddr:   netx.NewAddr(shared.AddrHost.Value(&err), shared.AuthGRPCGWAddrPort.Value(&err)),
+		BindMetricsAddr:  netx.NewAddr(shared.AddrHostInt.Value(&err), shared.AuthMetricsAddrPort.Value(&err)),
 		Secret:           norm.NFD.Bytes([]byte(own.Secret.Value(&err))),
 		TLSCACert:        shared.TLSCACert.Value(&err),
 		TLSCert:          own.TLSCert.Value(&err),

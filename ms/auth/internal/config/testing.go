@@ -26,10 +26,11 @@ func MustGetServeTest() *ServeConfig {
 
 	const hostInt = "127.0.0.1"
 	const host = "localhost"
-	cfg.Addr = netx.NewAddr(host, netx.UnusedTCPPort(host))
-	cfg.AddrInt = netx.NewAddr(hostInt, netx.UnusedTCPPort(hostInt))
-	cfg.GRPCGWAddr = netx.NewAddr(host, netx.UnusedTCPPort(host))
-	cfg.MetricsAddr = netx.NewAddr(hostInt, 0)
+	cfg.BindAddr = netx.NewAddr(host, netx.UnusedTCPPort(host))
+	cfg.AuthAddr = cfg.BindAddr
+	cfg.BindAddrInt = netx.NewAddr(hostInt, netx.UnusedTCPPort(hostInt))
+	cfg.BindGRPCGWAddr = netx.NewAddr(host, netx.UnusedTCPPort(host))
+	cfg.BindMetricsAddr = netx.NewAddr(hostInt, 0)
 
 	rootDir, err := os.Getwd()
 	must.NoErr(err)

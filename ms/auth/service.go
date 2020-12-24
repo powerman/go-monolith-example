@@ -104,7 +104,7 @@ func (s *Service) RunServe(ctxStartup, ctxShutdown Ctx, shutdown func()) (err er
 	})
 	s.mux, err = grpcgw.NewServer(grpcgw.Config{
 		CtxShutdown:      ctxShutdown,
-		Endpoint:         s.cfg.Addr,
+		Endpoint:         s.cfg.AuthAddr,
 		CA:               s.ca,
 		GRPCGWPattern:    "/",
 		OpenAPIPattern:   "/openapi/", // Also hardcoded in web/static/swagger-ui/index.html.
@@ -131,15 +131,15 @@ func (s *Service) connectRepo(ctx Ctx) (interface{}, error) {
 }
 
 func (s *Service) serveMetrics(ctx Ctx) error {
-	return serve.Metrics(ctx, s.cfg.MetricsAddr, reg)
+	return serve.Metrics(ctx, s.cfg.BindMetricsAddr, reg)
 }
 
 func (s *Service) serveGRPC(ctx Ctx) error {
-	return serve.GRPC(ctx, s.cfg.Addr, s.srv, "gRPC")
+	return serve.GRPC(ctx, s.cfg.BindAddr, s.srv, "gRPC")
 }
 
 func (s *Service) serveGRPCInt(ctx Ctx) error {
-	return serve.GRPC(ctx, s.cfg.AddrInt, s.srvInt, "gRPC internal")
+	return serve.GRPC(ctx, s.cfg.BindAddrInt, s.srvInt, "gRPC internal")
 }
 
 func (s *Service) serveGRPCGW(ctx Ctx) error {
@@ -147,5 +147,5 @@ func (s *Service) serveGRPCGW(ctx Ctx) error {
 		Certificates: []tls.Certificate{s.cert},
 		MinVersion:   tls.VersionTLS12,
 	}
-	return serve.HTTP(ctx, s.cfg.GRPCGWAddr, tlsConfig, s.mux, "grpc-gateway")
+	return serve.HTTP(ctx, s.cfg.BindGRPCGWAddr, tlsConfig, s.mux, "grpc-gateway")
 }
