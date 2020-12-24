@@ -30,7 +30,6 @@ import (
 //   - setup interceptor to store request-scooped logger inside context,
 //   - setup interceptor to recover from panics,
 //   - setup interceptor to log method access/result,
-//   - setup interceptor to check authentication using given authn,
 //   - has reflection service registered,
 //   - has health service registered,
 //   - has not started to accept requests yet.
@@ -41,7 +40,8 @@ func NewServer(
 	metric def.Metrics,
 	serverMetrics *grpc_prometheus.ServerMetrics,
 	cert *tls.Certificate,
-	authn AuthnFunc,
+	extraUnary []grpc.UnaryServerInterceptor,
+	extraStream []grpc.StreamServerInterceptor,
 ) (server *grpc.Server, healthServer *health.Server) {
 	server = grpc.NewServer(
 		grpc.Creds(credentials.NewServerTLSFromCert(cert)),
@@ -53,20 +53,18 @@ func NewServer(
 			MinTime:             keepaliveMinTime,
 			PermitWithoutStream: true,
 		}),
-		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(append([]grpc.UnaryServerInterceptor{
 			serverMetrics.UnaryServerInterceptor(),
 			MakeUnaryServerLogger(service, 1),
 			MakeUnaryServerRecover(metric),
 			UnaryServerAccessLog,
-			MakeUnaryServerAuthn(authn),
-		)),
-		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
+		}, extraUnary...)...)),
+		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(append([]grpc.StreamServerInterceptor{
 			serverMetrics.StreamServerInterceptor(),
 			MakeStreamServerLogger(service, 1),
 			MakeStreamServerRecover(metric),
 			StreamServerAccessLog,
-			MakeStreamServerAuthn(authn),
-		)),
+		}, extraStream...)...)),
 	)
 	reflection.Register(server)
 	healthServer = health.NewServer()

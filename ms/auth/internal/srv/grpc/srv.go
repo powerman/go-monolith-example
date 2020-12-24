@@ -31,7 +31,10 @@ func NewServer(appl app.Appl, cfg Config) *grpc.Server {
 		appl:        appl,
 		ctxShutdown: cfg.CtxShutdown,
 	}
-	server, _ := grpcx.NewServer(app.ServiceName, app.Metric, metric.server, cfg.Cert, srv.authn)
+	server, _ := grpcx.NewServer(app.ServiceName, app.Metric, metric.server, cfg.Cert,
+		[]grpc.UnaryServerInterceptor{grpcx.MakeUnaryServerAuthn(srv.authn)},
+		[]grpc.StreamServerInterceptor{grpcx.MakeStreamServerAuthn(srv.authn)},
+	)
 	api.RegisterNoAuthSvcServer(server, srv)
 	api.RegisterAuthSvcServer(server, srv)
 	metric.server.InitializeMetrics(server)
@@ -44,7 +47,10 @@ func NewServerInt(appl app.Appl, cfg Config) *grpc.Server {
 		appl:        appl,
 		ctxShutdown: cfg.CtxShutdown,
 	}
-	server, _ := grpcx.NewServer(app.ServiceName, app.Metric, metric.server, cfg.Cert, srv.authn)
+	server, _ := grpcx.NewServer(app.ServiceName, app.Metric, metric.server, cfg.Cert,
+		[]grpc.UnaryServerInterceptor{grpcx.MakeUnaryServerAuthn(srv.authn)},
+		[]grpc.StreamServerInterceptor{grpcx.MakeStreamServerAuthn(srv.authn)},
+	)
 	api.RegisterAuthIntSvcServer(server, srv)
 	metric.server.InitializeMetrics(server)
 	return server
