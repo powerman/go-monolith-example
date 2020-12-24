@@ -36,7 +36,11 @@ func DialOptions(ca *x509.CertPool) []grpc.DialOption {
 		"loadBalancingPolicy": "round_robin",
 		"healthCheckConfig": {
 			"serviceName": ""
-		}
+		},
+		"methodConfig": [{
+			"name": [{"service":""}],
+			"waitForReady": true
+		}]
 	}`
 	return []grpc.DialOption{
 		grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(ca, "")),
