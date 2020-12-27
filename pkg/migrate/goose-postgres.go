@@ -30,7 +30,7 @@ type Postgres struct {
 }
 
 // Connect to PostgreSQL. Will initialize schemaver if needed.
-func (c *Postgres) Connect(ctx Ctx, goose *goosepkg.Instance) (db *sql.DB, ver *schemaver.SchemaVer, err error) {
+func (c *Postgres) Connect(ctx Ctx, goose *goosepkg.Instance) (_ *sql.DB, _ *schemaver.SchemaVer, err error) {
 	log := structlog.FromContext(ctx, nil)
 
 	cfg := c.PostgresConfig.Clone()
@@ -43,7 +43,7 @@ func (c *Postgres) Connect(ctx Ctx, goose *goosepkg.Instance) (db *sql.DB, ver *
 		return nil, nil, err
 	}
 
-	db, err = sql.Open("postgres", cfg.FormatDSN())
+	db, err := sql.Open("postgres", cfg.FormatDSN())
 	if err != nil {
 		return nil, nil, fmt.Errorf("sql.Open: %w", err)
 	}
@@ -72,7 +72,7 @@ func (c *Postgres) Connect(ctx Ctx, goose *goosepkg.Instance) (db *sql.DB, ver *
 	must.NoErr(goose.SetDialect("postgres"))
 	_, _ = goose.EnsureDBVersion(db) // Race on CREATE TABLE, so allowed to fail.
 
-	ver, err = schemaver.NewAt("goose-" + cfg.FormatURL())
+	ver, err := schemaver.NewAt("goose-" + cfg.FormatURL())
 	if err != nil {
 		return nil, nil, err
 	}

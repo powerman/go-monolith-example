@@ -26,14 +26,14 @@ type MySQL struct {
 }
 
 // Connect to MySQL. Will create database and initialize schemaver if needed.
-func (c *MySQL) Connect(ctx Ctx, goose *goosepkg.Instance) (db *sql.DB, ver *schemaver.SchemaVer, err error) {
+func (c *MySQL) Connect(ctx Ctx, goose *goosepkg.Instance) (_ *sql.DB, _ *schemaver.SchemaVer, err error) {
 	log := structlog.FromContext(ctx, nil)
 
 	cfg := c.Clone()
 	cfg.MaxAllowedPacket = 0
 	cfg.MultiStatements = true // https://github.com/pressly/goose/issues/190
 
-	db, err = sql.Open("mysql", cfg.FormatDSN())
+	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
 		return nil, nil, fmt.Errorf("sql.Open: %w", err)
 	}
@@ -76,7 +76,7 @@ func (c *MySQL) Connect(ctx Ctx, goose *goosepkg.Instance) (db *sql.DB, ver *sch
 	must.NoErr(goose.SetDialect("mysql"))
 	_, _ = goose.EnsureDBVersion(db) // Race on CREATE TABLE, so allowed to fail.
 
-	ver, err = schemaver.NewAt("goose-mysql://" + reTCP.ReplaceAllString(cfg.FormatDSN(), "$1$2"))
+	ver, err := schemaver.NewAt("goose-mysql://" + reTCP.ReplaceAllString(cfg.FormatDSN(), "$1$2"))
 	if err != nil {
 		return nil, nil, err
 	}
