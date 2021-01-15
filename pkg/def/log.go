@@ -29,6 +29,7 @@ func setupLog() {
 		SetSuffixKeys(
 			LogServer,
 			LogUserName,
+			"dump",
 			structlog.KeyStack,
 		).
 		SetDefaultKeyvals(
@@ -45,8 +46,9 @@ func setupLog() {
 			LogAddr:           " %[2]s",
 			"version":         " %s %v",
 			"json":            " %s=%#q",
-			"ptr":             " %[2]p",   // for debugging references
-			"data":            " %#+[2]v", // for debugging structs
+			"ptr":             " %[2]p",            // for debugging references
+			"data":            " %#+[2]v",          // for debugging structs
+			"dump":            "\n›››\n%[2]s\n‹‹‹", // for debugging multiline text
 			"offset":          " page=%3[2]d",
 			"limit":           "+%[2]d ",
 			"err":             " %s: %v",
