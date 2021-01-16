@@ -3,6 +3,7 @@ package def
 import (
 	"fmt"
 
+	"github.com/powerman/getenv"
 	"github.com/powerman/structlog"
 	"google.golang.org/grpc/grpclog"
 )
@@ -55,10 +56,18 @@ func setupLog() {
 			LogServer:         " [%[2]s]",
 			LogUserName:       " %[2]v",
 		})
-	grpclog.SetLoggerV2(grpcLog{structlog.New(structlog.KeyUnit, "grpcpkg")})
+
+	grpclog.SetLoggerV2(grpcLog{
+		Logger: structlog.New(structlog.KeyUnit, "grpcpkg").SetLogLevel(
+			structlog.ParseLevel(getenv.Str("GRPC_GO_LOG_SEVERITY_LEVEL", "error"))),
+		verbosity: getenv.Int("GRPC_GO_LOG_VERBOSITY_LEVEL", 0),
+	})
 }
 
-type grpcLog struct{ *structlog.Logger }
+type grpcLog struct {
+	*structlog.Logger
+	verbosity int
+}
 
 func (g grpcLog) Info(args ...interface{})                    { g.Debug(fmt.Sprint(args...)) }
 func (g grpcLog) Infoln(args ...interface{})                  { g.Debug(g.sprintln(args...)) }
@@ -69,7 +78,7 @@ func (g grpcLog) Warningf(format string, args ...interface{}) { g.Warn(fmt.Sprin
 func (g grpcLog) Error(args ...interface{})                   { g.PrintErr(fmt.Sprint(args...)) }
 func (g grpcLog) Errorln(args ...interface{})                 { g.PrintErr(g.sprintln(args...)) }
 func (g grpcLog) Errorf(format string, args ...interface{})   { g.PrintErr(fmt.Sprintf(format, args...)) }
-func (g grpcLog) V(l int) bool                                { return false }
+func (g grpcLog) V(l int) bool                                { return l <= g.verbosity }
 func (g grpcLog) sprintln(args ...interface{}) string {
 	s := fmt.Sprintln(args...)
 	return s[:len(s)-1]
