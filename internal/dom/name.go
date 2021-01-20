@@ -10,13 +10,14 @@ var (
 	ErrInvalidName = errors.New("invalid name")
 )
 
-// Name is an identifier of some entity in format "{collection}/{id}".
-type Name struct {
-	collection, id string
-}
-
-// UserName is a Name within "users" collection.
-type UserName struct{ Name }
+type (
+	// Name is an identifier of some entity in format "{collection}/{id}".
+	Name struct {
+		collection, id string
+	}
+	// UserName is a Name within "users" collection.
+	UserName struct{ Name }
+)
 
 // Empty values.
 //nolint:gochecknoglobals // Const.

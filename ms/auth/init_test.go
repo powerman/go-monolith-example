@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/powerman/check"
+	_ "github.com/smartystreets/goconvey/convey"
 
 	"github.com/powerman/go-monolith-example/ms/auth/internal/app"
 	"github.com/powerman/go-monolith-example/ms/auth/internal/config"

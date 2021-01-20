@@ -8,12 +8,17 @@ import (
 	"github.com/powerman/go-monolith-example/internal/dom"
 )
 
-func TestNoName(tt *testing.T) {
+func TestEmpty(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
 
+	t.Zero(dom.NoName)
 	t.Zero(dom.NoName.String())
 	t.Zero(dom.NoName.ID())
+
+	t.Zero(dom.NoUser)
+	t.Zero(dom.NoUser.String())
+	t.Zero(dom.NoUser.ID())
 }
 
 func TestName(tt *testing.T) {
