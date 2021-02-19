@@ -10,7 +10,7 @@ func unexportedSensitive(m fluent.Matcher) {
 	//   struct{ Exported sensitive.Type; unexported sensitive.Type }
 	// TODO Add support for renamed package?
 	// TODO Detect if struct with exported sensitive field is itself
-	// inside unexported field in parent struct.
+	// inside unexported field in parent struct? Only if in print/log!
 	// TODO Detect panic(sensitiveValue).
 	m.Match(`struct{$*_; $field sensitive.$_; $*_}`,
 		`struct{$*_; $field AccessToken; $*_}`,

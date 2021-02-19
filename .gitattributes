@@ -8,6 +8,7 @@ go.sum binary
 *.*.go binary
 statik*.go binary
 /third_party/*/** binary
+/api/proto/**/*.swagger.json binary
 /api/**/model/** binary
 /api/**/restapi/** binary
 /api/**/restapi/configure_*.go -binary

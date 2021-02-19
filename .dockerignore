@@ -4,5 +4,5 @@
 # a*b?c/d[0-9]e[^a-z\]]f\[g     - pattern
 *
 !bin
-!ms/example/internal/migrations/*.sql
 !ms/auth/internal/migrations/*.sql
+!ms/example/internal/migrations/*.sql
