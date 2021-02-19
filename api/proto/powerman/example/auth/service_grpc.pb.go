@@ -11,6 +11,7 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
+// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
 // NoAuthSvcClient is the client API for NoAuthSvc service.
@@ -102,7 +103,7 @@ type UnsafeNoAuthSvcServer interface {
 }
 
 func RegisterNoAuthSvcServer(s grpc.ServiceRegistrar, srv NoAuthSvcServer) {
-	s.RegisterService(&_NoAuthSvc_serviceDesc, srv)
+	s.RegisterService(&NoAuthSvc_ServiceDesc, srv)
 }
 
 func _NoAuthSvc_CreateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -141,7 +142,10 @@ func _NoAuthSvc_SigninIdentity_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-var _NoAuthSvc_serviceDesc = grpc.ServiceDesc{
+// NoAuthSvc_ServiceDesc is the grpc.ServiceDesc for NoAuthSvc service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var NoAuthSvc_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "powerman.example.auth.NoAuthSvc",
 	HandlerType: (*NoAuthSvcServer)(nil),
 	Methods: []grpc.MethodDesc{
@@ -215,7 +219,7 @@ type UnsafeAuthSvcServer interface {
 }
 
 func RegisterAuthSvcServer(s grpc.ServiceRegistrar, srv AuthSvcServer) {
-	s.RegisterService(&_AuthSvc_serviceDesc, srv)
+	s.RegisterService(&AuthSvc_ServiceDesc, srv)
 }
 
 func _AuthSvc_SignoutIdentity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -236,7 +240,10 @@ func _AuthSvc_SignoutIdentity_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-var _AuthSvc_serviceDesc = grpc.ServiceDesc{
+// AuthSvc_ServiceDesc is the grpc.ServiceDesc for AuthSvc service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var AuthSvc_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "powerman.example.auth.AuthSvc",
 	HandlerType: (*AuthSvcServer)(nil),
 	Methods: []grpc.MethodDesc{

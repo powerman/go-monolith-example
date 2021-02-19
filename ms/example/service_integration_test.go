@@ -22,7 +22,6 @@ import (
 func TestSmoke(tt *testing.T) {
 	t := check.T(tt)
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	mockAuthn := apix.NewMockAuthn(ctrl)
 

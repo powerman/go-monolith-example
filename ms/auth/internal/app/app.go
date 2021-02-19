@@ -1,4 +1,5 @@
-//go:generate gobin -m -run github.com/golang/mock/mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE Appl,Repo
+//go:generate -command mockgen sh -c "$(git rev-parse --show-toplevel)/.gobincache/$DOLLAR{DOLLAR}0 \"$DOLLAR{DOLLAR}@\"" mockgen
+//go:generate mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE
 
 // Package app provides business logic.
 package app
@@ -111,10 +112,13 @@ func (s AccessToken) MarshalJSON() ([]byte, error) { return sensitive.String(s).
 func (s AccessToken) MarshalText() ([]byte, error) { return sensitive.String(s).MarshalText() }
 
 // Roles.
+//go:generate -command stringer sh -c "$(git rev-parse --show-toplevel)/.gobincache/$DOLLAR{DOLLAR}0 \"$DOLLAR{DOLLAR}@\"" stringer
+//go:generate stringer -output=stringer.Role.go -type=Role -trimprefix=Role
 const (
 	_ Role = iota
 	RoleAdmin
 	RoleUser
+	roleMax
 )
 
 // Config contains configuration for business-logic.

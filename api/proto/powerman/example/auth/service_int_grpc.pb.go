@@ -11,6 +11,7 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
+// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
 // AuthIntSvcClient is the client API for AuthIntSvc service.
@@ -62,7 +63,7 @@ type UnsafeAuthIntSvcServer interface {
 }
 
 func RegisterAuthIntSvcServer(s grpc.ServiceRegistrar, srv AuthIntSvcServer) {
-	s.RegisterService(&_AuthIntSvc_serviceDesc, srv)
+	s.RegisterService(&AuthIntSvc_ServiceDesc, srv)
 }
 
 func _AuthIntSvc_CheckAccessToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -83,7 +84,10 @@ func _AuthIntSvc_CheckAccessToken_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-var _AuthIntSvc_serviceDesc = grpc.ServiceDesc{
+// AuthIntSvc_ServiceDesc is the grpc.ServiceDesc for AuthIntSvc service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var AuthIntSvc_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "powerman.example.auth.AuthIntSvc",
 	HandlerType: (*AuthIntSvcServer)(nil),
 	Methods: []grpc.MethodDesc{

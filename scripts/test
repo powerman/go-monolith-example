@@ -1,24 +1,24 @@
 #!/bin/bash
-PATH=$(gobin -m -p \
-	github.com/bufbuild/buf/cmd/buf \
-	github.com/golangci/golangci-lint/cmd/golangci-lint \
-	github.com/googleapis/api-linter/cmd/api-linter \
-	github.com/powerman/dockerize \
-	gotest.tools/gotestsum |
-	xargs dirname | sed -z -e 's/\n/:/g')$PATH
-set -x -e -o pipefail
+set -e -o pipefail
+export PATH="$PWD/.gobincache:$PATH"
+go generate
+HADOLINT_VER="1.22.1"
+hadolint --version | grep -wq v$HADOLINT_VER || curl -sSfL https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VER}/hadolint-"$(uname)"-x86_64 | install -D /dev/stdin .gobincache/hadolint
+SHELLCHECK_VER="0.7.1"
+shellcheck --version | grep -wq $SHELLCHECK_VER || curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VER}/shellcheck-v${SHELLCHECK_VER}."$(uname)".x86_64.tar.xz | tar xJf - -C .gobincache --strip-components=1 shellcheck-v${SHELLCHECK_VER}/shellcheck
+set -x
 
 hadolint Dockerfile
 
 shellcheck env.sh.dist scripts/*
 
 if test -d api/proto; then
-	git show-branch master >/dev/null
+	git show-branch master >/dev/null || git branch master origin/master
 	! git ls-tree -r master api/proto | grep -q '[.]proto$' ||
 		! find api/proto -name '*.proto' -print -quit 2>/dev/null | grep -q . ||
-		buf check breaking --against '.git#branch=master'
+		buf breaking --against '.git#branch=master'
 
-	buf check lint
+	buf lint
 
 	# shellcheck disable=SC2046 # $(sed) needs to output multiple words.
 	find api/proto -name '*.proto' -print0 2>/dev/null | xargs -0 --no-run-if-empty -n 1 \

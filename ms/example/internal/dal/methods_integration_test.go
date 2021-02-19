@@ -15,8 +15,7 @@ import (
 func TestExampleSmoke(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, r := newTestRepo(t)
-	defer cleanup()
+	r := newTestRepo(t)
 
 	var (
 		now    = time.Now().Truncate(time.Second)

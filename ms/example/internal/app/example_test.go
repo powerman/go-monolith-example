@@ -13,8 +13,7 @@ import (
 func TestExample(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, a, mockRepo := testNew(t)
-	defer cleanup()
+	a, mockRepo := testNew(t)
 
 	exampleUser := &app.Example{Counter: 3}
 
@@ -46,8 +45,7 @@ func TestExample(tt *testing.T) {
 func TestIncExample(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, a, mockRepo := testNew(t)
-	defer cleanup()
+	a, mockRepo := testNew(t)
 
 	mockRepo.EXPECT().IncExample(gomock.Any(), authAdmin.UserName).Return(nil)
 	t.Nil(a.IncExample(ctx, authAdmin))

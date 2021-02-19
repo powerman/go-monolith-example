@@ -1,4 +1,5 @@
-//go:generate gobin -m -run github.com/golang/mock/mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE Appl,Repo
+//go:generate -command mockgen sh -c "$(git rev-parse --show-toplevel)/.gobincache/$DOLLAR{DOLLAR}0 \"$DOLLAR{DOLLAR}@\"" mockgen
+//go:generate mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE
 
 // Package app provides business logic.
 package app

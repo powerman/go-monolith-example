@@ -7,8 +7,6 @@ import (
 )
 
 // All generic errors which may be returned by RPC methods.
-//
-//nolint:gomnd // By design.
 var (
 	ErrTryAgainLater   = jsonrpc2.NewError(-503, "temporary error")   // Safe to resend.
 	ErrTooManyRequests = jsonrpc2.NewError(-429, "too many requests") // Safe to resend (after delay).
@@ -28,8 +26,6 @@ var ErrsCommon = []error{
 }
 
 // All errors which may be returned by RPC methods.
-//
-//nolint:gomnd // By design.
 var (
 // ErrSomething = jsonrpc2.NewError(1, "Something is wrong")
 )

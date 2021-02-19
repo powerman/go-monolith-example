@@ -5,15 +5,6 @@ setup_env: &setup_env
   run:
     name: Setup environment
     command: |
-      env | sort > /tmp/env.old
-
-      export HADOLINT_VER=1.19.0
-      export SHELLCHECK_VER=0.7.1
-
-      env | sort > /tmp/env.new
-      ! diff -u /tmp/env.old /tmp/env.new | sed -n '/^+[^+]/s/^./export /p' >> $BASH_ENV
-      env | grep _VER | sort > /tmp/tools.ver
-
       test -d ~/.ssh || install -m 0700 -d ~/.ssh
       test -f ~/.ssh/config || install -m 0600 /dev/null ~/.ssh/config
       test -d /run/.ssh && sudo sh -c "cp /run/.ssh/* $HOME/.ssh/; chown -R circleci:circleci $HOME/.ssh" || true # For scripts/test-ci-circle.
@@ -24,7 +15,7 @@ setup_env: &setup_env
 jobs:
   test:
     docker:
-      - image: "cimg/go:1.15"
+      - image: "cimg/go:1.16"
         environment:
           GOFLAGS: "-mod=readonly"
           MONO_TLS_CA_CERT: "configs/insecure-dev-pki/ca.crt"
@@ -47,7 +38,7 @@ jobs:
       - image: "mysql:5.7"
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      - image: "postgres:12.5"
+      - image: "postgres:12.6"
         environment:
           POSTGRES_PASSWORD: "postgres"
           # configs/insecure-dev-pki/issued/postgres.crt
@@ -113,8 +104,8 @@ jobs:
             echo "$KEY" | install -m 0440 -o root -g postgres /dev/stdin /server.key
             exec docker-entrypoint.sh postgres -c ssl=on \
                 --ssl_cert_file=/server.crt --ssl_key_file=/server.key
-      - image: "nats:2.1.4"
-      - image: "nats-streaming:0.17.0"
+      - image: "nats:2.1.9"
+      - image: "nats-streaming:0.20.0"
         command:
           - "--cluster_id=ci"
           - "--max_channels=0"
@@ -135,17 +126,12 @@ jobs:
       - *setup_env
       - restore_cache:
           keys:
-            - v2-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-{{ .Branch }}
-            - v2-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-
-            - v2-{{ checksum "/tmp/tools.ver" }}-
+            - v3-{{ checksum "go.mod" }}-{{ .Branch }}
+            - v3-{{ checksum "go.mod" }}-
+            - v3-
       - run:
           name: Install tools
           command: |
-            GO111MODULE=off go get -u github.com/myitcv/gobin
-            hadolint --version | tee /dev/stderr | grep -wq v$HADOLINT_VER ||
-              curl -sSfL https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VER}/hadolint-$(uname)-x86_64 | install /dev/stdin $(go env GOPATH)/bin/hadolint
-            shellcheck --version | tee /dev/stderr | grep -wq $SHELLCHECK_VER ||
-              curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VER}/shellcheck-v${SHELLCHECK_VER}.$(uname).x86_64.tar.xz | tar xJf - -C $(go env GOPATH)/bin --strip-components=1 shellcheck-v${SHELLCHECK_VER}/shellcheck
             sudo apt update
             sudo apt install -y postgresql-client
       - run:
@@ -158,17 +144,16 @@ jobs:
           name: Report code coverage
           command: |
             scripts/cover
-            # gobin -m -run github.com/mattn/goveralls -coverprofile=cover.out -service=CircleCI
+            # .gobincache/goveralls -coverprofile=cover.out -service=CircleCI
       - save_cache:
           when: always
-          key: v2-{{ checksum "/tmp/tools.ver" }}-{{ checksum "go.mod" }}-{{ .Branch }}
+          key: v3-{{ checksum "go.mod" }}-{{ .Branch }}
           paths:
             - ~/go/bin/
             - ~/go/pkg/
             - ~/go/src/
             - ~/.cache/go-build/
             - ~/.cache/golangci-lint/
-            - ~/.cache/gobin/
             - .gobincache/
 
 workflows:

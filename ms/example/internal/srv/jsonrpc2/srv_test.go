@@ -28,8 +28,7 @@ func fetch(t *check.C, url string, headers ...string) *http.Response {
 func TestCORS(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, _, url, _ := testNew(t)
-	defer cleanup()
+	_, url, _ := testNew(t)
 
 	resp := fetch(t, url, "Origin", "google.com")
 	t.Equal(resp.StatusCode, 405)

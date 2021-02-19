@@ -27,10 +27,10 @@ var (
 	ctx = def.NewContext(app.ServiceName)
 )
 
-func testNew(t *check.C) (func(), *app.App, *app.MockRepo) {
+func testNew(t *check.C) (*app.App, *app.MockRepo) {
 	ctrl := gomock.NewController(t)
 
 	mockRepo := app.NewMockRepo(ctrl)
 	a := app.New(mockRepo, app.Config{})
-	return ctrl.Finish, a, mockRepo
+	return a, mockRepo
 }

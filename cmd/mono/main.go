@@ -121,9 +121,7 @@ func runServeWithGracefulShutdown(_ *cobra.Command, _ []string) error {
 	defer cancel()
 
 	ctxShutdown, shutdown := context.WithCancel(context.Background())
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGABRT, syscall.SIGTERM)
-	go func() { <-sigc; shutdown() }()
+	ctxShutdown, _ = signal.NotifyContext(ctxShutdown, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGABRT, syscall.SIGTERM)
 	go func() {
 		<-ctxShutdown.Done()
 		time.Sleep(serveShutdownTimeout.Value(nil))

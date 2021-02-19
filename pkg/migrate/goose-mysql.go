@@ -17,7 +17,6 @@ import (
 	"github.com/powerman/structlog"
 )
 
-//nolint:gochecknoglobals // Regexp.
 var reTCP = regexp.MustCompile(`(^|@)tcp[(]([^)]*)[)]`)
 
 // MySQL implements Connector interface.

@@ -16,8 +16,7 @@ import (
 func TestExample(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, c, _, mockAppl := testNew(t)
-	defer cleanup()
+	c, _, mockAppl := testNew(t)
 
 	exampleUser := &app.Example{Counter: 3}
 
@@ -58,8 +57,7 @@ func TestExample(tt *testing.T) {
 func TestIncExample(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, c, _, mockAppl := testNew(t)
-	defer cleanup()
+	c, _, mockAppl := testNew(t)
 
 	mockAppl.EXPECT().IncExample(gomock.Any(), authAdmin).Return(nil)
 

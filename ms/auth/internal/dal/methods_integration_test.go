@@ -45,8 +45,7 @@ var (
 func TestUser(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, r := newTestRepo(t)
-	defer cleanup()
+	r := newTestRepo(t)
 
 	var (
 		uAdmin    = tmplUAdmin
@@ -110,8 +109,7 @@ func TestUser(tt *testing.T) {
 func TestAccessToken(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, r := newTestRepo(t)
-	defer cleanup()
+	r := newTestRepo(t)
 
 	var (
 		uAdmin = tmplUAdmin
@@ -141,7 +139,7 @@ func TestAccessToken(tt *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		t.Run("", func(tt *testing.T) {
-			t := check.T(tt) //nolint:govet // False positive.
+			t := check.T(tt)
 			err := r.AddAccessToken(ctx, tc.AccessToken, tc.userName)
 			matchErr(t, err, tc.wantErr)
 		})

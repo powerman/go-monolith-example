@@ -1,10 +1,12 @@
 #!/bin/bash
 set -e -o pipefail
+export PATH="$PWD/.gobincache:$PATH"
+GOBIN="$PWD/.gobincache" go install gotest.tools/gotestsum
 
-gobin -m -run gotest.tools/gotestsum -- \
+gotestsum -- \
 	-coverpkg="$(go list ./... | grep -v "^$(go list -m)/api/" | paste -s -d,)" \
 	-coverprofile cover.out \
-	-tags=integration ./...
+	-tags=integration "$@" ./...
 
 sed -i -e '/[/]mock[.]/d' cover.out
 

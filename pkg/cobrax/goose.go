@@ -43,7 +43,7 @@ Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
 `
 
 var (
-	reGooseCommand         = regexp.MustCompile(`^(?:up|up-by-one|up-to\s+\d+|down|down-to\s+\d+|redo|reset|status|version|create\s+\S+\s+(?:go|sql)|fix)$`) //nolint:gochecknoglobals // Regexp.
+	reGooseCommand         = regexp.MustCompile(`^(?:up|up-by-one|up-to\s+\d+|down|down-to\s+\d+|redo|reset|status|version|create\s+\S+\s+(?:go|sql)|fix)$`)
 	errInvalidGooseCommand = errors.New("invalid goose command")
 )
 

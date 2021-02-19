@@ -41,7 +41,7 @@ var (
 	userIDBad = dom.UserName{Name: dom.NewName("guests", "0")}
 )
 
-func testNew(t *check.C) (func(), *jsonrpc2x.Client, string, *app.MockAppl) {
+func testNew(t *check.C) (*jsonrpc2x.Client, string, *app.MockAppl) {
 	ctrl := gomock.NewController(t)
 
 	mockAppl := app.NewMockAppl(ctrl)
@@ -56,9 +56,6 @@ func testNew(t *check.C) (func(), *jsonrpc2x.Client, string, *app.MockAppl) {
 	mockAuthn.EXPECT().Authenticate(gomock.Any(), gomock.Any()).Return(dom.Auth{}, apix.ErrAccessTokenInvalid).AnyTimes()
 
 	ts := httptest.NewServer(srv)
-	cleanup := func() {
-		ts.Close()
-		ctrl.Finish()
-	}
-	return cleanup, jsonrpc2x.NewHTTPClient(ts.URL), ts.URL, mockAppl
+	t.Cleanup(ts.Close)
+	return jsonrpc2x.NewHTTPClient(ts.URL), ts.URL, mockAppl
 }

@@ -19,7 +19,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
 
   postgres:
-    image: "postgres:12.5" # We're using 12.
+    image: "postgres:12.6" # We're using 12.
     container_name: "mono_postgres"
     restart: "always"
     shm_size: "256m"
@@ -44,7 +44,7 @@ services:
   postgres-setup:
     depends_on:
       - postgres
-    image: "postgres:12.5" # We're using 12.
+    image: "postgres:12.6" # We're using 12.
     container_name: "mono_postgres-setup"
     restart: "no"
     volumes:
@@ -74,7 +74,7 @@ services:
       - "${mono_nats_addr_port:-0}:4222"
 
   stan:
-    image: "nats-streaming:0.19.0" # This is the latest version at the moment.
+    image: "nats-streaming:0.20.0" # This is the latest version at the moment.
     container_name: mono_stan
     restart: always
     volumes:

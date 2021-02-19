@@ -1,10 +1,11 @@
 // Package grpcgw provides grpc-gateway server.
 package grpcgw
 
+//go:generate -command statik sh -c "$(git rev-parse --show-toplevel)/.gobincache/$DOLLAR{DOLLAR}0 \"$DOLLAR{DOLLAR}@\"" statik
 //go:generate rm -rf statik
-//go:generate gobin -m -run github.com/rakyll/statik -ns "Swagger UI" -src ../../../../../web/static/swagger-ui
+//go:generate statik -ns "Swagger UI" -src ../../../../../web/static/swagger-ui
 //go:generate mv statik/statik.go statik/statik-swaggerui.go
-//go:generate gobin -m -run github.com/rakyll/statik -ns "OpenAPI" -src ../../../../../api/proto -include "*.swagger.json"
+//go:generate statik -ns "OpenAPI" -src ../../../../../api/proto -include "*.swagger.json"
 //go:generate mv statik/statik.go statik/statik-openapi.go
 
 import (

@@ -35,7 +35,7 @@ var (
 	cfg *config.ServeConfig
 )
 
-func newTestRepo(t *check.C) (cleanup func(), r *dal.Repo) {
+func newTestRepo(t *check.C) *dal.Repo {
 	t.Helper()
 
 	pc, _, _, _ := runtime.Caller(1)
@@ -45,12 +45,10 @@ func newTestRepo(t *check.C) (cleanup func(), r *dal.Repo) {
 
 	tempDBCfg, cleanupDB, err := mysqlx.EnsureTempDB(tLogger(*t), suffix, cfg.MySQL)
 	t.Must(t.Nil(err))
-	r, err = dal.New(ctx, cfg.GooseMySQLDir, tempDBCfg)
+	t.Cleanup(cleanupDB)
+	r, err := dal.New(ctx, cfg.GooseMySQLDir, tempDBCfg)
 	t.Must(t.Nil(err))
+	t.Cleanup(r.Close)
 
-	cleanup = func() {
-		r.Close()
-		cleanupDB()
-	}
-	return cleanup, r
+	return r
 }

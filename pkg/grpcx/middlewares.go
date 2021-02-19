@@ -154,7 +154,7 @@ func newLogger(ctx Ctx, service, pkg, fullMethod string) *structlog.Logger {
 }
 
 // LogHandler logs error and hides message&details of Unknown&Internal errors.
-func logHandler(log *structlog.Logger, err error) error { //nolint:funlen,gocyclo // By design.
+func logHandler(log *structlog.Logger, err error) error { //nolint:funlen,gocyclo,cyclop // By design.
 	s := status.Convert(err)
 	code, msg := s.Code(), s.Message()
 	switch code {

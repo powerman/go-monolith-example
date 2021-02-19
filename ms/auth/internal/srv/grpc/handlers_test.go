@@ -40,8 +40,7 @@ var (
 func TestCreateAccount(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, clientNoAuth, _, _, mockAppl := testNew(t)
-	defer cleanup()
+	clientNoAuth, _, _, mockAppl := testNew(t)
 
 	var (
 		userRand1 = app.User{
@@ -133,8 +132,7 @@ func TestCreateAccount(tt *testing.T) {
 func TestSigninIdentity(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, clientNoAuth, _, _, mockAppl := testNew(t)
-	defer cleanup()
+	clientNoAuth, _, _, mockAppl := testNew(t)
 
 	var (
 		respAdmin1 = &api.SigninIdentityResponse{
@@ -210,8 +208,7 @@ func TestSigninIdentity(tt *testing.T) {
 func TestSignoutIdentity(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, _, clientAuth, _, mockAppl := testNew(t)
-	defer cleanup()
+	_, clientAuth, _, mockAppl := testNew(t)
 
 	mockAppl.EXPECT().Authenticate(gomock.Any(), app.AccessToken("boom")).Return(nil, io.EOF)
 	mockAppl.EXPECT().Authenticate(gomock.Any(), app.AccessToken("token1")).Return(&userAdmin, nil)
@@ -255,8 +252,7 @@ func TestSignoutIdentity(tt *testing.T) {
 func TestCheckAccessToken(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, _, _, clientAuthInt, mockAppl := testNew(t)
-	defer cleanup()
+	_, _, clientAuthInt, mockAppl := testNew(t)
 
 	mockAppl.EXPECT().Authenticate(gomock.Any(), app.AccessToken("expire")).Return(&userAdmin, nil)
 	mockAppl.EXPECT().Authenticate(gomock.Any(), app.AccessToken("expire")).Return(nil, app.ErrNotFound)

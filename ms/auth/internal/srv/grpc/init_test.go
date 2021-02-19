@@ -36,7 +36,7 @@ var (
 	cfg *config.ServeConfig
 )
 
-func testNew(t *check.C) (func(), api.NoAuthSvcClient, api.AuthSvcClient, api.AuthIntSvcClient, *app.MockAppl) {
+func testNew(t *check.C) (api.NoAuthSvcClient, api.AuthSvcClient, api.AuthIntSvcClient, *app.MockAppl) {
 	t.Helper()
 	ctrl := gomock.NewController(t)
 
@@ -77,7 +77,7 @@ func testNew(t *check.C) (func(), api.NoAuthSvcClient, api.AuthSvcClient, api.Au
 	)
 	t.Must(t.Nil(err, "grpc.Dial internal"))
 
-	cleanup := func() {
+	t.Cleanup(func() {
 		t.Helper()
 		t.Nil(conn.Close())
 		t.Nil(connInt.Close())
@@ -85,10 +85,9 @@ func testNew(t *check.C) (func(), api.NoAuthSvcClient, api.AuthSvcClient, api.Au
 		srvInt.Stop()
 		t.Nil(<-errc, "srv.Serve")
 		t.Nil(<-errcInt, "srv.Serve internal")
-		ctrl.Finish()
-	}
+	})
 	clientNoAuth := api.NewNoAuthSvcClient(conn)
 	clientAuth := api.NewAuthSvcClient(conn)
 	clientAuthInt := api.NewAuthIntSvcClient(connInt)
-	return cleanup, clientNoAuth, clientAuth, clientAuthInt, mockAppl
+	return clientNoAuth, clientAuth, clientAuthInt, mockAppl
 }

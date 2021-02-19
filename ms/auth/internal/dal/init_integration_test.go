@@ -37,7 +37,7 @@ var (
 	cfg *config.ServeConfig
 )
 
-func newTestRepo(t *check.C) (cleanup func(), r *dal.Repo) {
+func newTestRepo(t *check.C) *dal.Repo {
 	t.Helper()
 
 	pc, _, _, _ := runtime.Caller(1)
@@ -52,16 +52,14 @@ func newTestRepo(t *check.C) (cleanup func(), r *dal.Repo) {
 	dbCfg := cfg.Postgres.Clone()
 	_, cleanupDB, err := pqx.EnsureTempDB(tLogger(*t), suffix, dbCfg.Config)
 	t.Must(t.Nil(err))
+	t.Cleanup(cleanupDB)
 	tempDBCfg := dbCfg.Clone()
 	tempDBCfg.DBName += "_" + suffix
-	r, err = dal.New(ctx, cfg.GoosePostgresDir, tempDBCfg)
+	r, err := dal.New(ctx, cfg.GoosePostgresDir, tempDBCfg)
 	t.Must(t.Nil(err))
+	t.Cleanup(r.Close)
 
-	cleanup = func() {
-		r.Close()
-		cleanupDB()
-	}
-	return cleanup, r
+	return r
 }
 
 func matchErr(t *check.C, err, wantErr error) {

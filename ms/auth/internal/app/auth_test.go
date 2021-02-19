@@ -16,8 +16,7 @@ import (
 func TestRegister(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, a, mockRepo := testNew(t)
-	defer cleanup()
+	a, mockRepo := testNew(t)
 
 	var (
 		now   = time.Now()
@@ -71,8 +70,7 @@ func TestRegister(tt *testing.T) {
 func TestLoginByUserID(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, a, mockRepo := testNew(t)
-	defer cleanup()
+	a, mockRepo := testNew(t)
 
 	mockRepo.EXPECT().AddUser(gomock.Any(), gomock.Any())
 	uAdmin := &app.User{}
@@ -110,8 +108,7 @@ func TestLoginByUserID(tt *testing.T) {
 func TestLoginByEmail(tt *testing.T) {
 	t := check.T(tt)
 	t.Parallel()
-	cleanup, a, mockRepo := testNew(t)
-	defer cleanup()
+	a, mockRepo := testNew(t)
 
 	mockRepo.EXPECT().AddUser(gomock.Any(), gomock.Any())
 	uAdmin := &app.User{Email: "admin@host"}

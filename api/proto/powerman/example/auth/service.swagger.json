@@ -4,6 +4,14 @@
     "title": "Example: Auth",
     "version": "1.0.0"
   },
+  "tags": [
+    {
+      "name": "NoAuthSvc"
+    },
+    {
+      "name": "AuthSvc"
+    }
+  ],
   "basePath": "/",
   "schemes": [
     "https"

@@ -111,6 +111,9 @@ linters-settings:
     # 'default' case is present, even if all enum members aren't listed in the
     # switch
     default-signifies-exhaustive: false
+  exhaustivestruct:
+    struct-patterns:
+      - '*.ExampleTypeToAlwaysFillAllFields'
   funlen:
     lines: 60
     statements: 40
@@ -155,19 +158,61 @@ linters-settings:
       - opinionated
     #disabled-tags:
 
-    settings: # settings passed to gocritic
+    # Settings passed to gocritic.
+    # The settings key is the name of a supported gocritic checker.
+    # The list of supported checkers can be find in https://go-critic.github.io/overview.
+    settings:
       captLocal: # must be valid enabled check name
-        paramsOnly: true
+        # whether to restrict checker to params only (default true)
+        paramsOnly: false
+      elseif:
+        # whether to skip balanced if-else pairs (default true)
+        #skipBalanced: true
+      hugeParam:
+        # size in bytes that makes the warning trigger (default 80)
+        #sizeThreshold: 80
+      nestingReduce:
+        # min number of statements inside a branch to trigger a warning (default 5)
+        #bodyWidth: 5
+      rangeExprCopy:
+        # size in bytes that makes the warning trigger (default 512)
+        #sizeThreshold: 512
+        # whether to check test functions (default true)
+        #skipTestFuncs: true
       rangeValCopy:
-        sizeThreshold: 32
+        # size in bytes that makes the warning trigger (default 128)
+        #sizeThreshold: 32
+        # whether to check test functions (default true)
+        #skipTestFuncs: true
       ruleguard:
+        # path to a gorules file for the ruleguard checker
         rules: "build/gorules/rules.go" # Run `golangci-lint cache clean` when it changes!
+      truncateCmp:
+        # whether to skip int/uint/uintptr types (default true)
+        skipArchDependent: false
+      underef:
+        # whether to skip (*x).method() calls where x is a pointer receiver (default true)
+        skipRecvDeref: false
+      unnamedResult:
+        # whether to check exported functions
+        checkExported: true
   gocyclo:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
     min-complexity: 15
+  cyclop:
+    # the maximal code complexity to report
+    max-complexity: 15
+    # the maximal average package complexity. If it's higher than 0.0 (float) the check is enabled (default 0.0)
+    #package-average: 0.0
+    # should ignore tests (default false)
+    #skip-tests: false
   godot:
     # comments to be checked: `declarations`, `toplevel`, or `all`
     scope: declarations
+    # list of regexps for excluding particular comment lines from check
+    exclude:
+      # example: exclude comments which contain numbers
+      - ':$'
     # check that each sentence starts with a capital letter
     capital: false
   godox:
@@ -184,22 +229,23 @@ linters-settings:
     values:
       const:
         # define here const type values in format k:v, for example:
-        # YEAR: 2020
         # COMPANY: MY COMPANY
       regexp:
         # define here regexp type values, for example
         # AUTHOR: .*@mycompany\.com
-    template:
+    template: # |
       # put here copyright header template for source code files, for example:
+      # Note: {{ YEAR }} is a builtin value that returns the year relative to the current machine time.
+      #
       #    {{ AUTHOR }} {{ COMPANY }} {{ YEAR }}
       #    SPDX-License-Identifier: Apache-2.0
-      #
+
       #    Licensed under the Apache License, Version 2.0 (the "License");
       #    you may not use this file except in compliance with the License.
       #    You may obtain a copy of the License at:
-      #
+
       #      http://www.apache.org/licenses/LICENSE-2.0
-      #
+
       #    Unless required by applicable law or agreed to in writing, software
       #    distributed under the License is distributed on an "AS IS" BASIS,
       #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -219,6 +265,9 @@ linters-settings:
       mnd:
         # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
         checks: argument,case,condition,operation,return,assign
+        # ignored-numbers: 1000
+        # ignored-files: magic_.*.go
+        # ignored-functions: math.*
   gomodguard:
     allowed:
       modules:                                                        # List of allowed modules
@@ -227,17 +276,17 @@ linters-settings:
         # - golang.org
     blocked:
       modules:                                                        # List of blocked modules
-        - github.com/cenkalti/backoff:
-            recommendations:
-              - github.com/cenkalti/backoff/v4
         # - github.com/uudashr/go-module:                             # Blocked module
         #     recommendations:                                        # Recommended modules that should be used instead (Optional)
         #       - golang.org/x/mod
         #     reason: "`mod` is the official go.mod parser library."  # Reason why the recommended module should be used (Optional)
       versions:                                                       # List of blocked module version constraints
+        - github.com/cenkalti/backoff:
+            version: "< 4.0.0"
         # - github.com/mitchellh/go-homedir:                          # Blocked module with version constraint
         #     version: "< 1.1.0"                                      # Version constraint, see https://github.com/Masterminds/semver#basic-comparisons
         #     reason: "testing if blocked version constraint works."  # Reason why the version constraint exists. (Optional)
+      local_replace_directives: false                                 # Set to true to raise lint issues for packages that are loaded from a local path via replace directive
   govet:
     # report about shadowed variables
     check-shadowing: true
@@ -270,6 +319,12 @@ linters-settings:
     packages-with-error-message:
       # specify an error message to output when a blacklisted package is used
       - log: "logging is allowed only by github.com/powerman/structlog"
+  ifshort:
+    # Maximum length of variable declaration measured in number of lines, after which linter won't suggest using short syntax.
+    # Has higher priority than max-decl-chars.
+    max-decl-lines: 1
+    # Maximum length of variable declaration measured in number of characters, after which linter won't suggest using short syntax.
+    max-decl-chars: 30
   lll:
     # max line length, lines longer will be reported. Default is 120.
     # '\t' is counted as 1 character by default, and can be changed with the tab-width option
@@ -298,6 +353,11 @@ linters-settings:
     #simple: true
     #range-loops: true # Report preallocation suggestions on range loops, true by default
     #for-loops: false # Report preallocation suggestions on for loops, false by default
+  predeclared:
+    # comma-separated list of predeclared identifiers to not report on
+    ignore: ""
+    # include method names and field names (i.e., qualified names) in checks
+    q: false
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
     allow-unused: false
@@ -314,9 +374,31 @@ linters-settings:
       - github.com/jmoiron/sqlx
       # TODO Disabled to avoid crash https://github.com/golangci/golangci-lint/issues/1005
       # - github.com/powerman/sqlxx
+  revive:
+    # see https://github.com/mgechev/revive#available-rules for details.
+    ignore-generated-header: true
+    severity: warning
+    rules:
+      - name: indent-error-flow
+        severity: warning
   testpackage:
     # regexp pattern to skip files
     #skip-regexp: (export|internal)_test\.go
+  thelper:
+    # The following configurations enable all checks. It can be omitted because all checks are enabled by default.
+    # You can enable only required checks deleting unnecessary checks.
+    test:
+      first: true
+      name: true
+      begin: true
+    benchmark:
+      first: true
+      name: true
+      begin: true
+    tb:
+      first: true
+      name: true
+      begin: true
   unparam:
     # Inspect exported functions, default is false. Set to true if no external program/library imports your code.
     # XXX: if you enable this setting, unparam will report a lot of false-positives in text editors:
@@ -358,6 +440,17 @@ linters-settings:
   errorlint:
     # Report non-wrapping error creation using fmt.Errorf
     errorf: true
+  makezero:
+    # Allow only slices initialized with a length of zero. Default is false.
+    #always: false
+  forbidigo:
+    # Forbid the following identifiers
+    forbid:
+      #- fmt.Errorf # consider errors.Errorf in github.com/pkg/errors
+      #- fmt.Print.* # too much log noise
+      - ginkgo\\.F.* # these are used just for local development
+    # Exclude godoc examples from forbidigo checks.  Default is true.
+    exclude_godoc_examples: false
 
   # The custom section can be used to define linter plugins to be loaded at runtime. See README doc
   #  for more info.
@@ -379,7 +472,7 @@ linters:
   disable:
     - dogsled # questionable
     - dupl
-    - exhaustivestruct
+    - ifshort # questionable
     - lll
     - maligned # premature optimization
     - nlreturn
@@ -450,7 +543,7 @@ issues:
 
     # Servers are allowed to contain a lot of handlers/middlewares.
     - path: internal/srv/[^/]*/srv.go
-      text: Function 'NewServer'
+      text: Function '(NewServer|NewServerInt)'
       linters:
         - funlen
 
@@ -477,7 +570,7 @@ issues:
       text: '`(SharedCfg)` should have comment'
 
     - path: internal/srv/
-      text: '`(Config|Server|NewServer)` should have comment'
+      text: '`(Config|Server|NewServer|NewServerInt)` should have comment'
 
     - path: ^ms/[^/]*/internal/srv/local/ # Should be documented in lpc.* interface.
       text: '`Server[.]\w+` should have comment'
@@ -635,6 +728,9 @@ issues:
 
   # Show only new issues created in git patch with set file path.
   #new-from-patch: path/to/patch/file
+
+  # Fix found issues (if it's supported by the linter)
+  fix: true
 
 severity:
   # Default value is empty string.

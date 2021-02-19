@@ -17,7 +17,7 @@ import (
 )
 
 // APIErr converts non-JSON-RPC 2.0 errors to JSON-RPC 2.0 errors.
-func apiErr(next jsonrpc2x.Handler) jsonrpc2x.Handler { //nolint:gocyclo // By design.
+func apiErr(next jsonrpc2x.Handler) jsonrpc2x.Handler {
 	return func() error {
 		err := next()
 

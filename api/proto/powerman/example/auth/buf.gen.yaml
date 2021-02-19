@@ -2,13 +2,19 @@ version: v1beta1
 plugins:
   - name: go
     out: api/proto
-    opt: paths=source_relative
+    opt:
+      - paths=source_relative
   - name: go-grpc
     out: api/proto
-    opt: paths=source_relative,require_unimplemented_servers=false
+    opt:
+      - paths=source_relative
+      - require_unimplemented_servers=false
   - name: grpc-gateway
     out: api/proto
-    opt: paths=source_relative
+    opt:
+      - paths=source_relative
   - name: openapiv2
     out: api/proto
-    opt: simple_operation_ids=true,openapi_configuration=api/proto/powerman/example/auth/service.openapi.yml
+    opt:
+      - simple_operation_ids=true
+      - openapi_configuration=api/proto/powerman/example/auth/service.openapi.yml
