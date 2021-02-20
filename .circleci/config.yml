@@ -134,12 +134,12 @@ jobs:
           command: |
             sudo apt update
             sudo apt install -y postgresql-client
+      - run: scripts/test
       - run:
           name: Ensure API spec match auto-generated code
           command: |
             go generate ./api/...
             git add . && git status --short && git diff-index --quiet HEAD
-      - run: scripts/test
       - run:
           name: Report code coverage
           command: |
