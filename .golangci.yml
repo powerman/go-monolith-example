@@ -521,6 +521,11 @@ issues:
       linters:
         - govet
 
+    # Files with go:embed directives are designed to contain global constants.
+    - path: ^(.*/)?embed.go$
+      linters:
+        - gochecknoglobals
+
     # Package def is designed to contain global constants.
     - path: pkg/def/
       linters:

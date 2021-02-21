@@ -16,6 +16,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
 	github.com/jackc/pgtype v1.6.2
 	github.com/jmoiron/sqlx v1.3.1
+	github.com/laher/mergefs v0.1.0
 	github.com/lib/pq v1.9.0
 	github.com/mattn/goveralls v0.0.7
 	github.com/nats-io/nats-streaming-server v0.20.0 // indirect
@@ -37,7 +38,6 @@ require (
 	github.com/powerman/sqlxx v0.2.0
 	github.com/powerman/structlog v0.7.1
 	github.com/prometheus/client_golang v1.9.0
-	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.7.0
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/smartystreets/goconvey v1.6.4

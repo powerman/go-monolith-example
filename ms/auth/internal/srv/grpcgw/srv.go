@@ -1,25 +1,20 @@
 // Package grpcgw provides grpc-gateway server.
 package grpcgw
 
-//go:generate -command statik sh -c "$(git rev-parse --show-toplevel)/.gobincache/$DOLLAR{DOLLAR}0 \"$DOLLAR{DOLLAR}@\"" statik
-//go:generate rm -rf statik
-//go:generate statik -ns "Swagger UI" -src ../../../../../web/static/swagger-ui
-//go:generate mv statik/statik.go statik/statik-swaggerui.go
-//go:generate statik -ns "OpenAPI" -src ../../../../../api/proto -include "*.swagger.json"
-//go:generate mv statik/statik.go statik/statik-openapi.go
-
 import (
 	"context"
 	"crypto/x509"
 	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/rakyll/statik/fs"
+	"github.com/laher/mergefs"
 
+	"github.com/powerman/go-monolith-example/api/proto"
 	api "github.com/powerman/go-monolith-example/api/proto/powerman/example/auth"
-	"github.com/powerman/go-monolith-example/ms/auth/internal/srv/grpcgw/statik"
 	"github.com/powerman/go-monolith-example/pkg/grpcx"
 	"github.com/powerman/go-monolith-example/pkg/netx"
+	"github.com/powerman/go-monolith-example/third_party"
+	"github.com/powerman/go-monolith-example/web"
 )
 
 // Ctx is a synonym for convenience.
@@ -49,18 +44,10 @@ func NewServer(cfg Config) (*http.ServeMux, error) {
 		return nil, err
 	}
 
-	statikOpenAPI, err := fs.NewWithNamespace(statik.OpenAPI)
-	if err != nil {
-		return nil, err
-	}
-	statikSwaggerUI, err := fs.NewWithNamespace(statik.SwaggerUI)
-	if err != nil {
-		return nil, err
-	}
-
 	mux := http.NewServeMux()
 	mux.Handle(cfg.GRPCGWPattern, noCache(corsAllowAll(gw)))
-	mux.Handle(cfg.OpenAPIPattern, http.StripPrefix(cfg.OpenAPIPattern, http.FileServer(statikOpenAPI)))
-	mux.Handle(cfg.SwaggerUIPattern, http.StripPrefix(cfg.SwaggerUIPattern, http.FileServer(statikSwaggerUI)))
+	mux.Handle(cfg.OpenAPIPattern, http.StripPrefix(cfg.OpenAPIPattern, http.FileServer(http.FS(proto.OpenAPI))))
+	mux.Handle(cfg.SwaggerUIPattern, http.StripPrefix(cfg.SwaggerUIPattern, http.FileServer(http.FS(
+		mergefs.Merge(web.SwaggerUI, third_party.SwaggerUI)))))
 	return mux, nil
 }
