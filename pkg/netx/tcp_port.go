@@ -5,12 +5,19 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/powerman/must"
 )
 
-// UnusedTCPPort returns random unused TCP port at host.
+//nolint:gochecknoglobals // By design.
+var (
+	usedTCPPort   = make(map[int]int)
+	usedTCPPortMu sync.Mutex
+)
+
+// UnusedTCPPort returns random unique unused TCP port at host.
 func UnusedTCPPort(host string) (port int) {
 	var portStr string
 	ln, err := net.Listen("tcp", host+":0")
@@ -24,6 +31,19 @@ func UnusedTCPPort(host string) (port int) {
 		port, err = strconv.Atoi(portStr)
 	}
 	must.NoErr(err)
+
+	usedTCPPortMu.Lock()
+	used := usedTCPPort[port]
+	usedTCPPort[port]++
+	usedTCPPortMu.Unlock()
+	if used > 0 {
+		const maxRecursion = 3
+		if used > maxRecursion {
+			panic(fmt.Sprintf("same TCP port returned multiple times: %d", port))
+		}
+		return UnusedTCPPort(host)
+	}
+
 	return port
 }
 
