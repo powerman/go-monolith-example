@@ -16,6 +16,7 @@ import (
 
 	"github.com/powerman/appcfg"
 	"github.com/powerman/pqx"
+	"github.com/powerman/sensitive"
 	"github.com/spf13/pflag"
 	"golang.org/x/text/unicode/norm"
 
@@ -104,7 +105,7 @@ type ServeConfig struct {
 	BindAddrInt      netx.Addr
 	BindGRPCGWAddr   netx.Addr
 	BindMetricsAddr  netx.Addr
-	Secret           []byte
+	Secret           sensitive.Bytes
 	TLSCACert        string
 	TLSCert          string
 	TLSCertInt       string

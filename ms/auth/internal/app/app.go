@@ -123,7 +123,7 @@ const (
 
 // Config contains configuration for business-logic.
 type Config struct {
-	Secret []byte
+	Secret sensitive.Bytes
 }
 
 // App implements interface Appl.
