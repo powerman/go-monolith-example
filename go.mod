@@ -10,7 +10,7 @@ require (
 	github.com/golang/mock v1.5.0
 	github.com/golang/protobuf v1.4.3
 	github.com/golangci/golangci-lint v1.37.1
-	github.com/googleapis/api-linter v1.15.0
+	github.com/googleapis/api-linter v1.16.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.2.0
