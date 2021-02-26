@@ -21,7 +21,7 @@ require (
 	github.com/mattn/goveralls v0.0.7
 	github.com/nats-io/nats-streaming-server v0.20.0 // indirect
 	github.com/nats-io/nats.go v1.10.0
-	github.com/nats-io/stan.go v0.8.2
+	github.com/nats-io/stan.go v0.8.3
 	github.com/oklog/ulid v1.3.1
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/powerman/appcfg v0.6.0
