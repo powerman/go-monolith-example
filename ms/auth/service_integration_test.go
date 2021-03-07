@@ -46,7 +46,7 @@ func TestSmoke(tt *testing.T) {
 
 	s := &Service{cfg: cfg}
 
-	pc, _, _, _ := runtime.Caller(1)
+	pc, _, _, _ := runtime.Caller(0)
 	suffix := runtime.FuncForPC(pc).Name()
 	suffix = suffix[:strings.LastIndex(suffix, ".")]
 	_, cleanup, err := pqx.EnsureTempDB(tLogger(*t), suffix, cfg.Postgres.Config)
