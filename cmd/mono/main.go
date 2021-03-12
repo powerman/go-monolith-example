@@ -131,8 +131,9 @@ func runServeWithGracefulShutdown(_ *cobra.Command, _ []string) error {
 
 	services := make([]func(Ctx) error, len(embeddedServices))
 	for i := range embeddedServices {
+		name := embeddedServices[i].Name()
 		runServe := embeddedServices[i].RunServe
-		log := structlog.New(structlog.KeyApp, embeddedServices[i].Name())
+		log := structlog.New(structlog.KeyApp, name)
 		ctxStartup := structlog.NewContext(ctxStartup, log) //nolint:govet // Shadow.
 		services[i] = func(ctxShutdown Ctx) error {
 			ctxShutdown = structlog.NewContext(ctxShutdown, log)
