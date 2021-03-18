@@ -1,3 +1,6 @@
+//go:generate -command mockgen sh -c "$(git rev-parse --show-toplevel)/.gobincache/$DOLLAR{DOLLAR}0 \"$DOLLAR{DOLLAR}@\"" mockgen
+//go:generate mockgen -package=$GOPACKAGE -source=$GOFILE -destination=mock.$GOFILE
+
 package apix
 
 import (
@@ -24,6 +27,19 @@ const (
 
 var errRespTooLarge = errors.New("HTTP response is too large")
 
+// UserAgent is a convenience wrapper for http.Client, suitable for
+// fetching small responses (because it reads full response in memory).
+type UserAgent interface {
+	// Do sends an HTTP request and returns an HTTP response.
+	// It returns body for convenience - it's same as can be read from resp.Body.
+	// It saves body to file if log level is Debug and cfg.Debug and cfg.DumpDir is set.
+	// Returned resp.Body doesn't needs to be closed.
+	Do(ctx Ctx, req *http.Request, skip int) (_ *http.Response, body []byte, _ error)
+	// Log resp (both HTTP request and response).
+	// It does nothing if cfg.Debug is false.
+	Log(ctx Ctx, resp *http.Response, body []byte)
+}
+
 // UserAgentConfig contains configuration for UserAgent.
 type UserAgentConfig struct {
 	Timeout     time.Duration // Default: 30s.
@@ -32,38 +48,31 @@ type UserAgentConfig struct {
 	DumpDir     string        // If not empty and Debug - dump response body to files in this dir.
 }
 
-// UserAgent is a convenience wrapper for http.Client, suitable for
-// fetching small responses (because it reads full response in memory).
-type UserAgent struct {
+type userAgent struct {
 	cfg    UserAgentConfig
-	Client *http.Client // Default: &http.Client{}. Feel free to change as needed.
+	client *http.Client // Default: &http.Client{}. Feel free to change as needed.
 }
 
 // NewUserAgent creates and returns new UserAgent.
-func NewUserAgent(cfg UserAgentConfig) *UserAgent {
+func NewUserAgent(cfg UserAgentConfig) UserAgent {
 	if cfg.Timeout == 0 {
 		cfg.Timeout = defaultTimeout
 	}
 	if cfg.MaxBodySize == 0 {
 		cfg.MaxBodySize = maxBodySize
 	}
-	return &UserAgent{
+	return &userAgent{
 		cfg:    cfg,
-		Client: &http.Client{},
+		client: &http.Client{},
 	}
 }
 
-// Do sends an HTTP request and returns an HTTP response.
-// It returns body for convenience - it's same as can be read from resp.Body.
-// It saves body to file if log level is Debug and cfg.Debug and cfg.DumpDir is set.
-// Returned resp.Body doesn't needs to be closed.
-func (x *UserAgent) Do(ctx Ctx, req *http.Request, skip int) (_ *http.Response, body []byte, _ error) {
-	// TODO Add metrics?
+func (x *userAgent) Do(ctx Ctx, req *http.Request, skip int) (_ *http.Response, body []byte, _ error) {
 	log := structlog.FromContext(ctx, nil)
 	ctx, cancel := context.WithTimeout(ctx, x.cfg.Timeout)
 	defer cancel()
 
-	resp, err := x.Client.Do(req.WithContext(ctx))
+	resp, err := x.client.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -88,9 +97,7 @@ func (x *UserAgent) Do(ctx Ctx, req *http.Request, skip int) (_ *http.Response, 
 	return resp, body, nil
 }
 
-// Log resp (both HTTP request and response).
-// It does nothing if cfg.Debug is false.
-func (x *UserAgent) Log(ctx Ctx, resp *http.Response, body []byte) {
+func (x *userAgent) Log(ctx Ctx, resp *http.Response, body []byte) {
 	log := structlog.FromContext(ctx, nil)
 	if !(log.IsDebug() && x.cfg.Debug) {
 		return
@@ -111,7 +118,7 @@ func (x *UserAgent) Log(ctx Ctx, resp *http.Response, body []byte) {
 	log.Debug("response", "dump", dump.String())
 }
 
-func (x *UserAgent) dump(ctx Ctx, resp *http.Response, body []byte, skip int) {
+func (x *userAgent) dump(ctx Ctx, resp *http.Response, body []byte, skip int) {
 	log := structlog.FromContext(ctx, nil)
 	if !(log.IsDebug() && x.cfg.Debug && x.cfg.DumpDir != "") {
 		return
