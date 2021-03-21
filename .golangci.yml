@@ -7,7 +7,7 @@ run:
   #concurrency: 4
 
   # timeout for analysis, e.g. 30s, 5m, default is 1m
-  timeout: 5m
+  #timeout: 1m
 
   # exit code when at least one issue was found, default is 1
   #issues-exit-code: 1
@@ -113,7 +113,7 @@ linters-settings:
     default-signifies-exhaustive: false
   exhaustivestruct:
     struct-patterns:
-      - '*.ExampleTypeToAlwaysFillAllFields'
+      - 'github.com/powerman/go-monolith-example/ms/*/internal/config.[A-Z]*Config'
   funlen:
     lines: 60
     statements: 40
@@ -233,7 +233,7 @@ linters-settings:
       regexp:
         # define here regexp type values, for example
         # AUTHOR: .*@mycompany\.com
-    template: # |
+    template: # |-
       # put here copyright header template for source code files, for example:
       # Note: {{ YEAR }} is a builtin value that returns the year relative to the current machine time.
       #
@@ -301,10 +301,12 @@ linters-settings:
           #- (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
 
     # enable or disable analyzers by name
+    # run `go tool vet help` to see all analyzers
     #enable:
     #   - atomicalign
     enable-all: true
-    #disable:
+    disable:
+      - fieldalignment
     #   - shadow
     #disable-all: false
   depguard:
@@ -316,6 +318,7 @@ linters-settings:
       - github.com/pkg/errors
       - github.com/prometheus/client_golang/prometheus/promauto
       - github.com/prometheus/common/log
+      - github.com/golang/protobuf
     packages-with-error-message:
       # specify an error message to output when a blacklisted package is used
       - log: "logging is allowed only by github.com/powerman/structlog"
@@ -421,6 +424,8 @@ linters-settings:
     # Allow calls and assignments to be cuddled as long as the lines have any
     # matching variables, fields or types. Default is true.
     allow-assign-and-call: true
+    # Allow assignments to be cuddled with anything. Default is false.
+    allow-assign-and-anything: false
     # Allow multiline assignments to be cuddled. Default is true.
     allow-multiline-assign: true
     # Allow declarations (var) to be cuddled.
@@ -451,6 +456,11 @@ linters-settings:
       - ginkgo\\.F.* # these are used just for local development
     # Exclude godoc examples from forbidigo checks.  Default is true.
     exclude_godoc_examples: false
+  importas:
+    # using `servingv1` alias for `knative.dev/serving/pkg/apis/serving/v1` package
+    #servingv1: knative.dev/serving/pkg/apis/serving/v1
+    # using `autoscalingv1alpha1` alias for `knative.dev/serving/pkg/apis/autoscaling/v1alpha1` package
+    #autoscalingv1alpha1: knative.dev/serving/pkg/apis/autoscaling/v1alpha1
 
   # The custom section can be used to define linter plugins to be loaded at runtime. See README doc
   #  for more info.
@@ -504,9 +514,11 @@ issues:
         - bodyclose
         - dupl
         - errcheck
+        - forcetypeassert
         - funlen
         - gochecknoglobals
         - gochecknoinits
+        - goconst
         - gocyclo
         - gosec
         - maligned
@@ -653,7 +665,6 @@ issues:
         - gosimple
         - govet
         - ineffassign
-        - interfacer
         - lll
         - maligned
         - misspell
