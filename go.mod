@@ -14,7 +14,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.3.0
 	github.com/jackc/pgtype v1.6.2
-	github.com/jmoiron/sqlx v1.3.1
+	github.com/jmoiron/sqlx v1.3.3
 	github.com/laher/mergefs v0.1.0
 	github.com/lib/pq v1.10.0
 	github.com/mattn/goveralls v0.0.7
@@ -33,7 +33,7 @@ require (
 	github.com/powerman/narada4d v1.7.1
 	github.com/powerman/pqx v0.7.0
 	github.com/powerman/rpc-codec v1.2.2
-	github.com/powerman/sensitive v0.0.5
+	github.com/powerman/sensitive v0.0.6
 	github.com/powerman/sqlxx v0.2.0
 	github.com/powerman/structlog v0.7.1
 	github.com/prometheus/client_golang v1.10.0
