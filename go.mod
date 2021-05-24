@@ -20,8 +20,8 @@ require (
 	github.com/lib/pq v1.9.0
 	github.com/mattn/goveralls v0.0.7
 	github.com/nats-io/nats-streaming-server v0.20.0 // indirect
-	github.com/nats-io/nats.go v1.10.0
-	github.com/nats-io/stan.go v0.8.2
+	github.com/nats-io/nats.go v1.11.0
+	github.com/nats-io/stan.go v0.9.0
 	github.com/oklog/ulid v1.3.1
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/powerman/appcfg v0.6.0
@@ -43,7 +43,7 @@ require (
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
+	golang.org/x/crypto v0.0.0-20210314154223-e6e6c4f2bb5b
 	golang.org/x/oauth2 v0.0.0-20210220000619-9bb904979d93
 	golang.org/x/text v0.3.5
 	golang.org/x/tools v0.1.0
