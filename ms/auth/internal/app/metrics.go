@@ -24,7 +24,7 @@ func InitMetrics(reg *prometheus.Registry) {
 	metric.ErrAccessDeniedTotal = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
-			Name:      "ErrAccessDenied_total",
+			Name:      "err_access_denied_total",
 			Help:      "Amount of Access Denied errors.",
 		},
 	)

@@ -38,7 +38,7 @@ jobs:
       - image: "mysql:5.7"
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      - image: "postgres:12.6"
+      - image: "postgres:12.7"
         environment:
           POSTGRES_PASSWORD: "postgres"
           # configs/insecure-dev-pki/issued/postgres.crt
@@ -104,8 +104,8 @@ jobs:
             echo "$KEY" | install -m 0440 -o root -g postgres /dev/stdin /server.key
             exec docker-entrypoint.sh postgres -c ssl=on \
                 --ssl_cert_file=/server.crt --ssl_key_file=/server.key
-      - image: "nats:2.1.9"
-      - image: "nats-streaming:0.20.0"
+      - image: "nats:2.2.6"
+      - image: "nats-streaming:0.21.2"
         command:
           - "--cluster_id=ci"
           - "--max_channels=0"

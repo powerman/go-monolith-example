@@ -106,7 +106,7 @@ func (x *userAgent) Log(ctx Ctx, resp *http.Response, body []byte) {
 	const maxLogBodyBytes = 1019 // Prime number to increase chance last line won't be full and cut mark will be easier to spot.
 	const cutMark = "....."
 	if len(body) > maxLogBodyBytes {
-		part := append(body[:maxLogBodyBytes:maxLogBodyBytes], []byte(cutMark)...)
+		part := append(body[:maxLogBodyBytes:maxLogBodyBytes], []byte(cutMark)...) //nolint:gocritic // Not same slice.
 		defer func(r io.ReadCloser) { resp.Body = r }(resp.Body)
 		resp.Body = ioutil.NopCloser(bytes.NewReader(part))
 	}

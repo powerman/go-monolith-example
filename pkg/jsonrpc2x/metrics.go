@@ -71,7 +71,7 @@ func NewMetrics( //nolint:funlen // By design.
 			if _, ok := errsExtra[methodName]; !ok {
 				panic(fmt.Sprintf("missing ErrsExtra[%s]", methodName))
 			}
-			codes := append(commonCodes, codes(errsExtra[methodName])...)
+			codes := append(commonCodes, codes(errsExtra[methodName])...) //nolint:gocritic // Not same slice.
 			for _, code := range codes {
 				l := prometheus.Labels{
 					methodLabel: methodName,
