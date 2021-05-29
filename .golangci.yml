@@ -299,10 +299,6 @@ linters-settings:
     # it's a comma-separated list of prefixes
     local-prefixes: github.com/powerman/go-monolith-example
 
-  golint:
-    # minimal confidence for issues, default is 0.8
-    #min-confidence: 0.8
-
   gomnd:
     settings:
       mnd:
@@ -620,12 +616,15 @@ linters:
   disable:
     - dogsled # questionable
     - dupl
+    - golint # deprecated
     - ifshort # questionable
+    - interfacer # deprecated
     - lll
     - maligned # premature optimization
     - nlreturn
     - paralleltest # questionable
     - prealloc
+    - scopelint # deprecated
     - wrapcheck # enable after implementing https://github.com/tomarrell/wrapcheck/issues/1
     - wsl # questionable
   #disable-all: false
@@ -795,7 +794,6 @@ issues:
         - gofumpt
         - goheader
         - goimports
-        - golint
         - gomnd
         - gomodguard
         - goprintffuncname
@@ -813,7 +811,6 @@ issues:
         - nolintlint
         - prealloc
         - rowserrcheck
-        - scopelint
         - sqlclosecheck
         - staticcheck
         - structcheck

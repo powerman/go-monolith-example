@@ -2,9 +2,9 @@
 set -e -o pipefail
 export PATH="$PWD/.gobincache:$PATH"
 go generate
-HADOLINT_VER="1.22.1"
-hadolint --version | grep -wq v$HADOLINT_VER || curl -sSfL https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VER}/hadolint-"$(uname)"-x86_64 | install -D /dev/stdin .gobincache/hadolint
-SHELLCHECK_VER="0.7.1"
+HADOLINT_VER="2.4.1"
+hadolint --version | grep -wq $HADOLINT_VER || curl -sSfL https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VER}/hadolint-"$(uname)"-x86_64 | install -D /dev/stdin .gobincache/hadolint
+SHELLCHECK_VER="0.7.2"
 shellcheck --version | grep -wq $SHELLCHECK_VER || curl -sSfL https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VER}/shellcheck-v${SHELLCHECK_VER}."$(uname)".x86_64.tar.xz | tar xJf - -C .gobincache --strip-components=1 shellcheck-v${SHELLCHECK_VER}/shellcheck
 set -x
 
