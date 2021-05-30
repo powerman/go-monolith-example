@@ -2,6 +2,7 @@ package apix
 
 import (
 	"context"
+	"net"
 
 	"github.com/powerman/rpc-codec/jsonrpc2"
 	"github.com/powerman/structlog"
@@ -32,11 +33,11 @@ func (c *JSONRPC2Ctx) NewContext(
 ) {
 	ctx = c.Context()
 
-	remote := "unknown" // non-HTTP RPC call (like in tests)
+	remoteIP := "" // non-HTTP RPC call (like in tests)
 	if r := jsonrpc2.HTTPRequestFromContext(ctx); r != nil {
-		remote = xff.GetRemoteAddr(r)
+		remoteIP, _, _ = net.SplitHostPort(xff.GetRemoteAddr(r))
 	}
-	ctx = context.WithValue(ctx, contextKeyRemoteIP, remote)
+	ctx = context.WithValue(ctx, contextKeyRemoteIP, remoteIP)
 
 	methodName = reflectx.CallerMethodName(1)
 	ctx = context.WithValue(ctx, contextKeyMethodName, methodName)
@@ -50,7 +51,7 @@ func (c *JSONRPC2Ctx) NewContext(
 
 	log = structlog.New(
 		structlog.KeyApp, service,
-		def.LogRemoteIP, remote,
+		def.LogRemoteIP, remoteIP,
 		def.LogFunc, methodName,
 		def.LogUserName, auth.UserName,
 	)

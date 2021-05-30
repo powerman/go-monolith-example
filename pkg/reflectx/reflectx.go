@@ -7,12 +7,6 @@ import (
 	"strings"
 )
 
-// RPCMethodsOf require receiver value used for net/rpc.Register and
-// returns all it RPC methods (detected in same way as net/rpc does).
-func RPCMethodsOf(v interface{}) []string {
-	return suitableMethods(reflect.TypeOf(v))
-}
-
 // MethodsOf require pointer to interface (e.g.: new(app.Appl)) and
 // returns all it methods.
 func MethodsOf(v interface{}) []string {
