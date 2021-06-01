@@ -3,7 +3,7 @@ module github.com/powerman/go-monolith-example
 go 1.16
 
 require (
-	github.com/bufbuild/buf v0.43.1
+	github.com/bufbuild/buf v0.43.2
 	github.com/cheekybits/genny v1.0.1-0.20200709201058-3e22f1a88ff2
 	github.com/elazarl/goproxy v0.0.0-20210110162100-a92cc753f88e // indirect
 	github.com/go-sql-driver/mysql v1.6.0
