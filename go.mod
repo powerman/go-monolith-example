@@ -7,7 +7,7 @@ require (
 	github.com/cheekybits/genny v1.0.1-0.20200709201058-3e22f1a88ff2
 	github.com/elazarl/goproxy v0.0.0-20210110162100-a92cc753f88e // indirect
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/golang/mock v1.5.0
+	github.com/golang/mock v1.6.0
 	github.com/golangci/golangci-lint v1.40.1
 	github.com/googleapis/api-linter v1.24.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
