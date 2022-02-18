@@ -3,11 +3,11 @@ module github.com/powerman/go-monolith-example
 go 1.16
 
 require (
-	github.com/bufbuild/buf v0.43.1
+	github.com/bufbuild/buf v1.0.0
 	github.com/cheekybits/genny v1.0.1-0.20200709201058-3e22f1a88ff2
 	github.com/elazarl/goproxy v0.0.0-20210110162100-a92cc753f88e // indirect
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/golang/mock v1.5.0
+	github.com/golang/mock v1.6.0
 	github.com/golangci/golangci-lint v1.40.1
 	github.com/googleapis/api-linter v1.24.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
@@ -40,16 +40,16 @@ require (
 	github.com/rs/cors v1.7.0
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/smartystreets/goconvey v1.6.4
-	github.com/spf13/cobra v1.1.3
+	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
-	golang.org/x/text v0.3.6
-	golang.org/x/tools v0.1.2
-	google.golang.org/genproto v0.0.0-20210524171403-669157292da3
-	google.golang.org/grpc v1.39.0-dev.0.20210519181852-3dd75a6888ce
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
+	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
+	golang.org/x/text v0.3.7
+	golang.org/x/tools v0.1.9
+	google.golang.org/genproto v0.0.0-20220211171837-173942840c17
+	google.golang.org/grpc v1.45.0-dev.0.20220209221444-a354b1eec350
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
-	google.golang.org/protobuf v1.26.1-0.20210520194023-50a85913fbce
+	google.golang.org/protobuf v1.27.1
 	gotest.tools/gotestsum v1.6.4
 	moul.io/http2curl v1.0.0 // indirect
 )
