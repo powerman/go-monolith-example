@@ -68,7 +68,7 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Run PostgreSQL service
         run: |
@@ -133,7 +133,7 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Turnstyle
         uses: softprops/turnstyle@v1
