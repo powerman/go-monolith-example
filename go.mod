@@ -36,20 +36,20 @@ require (
 	github.com/powerman/sensitive v0.0.6
 	github.com/powerman/sqlxx v0.2.0
 	github.com/powerman/structlog v0.7.1
-	github.com/prometheus/client_golang v1.10.0
+	github.com/prometheus/client_golang v1.13.0
 	github.com/rs/cors v1.7.0
 	github.com/sebest/xff v0.0.0-20210106013422-671bd2870b3a
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
-	golang.org/x/text v0.3.6
+	golang.org/x/oauth2 v0.0.0-20220223155221-ee480838109b
+	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.2
 	google.golang.org/genproto v0.0.0-20210524171403-669157292da3
 	google.golang.org/grpc v1.39.0-dev.0.20210519181852-3dd75a6888ce
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
-	google.golang.org/protobuf v1.26.1-0.20210520194023-50a85913fbce
+	google.golang.org/protobuf v1.28.1
 	gotest.tools/gotestsum v1.6.4
 	moul.io/http2curl v1.0.0 // indirect
 )
