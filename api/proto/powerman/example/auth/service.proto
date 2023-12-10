@@ -1,5 +1,8 @@
 syntax = "proto3";
 
+// (-- api-linter: core::0191::proto-package=disabled
+//     aip.dev/not-precedent: The parent path is api/proto --)
+
 package powerman.example.auth;
 
 import "google/api/annotations.proto";
@@ -55,7 +58,7 @@ message CreateAccountRequest {
     Account account = 1 [(google.api.field_behavior) = REQUIRED];
     // The ID to use for the account.
     // This value should be 4-63 characters [a-z0-9-].
-    string account_id = 2;
+    string account_id = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // Request.
@@ -63,38 +66,38 @@ message SigninIdentityRequest {
     // Authentication using username and password.
     message AccountAuth {
         // This value should be 4-63 characters [a-z0-9-].
-        string account_id = 1;
+        string account_id = 1 [(google.api.field_behavior) = REQUIRED];
         // Any value.
-        string password = 2;
+        string password = 2 [(google.api.field_behavior) = REQUIRED];
     }
     // Authentication user email and password.
     message EmailAuth {
         // This value should contain [@].
-        string email = 1;
+        string email = 1 [(google.api.field_behavior) = REQUIRED];
         // Any value.
-        string password = 2;
+        string password = 2 [(google.api.field_behavior) = REQUIRED];
     }
     // Different ways to authenticate.
     oneof auth {
         // By username.
-        AccountAuth account = 1;
+        AccountAuth account = 1 [(google.api.field_behavior) = REQUIRED];
         // By email.
-        EmailAuth email = 2;
+        EmailAuth email = 2 [(google.api.field_behavior) = REQUIRED];
     }
 }
 
 // Response.
 message SigninIdentityResponse {
     // Opaque.
-    string access_token = 1;
+    string access_token = 1 [(google.api.field_behavior) = REQUIRED];
     // User/Access details.
-    User user = 2;
+    User user = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Request.
 message SignoutIdentityRequest {
     // Set to true to invalidate all user's access_token.
-    bool everywhere = 1;
+    bool everywhere = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Response.
@@ -103,13 +106,13 @@ message SignoutIdentityResponse {}
 // Account contains data needed for authentication.
 message Account {
     // Format: "accounts/{account_id}".
-    string name = 1;
+    string name = 1 [(google.api.field_behavior) = REQUIRED];
     // Default identity connected to the account.
-    User user = 2;
+    User user = 2 [(google.api.field_behavior) = REQUIRED];
     // Must be strong enough.
-    string password = 16 [(google.api.field_behavior) = INPUT_ONLY];
+    string password = 16 [(google.api.field_behavior) = OPTIONAL];
     // Primary email, needed to reset password.
-    string email = 3;
+    string email = 3 [(google.api.field_behavior) = REQUIRED];
     // Account create time.
     // Output only.
     google.protobuf.Timestamp create_time = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
@@ -118,11 +121,11 @@ message Account {
 // User is an identity tied to Account.
 message User {
     // Format: "users/{user_uid}".
-    string name = 1;
+    string name = 1 [(google.api.field_behavior) = REQUIRED];
     // By default set to {account_id}.
-    string display_name = 2;
+    string display_name = 2 [(google.api.field_behavior) = REQUIRED];
     // Permissions.
-    Access access = 3;
+    Access access = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Access describes identity's permissions.
@@ -139,5 +142,5 @@ message Access {
         ROLE_USER = 2;
     }
     // User's role.
-    Role role = 1;
+    Role role = 1 [(google.api.field_behavior) = REQUIRED];
 }

@@ -8,6 +8,7 @@ volumes:
 services:
 
   mysql:
+    platform: "linux/amd64"
     image: "mysql:5.7" # We're using 5.7.
     container_name: "mono_mysql"
     restart: "always"
@@ -98,7 +99,9 @@ services:
   mono:
     build:
       context: .
-      dockerfile: use `./scripts/build` instead of `docker-compose build`
+      args:
+        MONO_VERSION: ${MONO_VERSION:-latest}
+      dockerfile: Dockerfile
     image: "go-monolith-example:latest"
     container_name: mono_mono
     restart: always
