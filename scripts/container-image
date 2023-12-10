@@ -1,0 +1,7 @@
+#!/bin/bash
+
+MONO_VERSION="$(git log -1 --format='%h')"
+IMAGE_VERSION="${MONO_VERSION}"
+IMAGE_NAME="$(basename "$(go list -m)")"
+
+docker build --build-arg "MONO_VERSION=${MONO_VERSION}" -t "${IMAGE_NAME}:${IMAGE_VERSION}" .
