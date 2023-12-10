@@ -113,8 +113,28 @@ for more details.
 - Go 1.16
 - [Docker](https://docs.docker.com/install/) 19.03+
 - [Docker Compose](https://docs.docker.com/compose/install/) 1.25+
+- [Buf Build](https://buf.build/docs/installation) 1.1.0
+- [protoc-gen-go v1.26.0-devel]() 1.26+
+- [Api Linter](https://linter.aip.dev/) 1.58+
+- [Shellcheck](https://www.shellcheck.net/) 0.9+
+- [golangci-lint](https://golangci-lint.run/) 1.55+
 
 ### Setup
+
+Install gRPC libraries
+```shell
+go install github.com/bufbuild/buf/cmd/buf@v1.1.0
+
+go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway \
+    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2 \
+    google.golang.org/protobuf/cmd/protoc-gen-go \
+    google.golang.org/grpc/cmd/protoc-gen-go-grpc
+```
+
+Instsll API Linter
+```shell
+go install github.com/googleapis/api-linter/cmd/api-linter@latest
+```
 
 1. After cloning the repo copy `env.sh.dist` to `env.sh`.
 2. Review `env.sh` and update for your system as needed.
@@ -129,7 +149,7 @@ for more details.
    and also it uses gRPC with authentication which also require TLS certs,
    so you'll need to create certificate to run it on localhost - follow
    instructions in [Create local CA to issue localhost HTTPS
-   certificates](https://gist.github.com/powerman/2fc4b1a5aee62dd9491cee7f75ead0b4).
+   certificates](./docs/ca-certificate.md).
 2. Or you can just use certificates in `configs/insecure-dev-pki`, which
    was created this way:
 
