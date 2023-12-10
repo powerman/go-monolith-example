@@ -2,6 +2,8 @@ syntax = "proto3";
 
 // (-- api-linter: core::0127::http-annotation=disabled
 //     aip.dev/not-precedent: No HTTP support for private API. --)
+// (-- api-linter: core::0191::proto-package=disabled
+//     aip.dev/not-precedent: The parent path is api/proto --)
 
 package powerman.example.auth;
 
